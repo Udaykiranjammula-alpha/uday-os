@@ -117,8 +117,12 @@ export function IPhoneScreenContent({
     if (e.pointerType !== 'mouse' || e.button !== 0) return;
 
     const target = e.target as HTMLElement | null;
-    // Exclude form controls and specialized slider capsules
-    if (target?.closest('input, textarea, select, .camera-screen, .cc-slider-capsule, .brightness-slider-container, .volume-slider-container')) {
+    // Exclude form controls, camera, sliders, and arcade game controls from screen drag-scroll
+    if (
+      target?.closest(
+        'input, textarea, select, .camera-screen, .cc-slider-capsule, .brightness-slider-container, .volume-slider-container, .arcade-canvas-wrap, .arcade-app-page, .calc-grid, .camera-control-sensor-strip'
+      )
+    ) {
       return;
     }
 
