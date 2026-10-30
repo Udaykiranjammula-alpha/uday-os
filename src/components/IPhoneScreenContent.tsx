@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DynamicIsland } from './DynamicIsland';
 import { StatusBar } from './StatusBar';
@@ -25,6 +25,7 @@ import { MessagesApp } from '../apps/MessagesApp';
 import { LockScreen } from './LockScreen';
 import { SpotlightSearch } from './SpotlightSearch';
 import type { Project } from '../types';
+import { projects } from '../data/projects';
 
 export interface IPhoneScreenContentProps {
   color: 'plum' | 'desert';
@@ -58,10 +59,89 @@ export function IPhoneScreenContent({
 
   const isInApp = currentRoute !== 'home' || activeProject !== null || isDemoOpen;
 
+  // Authentic mouse drag-to-scroll on desktop across all iPhone apps
+  const dragScrollRef = useRef<{
+    isDown: boolean;
+    startY: number;
+    startScrollTop: number;
+    scrollTarget: HTMLElement | null;
+    hasMoved: boolean;
+  }>({
+    isDown: false,
+    startY: 0,
+    startScrollTop: 0,
+    scrollTarget: null,
+    hasMoved: false,
+  });
+
+  const onScreenPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    // Only handle mouse drag-scrolling; touch devices already have native touch scroll
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+
+    const target = e.target as HTMLElement | null;
+    if (target?.closest('input, textarea, select, .camera-screen, .control-center-sheet, .brightness-slider-container, .volume-slider-container')) {
+      return;
+    }
+
+    // Find nearest scrollable container
+    let node: HTMLElement | null = target;
+    let scrollEl: HTMLElement | null = null;
+    while (node && !node.classList.contains('iphone-screen')) {
+      const style = window.getComputedStyle(node);
+      const overflowY = style.overflowY;
+      if ((overflowY === 'auto' || overflowY === 'scroll') && node.scrollHeight > node.clientHeight + 4) {
+        scrollEl = node;
+        break;
+      }
+      node = node.parentElement;
+    }
+
+    if (!scrollEl) return;
+
+    dragScrollRef.current = {
+      isDown: true,
+      startY: e.clientY,
+      startScrollTop: scrollEl.scrollTop,
+      scrollTarget: scrollEl,
+      hasMoved: false,
+    };
+  };
+
+  const onScreenPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const state = dragScrollRef.current;
+    if (!state.isDown || !state.scrollTarget) return;
+
+    const dy = e.clientY - state.startY;
+    if (Math.abs(dy) > 4) {
+      state.hasMoved = true;
+    }
+    if (state.hasMoved) {
+      state.scrollTarget.scrollTop = state.startScrollTop - dy;
+    }
+  };
+
+  const onScreenPointerUp = () => {
+    dragScrollRef.current.isDown = false;
+    dragScrollRef.current.scrollTarget = null;
+  };
+
+  const onScreenClickCapture = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (dragScrollRef.current.hasMoved) {
+      e.preventDefault();
+      e.stopPropagation();
+      dragScrollRef.current.hasMoved = false;
+    }
+  };
+
   return (
     <div
       className={`iphone-screen iphone-amoled-display appearance-dark ${isInApp ? 'in-app' : `wallpaper-${color}`}`}
       style={{ filter: brightness < 1 ? `brightness(${brightness})` : undefined }}
+      onPointerDown={onScreenPointerDown}
+      onPointerMove={onScreenPointerMove}
+      onPointerUp={onScreenPointerUp}
+      onPointerCancel={onScreenPointerUp}
+      onClickCapture={onScreenClickCapture}
     >
       {/* Fullscreen Flashlight Beam Effect */}
       {flashlightOn && (
@@ -167,7 +247,13 @@ export function IPhoneScreenContent({
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <GitHubApp onBack={() => onNavigate('home')} />
+              <GitHubApp
+                onBack={() => onNavigate('home')}
+                onOpenProjectDetail={(id) => {
+                  const found = projects.find((p) => p.id === id);
+                  if (found) setActiveProject(found);
+                }}
+              />
             </motion.div>
           ) : currentRoute === 'linkedin' ? (
             <motion.div

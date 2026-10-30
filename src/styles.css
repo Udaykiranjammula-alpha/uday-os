@@ -341,11 +341,15 @@ a {
 
 /* Personal App Pages (Experience, Toolkit, etc.) */
 .personal-app {
-  min-height: 100%;
+  flex: 1;
+  height: 100%;
+  min-height: 0;
   background: var(--app-background);
   color: var(--app-ink);
   padding: 10px 18px 36px;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   scrollbar-width: none;
 }
 .personal-nav {
@@ -562,11 +566,15 @@ a {
 
 /* Mail Native Compose App (Contact) */
 .mail-native-app {
-  min-height: 100%;
+  flex: 1;
+  height: 100%;
+  min-height: 0;
   background: var(--app-surface);
   color: var(--app-ink);
   padding: 10px 18px 36px;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   scrollbar-width: none;
 }
 .mail-native-nav {
@@ -702,11 +710,15 @@ a {
 
 /* App Store Styles - Exact prsd.dev Screenshot 1 */
 .store-page {
+  flex: 1;
+  height: 100%;
+  min-height: 0;
   background: var(--app-background);
   padding: 8px 18px 95px;
   color: var(--app-ink);
-  min-height: 100%;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   scrollbar-width: none;
 }
 .store-heading {
@@ -970,12 +982,14 @@ a {
 
 /* Photos App Styles - Exact prsd.dev Screenshot 2 */
 .native-photos {
-  padding-bottom: 85px;
-  min-height: 100%;
+  flex: 1;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   background: var(--app-background);
   color: var(--app-ink);
-  overflow-y: auto;
-  scrollbar-width: none;
+  overflow: hidden;
 }
 .media-header {
   display: flex;
@@ -1567,12 +1581,15 @@ a {
 /* Viewport */
 .iphone-screen-viewport {
   flex: 1;
+  min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 .page-screen-anim {
   flex: 1;
+  min-height: 0;
   width: 100%;
   height: 100%;
   overflow-y: auto;
@@ -1583,6 +1600,12 @@ a {
 }
 .in-app .page-screen-anim {
   background: #000000;
+  overflow: hidden;
+  height: 100%;
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 .page-screen-anim::-webkit-scrollbar { display: none; }
 
@@ -2186,6 +2209,8 @@ a {
 /* ================= EXACT LINKEDIN APP VIEW (MATCHING PRSD.DEV) ================= */
 .ios-linkedin-page {
   flex: 1;
+  height: 100%;
+  min-height: 0;
   background: #0f1115;
   color: #ffffff;
   display: flex;
@@ -2368,9 +2393,13 @@ a {
 }
 .linkedin-scroll-body {
   flex: 1;
+  min-height: 0;
+  height: 100%;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   scrollbar-width: none;
-  padding-bottom: 30px;
+  padding-bottom: 50px;
 }
 .linkedin-scroll-body::-webkit-scrollbar { display: none; }
 .linkedin-cover-photo {
@@ -2660,7 +2689,11 @@ a {
 /* ================= iOS SETTINGS APP ================= */
 .ios-settings-page {
   flex: 1;
+  height: 100%;
+  min-height: 0;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   scrollbar-width: none;
   background: #000000;
   color: #ffffff;
@@ -3052,6 +3085,8 @@ a {
 /* ================= TERMINAL APP STYLES ================= */
 .terminal-container {
   flex: 1;
+  height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   background: #090b0e;
@@ -3090,7 +3125,11 @@ a {
 }
 .terminal-scroll-area {
   flex: 1;
+  min-height: 0;
+  height: 100%;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   padding: 12px 14px;
   font-size: 12px;
   line-height: 1.5;
@@ -3808,7 +3847,9 @@ a {
 
 /* ================= INSTAGRAM APP FULL STYLING ================= */
 .instagram-container {
+  flex: 1;
   height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   background: var(--app-background);
@@ -3860,8 +3901,11 @@ a {
 }
 .ig-profile-scroll {
   flex: 1;
+  min-height: 0;
+  height: 100%;
   overflow-y: auto;
-  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   scrollbar-width: none;
   padding-bottom: 80px;
 }
@@ -4194,7 +4238,9 @@ a {
 
 /* ================= APPLE FILES / RESUME QUICK LOOK APP ================= */
 .files-page-container {
+  flex: 1;
   height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   background: var(--app-background);
@@ -4246,8 +4292,11 @@ a {
 }
 .files-scroll-viewport {
   flex: 1;
+  min-height: 0;
+  height: 100%;
   overflow-y: auto;
-  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   scrollbar-width: none;
   padding: 12px 14px 80px;
 }
@@ -4554,7 +4603,9 @@ a {
 
 /* ================= NATIVE GITHUB APP (AUTHENTIC IOS CLIENT) ================= */
 .github-native-app {
+  flex: 1;
   height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   background: var(--app-background);
@@ -4599,10 +4650,16 @@ a {
 }
 .github-scroll-body {
   flex: 1;
+  min-height: 0;
+  height: 100%;
   overflow-y: auto;
-  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   scrollbar-width: none;
-  padding: 12px 14px 80px;
+  padding: 12px 14px 100px;
+}
+.github-scroll-body::-webkit-scrollbar {
+  display: none;
 }
 
 /* Profile Card */
@@ -4792,6 +4849,11 @@ a {
   display: flex;
   align-items: center;
   gap: 6px;
+  cursor: pointer;
+  transition: opacity 0.18s ease;
+}
+.gh-repo-title-box:hover strong {
+  text-decoration: underline;
 }
 .gh-book-icon {
   color: var(--app-muted);
@@ -5022,12 +5084,16 @@ a {
 
 /* Notes App Styles */
 .notes-layout {
+  flex: 1;
   height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   background: var(--app-background);
   color: var(--app-ink);
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   scrollbar-width: none;
   padding: 12px 16px 80px;
 }
@@ -5490,7 +5556,9 @@ a {
 
 /* AI Assistant Siri Experience */
 .ai-assistant-page {
+  flex: 1;
   height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   background: #090a0f;
@@ -5533,7 +5601,11 @@ a {
 }
 .ai-messages-container {
   flex: 1;
+  min-height: 0;
+  height: 100%;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   scrollbar-width: none;
   padding: 16px 14px 12px;
   display: flex;
@@ -6126,9 +6198,13 @@ a {
 /* Photos App Lightbox & Grid */
 .photos-gallery-scroll {
   flex: 1;
+  min-height: 0;
+  height: 100%;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   scrollbar-width: none;
-  padding: 6px 4px 60px;
+  padding: 6px 4px 80px;
 }
 .photos-grid-3col {
   display: grid;
@@ -6239,7 +6315,9 @@ a {
 
 /* LeetCode App Styles */
 .leetcode-page {
+  flex: 1;
   height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   background: #1a1a1a;
@@ -6297,9 +6375,13 @@ a {
 }
 .leetcode-body-scroll {
   flex: 1;
+  min-height: 0;
+  height: 100%;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   scrollbar-width: none;
-  padding: 12px 14px 60px;
+  padding: 12px 14px 80px;
 }
 .lc-hero-card {
   background: #242424;
@@ -6748,7 +6830,9 @@ a {
 
 /* iMessage Recruiter Chat Styles */
 .imessage-page {
+  flex: 1;
   height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   background: #000000;
@@ -6820,7 +6904,11 @@ a {
 }
 .imessage-thread-body {
   flex: 1;
+  min-height: 0;
+  height: 100%;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   scrollbar-width: none;
   padding: 14px 12px 10px;
   display: flex;
@@ -7178,4 +7266,151 @@ a {
 }
 .copy-link-btn:hover {
   background: #27272a;
+}
+
+/* Studio Lighting Contrast Improvements */
+.pocket-studio.studio-dark .studio-lighting-strip,
+.pocket-studio.lighting-cyberpunk .studio-lighting-strip {
+  background: rgba(30, 32, 38, 0.85);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+.pocket-studio.studio-dark .lighting-pill,
+.pocket-studio.lighting-cyberpunk .lighting-pill {
+  color: #a1a1aa;
+}
+.pocket-studio.studio-dark .lighting-pill.active,
+.pocket-studio.lighting-cyberpunk .lighting-pill.active {
+  background: #38bdf8;
+  color: #000000;
+}
+
+/* ================= IN-PHONE BROWSER DEMO PREVIEW APP ================= */
+.demo-preview-layout {
+  flex: 1;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: #111215;
+  color: #f5f5f7;
+  overflow: hidden;
+  padding: 8px 12px 14px;
+}
+.inline-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #38bdf8;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 0 8px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  transition: opacity 0.18s ease;
+}
+.inline-back-btn:hover {
+  opacity: 0.8;
+}
+.browser-address-bar {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #202228;
+  border: 0.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 0 10px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+.browser-icon {
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+.browser-url {
+  flex: 1;
+  font-size: 11px;
+  color: #cbd5e1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--font-mono);
+}
+.browser-refresh-btn {
+  color: #94a3b8;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.demo-iframe-container {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  background: #000000;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+.embedded-demo-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #ffffff;
+}
+.demo-loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: #111215;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #cbd5e1;
+}
+.demo-fallback-box {
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+}
+.demo-fallback-box .notice-text {
+  font-size: 9.5px;
+  color: #94a3b8;
+  margin: 0 0 6px;
+  line-height: 1.35;
+}
+.external-launch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #007aff;
+  color: #ffffff;
+  padding: 7px 12px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+.external-launch:hover {
+  background: #0062cc;
+}
+.no-demo-notice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 30px;
+  text-align: center;
+  color: #94a3b8;
+  gap: 10px;
 }

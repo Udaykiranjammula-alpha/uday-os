@@ -347,6 +347,12 @@ export function Phone3DCanvas({
       if (e.target instanceof Element && e.target.closest('input, textarea, select')) {
         return;
       }
+      // If interacting inside the phone screen when facing front, allow native UI scrolling & touch
+      const facingAngle = Math.cos(currentRotYRef.current) * Math.cos(currentRotXRef.current);
+      const isFacingBack = facingAngle < -0.12;
+      if (!isFacingBack && e.target instanceof Element && e.target.closest('.phone-surface')) {
+        return;
+      }
       dragStartRef.current = {
         x: e.clientX,
         y: e.clientY,

@@ -17,7 +17,12 @@ interface SpotlightAppItem {
 }
 
 const APPS: SpotlightAppItem[] = [
+  { id: 'github', label: 'GitHub', icon: '/ios/github.svg', route: 'github' },
   { id: 'projects', label: 'App Store', icon: '/ios/projects.png', route: 'projects' },
+  { id: 'messages', label: 'Messages', icon: '/ios/messages.svg', route: 'messages' },
+  { id: 'camera', label: 'Camera', icon: '/ios/camera.svg', route: 'camera' },
+  { id: 'leetcode', label: 'LeetCode', icon: '/ios/leetcode.svg', route: 'leetcode' },
+  { id: 'ai', label: 'Uday AI', icon: '/ios/ai.svg', route: 'ai' },
   { id: 'experience', label: 'Experience', icon: '/ios/experience.svg', route: 'experience' },
   { id: 'skills', label: 'Toolkit', icon: '/ios/skills.svg', route: 'skills' },
   { id: 'linkedin', label: 'LinkedIn', icon: '/ios/linkedin.svg', route: 'linkedin' },

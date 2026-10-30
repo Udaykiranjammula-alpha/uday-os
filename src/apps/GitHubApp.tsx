@@ -213,7 +213,12 @@ export function GitHubApp({ onBack, onOpenProjectDetail }: GitHubAppProps) {
             {projects.map((proj) => (
               <div key={proj.id} className="gh-pinned-card">
                 <div className="gh-card-top-line">
-                  <div className="gh-repo-title-box">
+                  <div
+                    className="gh-repo-title-box"
+                    onClick={() => onOpenProjectDetail?.(proj.id)}
+                    style={{ cursor: onOpenProjectDetail ? 'pointer' : 'default' }}
+                    title="View project architectural specs"
+                  >
                     <BookMarked size={14} className="gh-book-icon" />
                     <strong>{proj.title}</strong>
                   </div>
