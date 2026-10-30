@@ -1,28 +1,67 @@
-import React, { useState } from 'react';
-import { motion, useDragControls } from 'framer-motion';
-import {
-  Flashlight,
-  Camera,
-  ChevronUp,
-  Sparkles,
-  Github,
-  BriefcaseBusiness,
-  ShieldCheck,
-} from 'lucide-react';
-import { profile } from '../data/profile';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Lock, Unlock, Flame, Battery, GraduationCap, Flashlight, Camera, MessageSquare, ChevronUp } from 'lucide-react';
+import { useClock } from '../hooks/useClock';
+import { sound } from '../services/sound';
 
 interface LockScreenProps {
-  time: Date;
-  onUnlock: () => void;
-  reducedMotion: boolean;
+  onUnlock: (targetRoute?: string) => void;
+  flashlightOn?: boolean;
+  onToggleFlashlight?: () => void;
+  color?: 'plum' | 'desert';
+  time?: Date;
+  reducedMotion?: boolean;
 }
 
-export function LockScreen({ time, onUnlock, reducedMotion }: LockScreenProps) {
-  const [flashlightOn, setFlashlightOn] = useState(false);
-  const dragControls = useDragControls();
+export function LockScreen({
+  onUnlock,
+  flashlightOn = false,
+  onToggleFlashlight,
+  color = 'plum',
+  time: propTime,
+}: LockScreenProps) {
+  const clockTime = useClock();
+  const time = propTime || clockTime;
+  const [isUnlockedState, setIsUnlockedState] = useState(false);
+  const [isAOD, setIsAOD] = useState(false);
 
-  const formattedHours = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  const formattedDate = time.toLocaleDateString(undefined, {
+  // Auto AOD dim after 18s idle
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsAOD(true);
+    }, 18000);
+
+    const resetTimer = () => {
+      setIsAOD(false);
+    };
+
+    window.addEventListener('mousemove', resetTimer);
+    window.addEventListener('keydown', resetTimer);
+    window.addEventListener('touchstart', resetTimer);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('mousemove', resetTimer);
+      window.removeEventListener('keydown', resetTimer);
+      window.removeEventListener('touchstart', resetTimer);
+    };
+  }, []);
+
+  const handleUnlockSequence = (targetRoute = 'home') => {
+    if (isAOD) {
+      setIsAOD(false);
+      return;
+    }
+    sound.playUnlockSound();
+    setIsUnlockedState(true);
+    setTimeout(() => {
+      onUnlock(targetRoute);
+    }, 280);
+  };
+
+  const formattedHours = time.getHours().toString().padStart(2, '0');
+  const formattedMinutes = time.getMinutes().toString().padStart(2, '0');
+  const formattedDate = time.toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
@@ -30,118 +69,132 @@ export function LockScreen({ time, onUnlock, reducedMotion }: LockScreenProps) {
 
   return (
     <motion.div
-      className={`lock-screen ${flashlightOn ? 'flashlight-active' : ''}`}
+      className={`ios-lockscreen-root ${isAOD ? 'lockscreen-aod' : ''} wallpaper-${color}`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ y: -600, opacity: 0 }}
-      transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      drag="y"
-      dragControls={dragControls}
-      dragConstraints={{ top: -300, bottom: 0 }}
-      dragElastic={0.4}
-      onDragEnd={(_, info) => {
-        if (info.offset.y < -70 || info.velocity.y < -300) {
-          onUnlock();
-        }
+      exit={{ opacity: 0, y: -60 }}
+      transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+      onClick={() => {
+        if (isAOD) setIsAOD(false);
       }}
-      role="region"
-      aria-label="UDAY OS Lock Screen. Swipe up, click, or press Enter to unlock."
     >
-      {/* Subtle screen flashlight effect */}
-      {flashlightOn && <div className="screen-flashlight-beam" aria-hidden="true" />}
-
-      <div className="lock-header">
-        <div className="lock-identity">
-          <ShieldCheck size={14} className="lock-shield-icon" />
-          <span>UDAY OS</span>
+      {/* Top Face ID Lock Indicator */}
+      <header className="lockscreen-faceid-bar">
+        <div className={`faceid-padlock-wrap ${isUnlockedState ? 'unlocked' : ''}`}>
+          {isUnlockedState ? (
+            <Unlock size={17} className="text-cyan animate-pulse" />
+          ) : (
+            <Lock size={17} />
+          )}
         </div>
-        <span className="owner-status">{profile.name}</span>
+      </header>
+
+      {/* Date & Large Depth Clock */}
+      <div className="lockscreen-clock-container">
+        <span className="lockscreen-date-label">{formattedDate}</span>
+        <h1 className="lockscreen-giant-clock">
+          <span>{formattedHours}</span>
+          <span className="clock-colon">:</span>
+          <span>{formattedMinutes}</span>
+        </h1>
       </div>
 
-      <div className="lock-clock-section">
-        <h1 className="lock-time">{formattedHours}</h1>
-        <p className="lock-date">{formattedDate}</p>
+      {/* Lock Screen iOS 18 Widgets Row */}
+      <div className="lockscreen-widgets-strip">
+        {/* LeetCode Streak Widget */}
+        <div className="ls-widget-pill" title="LeetCode 128 Day Streak">
+          <Flame size={14} className="text-amber" />
+          <span>128 Days</span>
+        </div>
+
+        {/* Battery Widget */}
+        <div className="ls-widget-pill" title="Battery 98% Optimized">
+          <Battery size={14} className="text-emerald" />
+          <span>98%</span>
+        </div>
+
+        {/* KL University Widget */}
+        <div className="ls-widget-pill" title="KL University CSE Schedule">
+          <GraduationCap size={14} className="text-blue" />
+          <span>CSE Lab</span>
+        </div>
       </div>
 
-      {/* Lockscreen Notifications */}
-      <div className="lock-notifications">
-        <div className="lock-card">
-          <div className="lock-card-icon github-badge">
-            <Github size={15} />
-          </div>
-          <div className="lock-card-content">
-            <div className="lock-card-top">
-              <strong>GitHub Activity</strong>
-              <span>Just now</span>
+      {/* Notification Preview: Tech Recruiter Message */}
+      {!isAOD && (
+        <motion.div
+          className="lockscreen-notification-card"
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleUnlockSequence('messages');
+          }}
+          role="button"
+          tabIndex={0}
+          aria-label="New Message notification from Recruiter"
+        >
+          <div className="ls-notif-header">
+            <div className="ls-notif-app-info">
+              <div className="ls-notif-app-icon">
+                <MessageSquare size={12} />
+              </div>
+              <strong>MESSAGES</strong>
             </div>
-            <p>4 public repositories verified and ready to inspect.</p>
+            <span className="ls-notif-time">2m ago</span>
           </div>
-        </div>
-
-        <div className="lock-card">
-          <div className="lock-card-icon project-badge">
-            <BriefcaseBusiness size={15} />
+          <div className="ls-notif-body">
+            <h4>Tech Recruiter · Silicon Valley & Bangalore</h4>
+            <p>Hi Uday, reviewed your KL University projects & GitHub. Would love to connect for an SWE opportunity!</p>
           </div>
-          <div className="lock-card-content">
-            <div className="lock-card-top">
-              <strong>Hospital Management</strong>
-              <span>Live Demo</span>
-            </div>
-            <p>Deployed on Vercel · Interactive clinical triage dashboard.</p>
-          </div>
-        </div>
-      </div>
+        </motion.div>
+      )}
 
-      {/* Lockscreen Actions & Footer */}
-      <div className="lock-footer">
-        <div className="quick-actions">
-          <button
-            type="button"
-            className={`quick-circle-btn ${flashlightOn ? 'active' : ''}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              setFlashlightOn(!flashlightOn);
-            }}
-            aria-label={flashlightOn ? 'Turn off screen flashlight' : 'Turn on screen flashlight'}
-          >
-            <Flashlight size={18} />
-          </button>
-
-          <button
-            type="button"
-            className="quick-circle-btn"
-            onClick={(e) => {
-              e.stopPropagation();
-              onUnlock();
-            }}
-            aria-label="Quick unlock"
-          >
-            <Camera size={18} />
-          </button>
-        </div>
-
+      {/* Bottom Action Shortcuts: Torch & Camera */}
+      <footer className="lockscreen-bottom-bar">
+        {/* Flashlight Button */}
         <button
           type="button"
-          className="unlock-cta"
-          onClick={onUnlock}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              onUnlock();
-            }
+          className={`ls-quick-btn ${flashlightOn ? 'active' : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            sound.playTapSound();
+            onToggleFlashlight?.();
           }}
-          aria-label="Unlock UDAY OS to access apps"
+          aria-label="Toggle Flashlight"
         >
-          <motion.div
-            animate={reducedMotion ? false : { y: [-2, -6, -2] }}
-            transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
-          >
-            <ChevronUp size={18} />
-          </motion.div>
-          <span>Swipe up or click to enter</span>
+          <Flashlight size={19} />
         </button>
 
-        <div className="lock-bottom-bar" aria-hidden="true" />
-      </div>
+        {/* Unlock Swipe/Tap Hint */}
+        <div
+          className="ls-unlock-swipe-hint"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleUnlockSequence('home');
+          }}
+          role="button"
+          tabIndex={0}
+        >
+          <ChevronUp size={16} className="swipe-bounce-icon" />
+          <span>Swipe up or tap to unlock</span>
+          <div className="ls-home-swipe-line" />
+        </div>
+
+        {/* Camera Shortcut Button */}
+        <button
+          type="button"
+          className="ls-quick-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleUnlockSequence('camera');
+          }}
+          aria-label="Launch Camera"
+        >
+          <Camera size={19} />
+        </button>
+      </footer>
     </motion.div>
   );
 }

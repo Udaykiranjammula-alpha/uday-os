@@ -21,6 +21,8 @@ import { TerminalApp } from '../apps/TerminalApp';
 import { CameraApp } from '../apps/CameraApp';
 import { AiAssistantApp } from '../apps/AiAssistantApp';
 import { LeetCodeApp } from '../apps/LeetCodeApp';
+import { MessagesApp } from '../apps/MessagesApp';
+import { LockScreen } from './LockScreen';
 import { SpotlightSearch } from './SpotlightSearch';
 import type { Project } from '../types';
 
@@ -52,6 +54,7 @@ export function IPhoneScreenContent({
   const [isControlCenterOpen, setIsControlCenterOpen] = useState(false);
   const [brightness, setBrightness] = useState(1.0);
   const [flashlightOn, setFlashlightOn] = useState(false);
+  const [isLocked, setIsLocked] = useState(false);
 
   const isInApp = currentRoute !== 'home' || activeProject !== null || isDemoOpen;
 
@@ -222,6 +225,16 @@ export function IPhoneScreenContent({
             >
               <LeetCodeApp onBack={() => onNavigate('home')} />
             </motion.div>
+          ) : currentRoute === 'messages' ? (
+            <motion.div
+              key="messages-view"
+              className="page-screen-anim"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+            >
+              <MessagesApp onBack={() => onNavigate('home')} />
+            </motion.div>
           ) : currentRoute === 'instagram' ? (
             <motion.div
               key="instagram-view"
@@ -314,11 +327,25 @@ export function IPhoneScreenContent({
         setBrightness={setBrightness}
         flashlightOn={flashlightOn}
         setFlashlightOn={setFlashlightOn}
+        onLockPhone={() => setIsLocked(true)}
         onOpenApp={(app) => {
           setIsControlCenterOpen(false);
           onNavigate(app);
         }}
       />
+
+      {/* iOS 18 Lock Screen Overlay */}
+      {isLocked && (
+        <LockScreen
+          onUnlock={(target) => {
+            setIsLocked(false);
+            if (target && target !== 'home') onNavigate(target);
+          }}
+          flashlightOn={flashlightOn}
+          onToggleFlashlight={() => setFlashlightOn(!flashlightOn)}
+          color={color}
+        />
+      )}
 
       {/* iOS Home Indicator Bar */}
       <div

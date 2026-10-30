@@ -41,17 +41,17 @@ export function IosHomeScreen({ onNavigate, onOpenSearch }: IosHomeScreenProps) 
             <span className="ios-icon-title">LinkedIn</span>
           </button>
 
-          {/* Toolkit / Skills App */}
+          {/* Toolkit / Terminal App */}
           <button
             type="button"
             className="ios-home-icon-btn"
-            onClick={() => handleNav('skills')}
-            aria-label="Toolkit application"
+            onClick={() => handleNav('terminal')}
+            aria-label="Developer Terminal application"
           >
             <div className="ios-icon-box">
-              <img src="/ios/skills.svg" alt="Toolkit" width={52} height={52} />
+              <img src="/ios/skills.svg" alt="Terminal" width={52} height={52} />
             </div>
-            <span className="ios-icon-title">Toolkit</span>
+            <span className="ios-icon-title">Terminal</span>
           </button>
 
           {/* Safari / Projects Browser App */}
@@ -111,17 +111,17 @@ export function IosHomeScreen({ onNavigate, onOpenSearch }: IosHomeScreenProps) 
           <span className="ios-icon-title">LeetCode</span>
         </button>
 
-        {/* Notes */}
+        {/* Resume */}
         <button
           type="button"
           className="ios-home-icon-btn"
-          onClick={() => handleNav('notes')}
-          aria-label="Notes application"
+          onClick={() => handleNav('resume')}
+          aria-label="Resume application"
         >
           <div className="ios-icon-box">
-            <img src="/ios/notes.svg" alt="Notes" width={52} height={52} />
+            <img src="/ios/resume.png" alt="Resume" width={52} height={52} />
           </div>
-          <span className="ios-icon-title">Notes</span>
+          <span className="ios-icon-title">Resume</span>
         </button>
 
         {/* Settings */}
@@ -154,9 +154,10 @@ export function IosHomeScreen({ onNavigate, onOpenSearch }: IosHomeScreenProps) 
         </button>
       </div>
 
-      {/* Floating Glass Dock with 4 Core Developer Apps */}
+      {/* Floating Glass Dock with 4 Core Apps */}
       <div className="ios-dock-container">
         <div className="ios-dock-glass-bar">
+          {/* Projects */}
           <button
             type="button"
             className="dock-item-btn"
@@ -166,6 +167,20 @@ export function IosHomeScreen({ onNavigate, onOpenSearch }: IosHomeScreenProps) 
             <img src="/ios/projects.png" alt="Projects" width={52} height={52} />
           </button>
 
+          {/* iMessage Recruiter Chat */}
+          <button
+            type="button"
+            className="dock-item-btn"
+            onClick={() => handleNav('messages')}
+            aria-label="iMessage Recruiter Chat application"
+          >
+            <div className="dock-icon-relative">
+              <img src="/ios/messages.svg" alt="Messages" width={52} height={52} />
+              <span className="dock-unread-badge">1</span>
+            </div>
+          </button>
+
+          {/* GitHub */}
           <button
             type="button"
             className="dock-item-btn"
@@ -175,6 +190,7 @@ export function IosHomeScreen({ onNavigate, onOpenSearch }: IosHomeScreenProps) 
             <img src="/ios/github.svg" alt="GitHub" width={52} height={52} />
           </button>
 
+          {/* Photos */}
           <button
             type="button"
             className="dock-item-btn"
@@ -182,15 +198,6 @@ export function IosHomeScreen({ onNavigate, onOpenSearch }: IosHomeScreenProps) 
             aria-label="Photos Gallery application"
           >
             <img src="/ios/photos.png" alt="Photos" width={52} height={52} />
-          </button>
-
-          <button
-            type="button"
-            className="dock-item-btn"
-            onClick={() => handleNav('resume')}
-            aria-label="Resume application"
-          >
-            <img src="/ios/resume.png" alt="Resume" width={52} height={52} />
           </button>
         </div>
       </div>

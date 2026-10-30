@@ -1,29 +1,35 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Terminal as TerminalIcon, CornerDownLeft, ChevronLeft } from 'lucide-react';
+import { Terminal as TerminalIcon, CornerDownLeft, ChevronLeft, Sparkles, X } from 'lucide-react';
 import { profile } from '../data/profile';
 import { projects } from '../data/projects';
 import { skillCategories } from '../data/skills';
+import { sound } from '../services/sound';
 
 type TerminalLine = {
   text: string;
-  type: 'input' | 'output' | 'system' | 'error';
+  type: 'input' | 'output' | 'system' | 'error' | 'success';
 };
 
 interface TerminalAppProps {
   onBack?: () => void;
   onSetTheme?: (theme: 'dark' | 'light') => void;
+  onOpenDemo?: (projectSlug: string) => void;
 }
 
-export function TerminalApp({ onBack, onSetTheme }: TerminalAppProps) {
+export function TerminalApp({ onBack, onSetTheme, onOpenDemo }: TerminalAppProps) {
   const [lines, setLines] = useState<TerminalLine[]>([
-    { text: 'UDAY OS Terminal v2.4 (Simulated Shell)', type: 'system' },
-    { text: 'Type "help" to display available commands.', type: 'system' },
+    { text: 'UDAY OS Developer Terminal v2.5 (ZSH · Apple Silicon)', type: 'system' },
+    { text: 'Type "help" for command listing. Try "skills --tree", "matrix", or "sudo hire uday".', type: 'system' },
   ]);
   const [input, setInput] = useState('');
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
+  const [isMatrixActive, setIsMatrixActive] = useState(false);
+  const [isHiredCelebration, setIsHiredCelebration] = useState(false);
+
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const matrixCanvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -33,10 +39,64 @@ export function TerminalApp({ onBack, onSetTheme }: TerminalAppProps) {
     inputRef.current?.focus({ preventScroll: true });
   }, []);
 
+  // Matrix Digital Rain Effect
+  useEffect(() => {
+    if (!isMatrixActive) return;
+    const canvas = matrixCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    canvas.width = canvas.parentElement?.clientWidth || 320;
+    canvas.height = canvas.parentElement?.clientHeight || 500;
+
+    const chars = '01UDAYKIRANJAMMULAKLUNIVERSITYPYTHONC++REACT';
+    const fontSize = 12;
+    const columns = Math.floor(canvas.width / fontSize);
+    const drops: number[] = Array(columns).fill(1);
+
+    const interval = setInterval(() => {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#00ff66';
+      ctx.font = `${fontSize}px monospace`;
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = chars.charAt(Math.floor(Math.random() * chars.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }, 45);
+
+    return () => clearInterval(interval);
+  }, [isMatrixActive]);
+
+  const availableCommands = [
+    'help',
+    'about',
+    'whoami',
+    'skills',
+    'skills --tree',
+    'projects',
+    'projects --run hospital',
+    'github',
+    'contact',
+    'matrix',
+    'sudo hire uday',
+    'date',
+    'clear',
+  ];
+
   const handleCommand = (rawInput: string) => {
     const trimmed = rawInput.trim();
     if (!trimmed) return;
 
+    sound.playTapSound();
     setCommandHistory((prev) => [...prev, trimmed]);
     setHistoryIndex(-1);
 
@@ -49,66 +109,134 @@ export function TerminalApp({ onBack, onSetTheme }: TerminalAppProps) {
     switch (cmd) {
       case 'help':
         newEntries.push({
-          text: `Available commands:
-  help        - Show this reference menu
-  about       - Display developer summary
-  projects    - List verified portfolio projects
-  skills      - List categorized engineering competencies
-  github      - Display public GitHub URL & status
-  contact     - Display contact email and profiles
-  whoami      - Print active user identity
-  date        - Print current system date & time
-  theme <arg> - Change UI theme ("theme dark" or "theme light")
-  cat <topic> - Read file (e.g. "cat readme", "cat esp32")
-  sudo        - Request elevated administrative access
-  systeminfo  - Display UDAY OS kernel specifications
-  clear       - Clear screen buffer`,
-          type: 'output',
-        });
-        break;
-
-      case 'about':
-        newEntries.push({
-          text: `${profile.name} · ${profile.role}\n${profile.university} (${profile.location})\n${profile.bio}`,
-          type: 'output',
-        });
-        break;
-
-      case 'projects':
-        newEntries.push({
-          text: projects
-            .map((p, i) => `[${i + 1}] ${p.title} (${p.category})\n    Repo: ${p.repo}`)
-            .join('\n\n'),
-          type: 'output',
-        });
-        break;
-
-      case 'skills':
-        newEntries.push({
-          text: skillCategories
-            .map((c) => `${c.category}:\n  ${c.items.map((s) => s.name).join(', ')}`)
-            .join('\n\n'),
-          type: 'output',
-        });
-        break;
-
-      case 'github':
-        newEntries.push({
-          text: `GitHub Profile: ${profile.github}\nOwner: Udaykiranjammula-alpha\nStatus: 4 Verified Public Repositories`,
-          type: 'output',
-        });
-        break;
-
-      case 'contact':
-        newEntries.push({
-          text: `Email: ${profile.email}\nGitHub: ${profile.github}\nLinkedIn: ${profile.linkedin}`,
+          text: `UDAY OS Shell CLI 2.5 Commands:
+  help              - Display this manual
+  whoami            - Developer identity & credentials
+  about             - Biography and university background
+  skills            - Formatted technical skills
+  skills --tree     - ASCII hierarchy of languages & systems
+  projects          - List all engineered software
+  projects --run    - Launch project demo (e.g. "projects --run hospital")
+  matrix            - Enter full-screen digital rain mode
+  sudo hire uday    - Elevate privileges to offer employment
+  github            - Show repository telemetry
+  contact           - Direct communication handles
+  clear             - Clear display buffer`,
           type: 'output',
         });
         break;
 
       case 'whoami':
         newEntries.push({
-          text: `guest@uday-os (visitor terminal session)`,
+          text: `User: guest@uday-os
+Host: KL University Computer Science Subnet
+Authorization: Full Read-Only / Portfolio Inspection
+Target: Uday Kiran Jammula (B.Tech CSE '27)`,
+          type: 'output',
+        });
+        break;
+
+      case 'about':
+        newEntries.push({
+          text: `${profile.name} · ${profile.role}
+University: ${profile.university} (${profile.location})
+Focus: Algorithmic Engineering, Full-Stack Applications & Embedded Systems
+Status: Open for Software Engineering Internships`,
+          type: 'output',
+        });
+        break;
+
+      case 'skills':
+        if (args[0] === '--tree') {
+          newEntries.push({
+            text: `├── Systems & Core Languages
+│   ├── Python (Pandas, Algorithms, APIs)
+│   ├── C / C++ (FreeRTOS, Memory Management)
+│   ├── TypeScript / JavaScript (ESNext)
+│   └── SQL (Relational Data Modeling)
+├── Frontend Engineering
+│   ├── React 18 & Vite
+│   ├── WebGL & Three.js 3D Viewports
+│   └── Framer Motion & Responsive AMOLED Design
+└── Embedded & Hardware
+    ├── ESP32 Dual-Core SPI Packet Telemetry
+    └── Sensor Ingestion & FreeRTOS Tasks`,
+            type: 'output',
+          });
+        } else {
+          newEntries.push({
+            text: skillCategories
+              .map((c) => `[${c.category}]\n  ${c.items.map((s) => s.name).join(' · ')}`)
+              .join('\n\n'),
+            type: 'output',
+          });
+        }
+        break;
+
+      case 'projects':
+        if (args[0] === '--run' && args[1]?.toLowerCase().includes('hospital')) {
+          onOpenDemo?.('hospital-management-system');
+          newEntries.push({
+            text: `🚀 Launching Hospital Management System clinical demo...`,
+            type: 'success',
+          });
+        } else {
+          newEntries.push({
+            text: projects
+              .map(
+                (p, i) =>
+                  `[${i + 1}] ${p.title} (${p.category})\n    Tech: ${p.stack.join(', ')}\n    Repo: ${p.repo}`
+              )
+              .join('\n\n') +
+              '\n\nTip: Type "projects --run hospital" to test the live clinical app.',
+            type: 'output',
+          });
+        }
+        break;
+
+      case 'matrix':
+        setIsMatrixActive(true);
+        newEntries.push({
+          text: `[SYSTEM] Initializing Matrix digital rain simulation. Press (X) to exit.`,
+          type: 'system',
+        });
+        break;
+
+      case 'sudo':
+        if (args.join(' ').toLowerCase() === 'hire uday') {
+          setIsHiredCelebration(true);
+          newEntries.push({
+            text: `🎉 ========================================== 🎉
+    [ROOT PRIVILEGES UNLOCKED]
+    OFFER ACCEPTED!
+    Candidate Uday Kiran Jammula is ready to join your team.
+    Direct Email: ${profile.email}
+🎉 ========================================== 🎉`,
+            type: 'success',
+          });
+          setTimeout(() => setIsHiredCelebration(false), 5000);
+        } else {
+          newEntries.push({
+            text: `sudo: ${args[0] || ''}: command requiring root credentials. Try "sudo hire uday".`,
+            type: 'error',
+          });
+        }
+        break;
+
+      case 'github':
+        newEntries.push({
+          text: `GitHub Profile: ${profile.github}
+Handle: @Udaykiranjammula-alpha
+Telemetry: 4 Verified Production Repositories (Hospital System, ESP32 ML, Titan Network)`,
+          type: 'output',
+        });
+        break;
+
+      case 'contact':
+        newEntries.push({
+          text: `Email: ${profile.email}
+GitHub: ${profile.github}
+LinkedIn: ${profile.linkedin}`,
           type: 'output',
         });
         break;
@@ -120,60 +248,6 @@ export function TerminalApp({ onBack, onSetTheme }: TerminalAppProps) {
         });
         break;
 
-      case 'theme':
-        if (args[0] === 'light' || args[0] === 'dark') {
-          if (onSetTheme) {
-            onSetTheme(args[0]);
-            newEntries.push({ text: `Theme updated to ${args[0]} mode.`, type: 'output' });
-          } else {
-            newEntries.push({ text: `Theme switcher ready.`, type: 'output' });
-          }
-        } else {
-          newEntries.push({
-            text: 'Usage: theme dark | theme light',
-            type: 'error',
-          });
-        }
-        break;
-
-      case 'cat':
-        if (args[0]?.toLowerCase() === 'readme') {
-          newEntries.push({
-            text: 'UDAY OS: An interactive virtual smartphone developer portfolio.\nBuilt with React 18, TypeScript, Vite, and Framer Motion.',
-            type: 'output',
-          });
-        } else if (args[0]?.toLowerCase() === 'esp32') {
-          newEntries.push({
-            text: 'ESP32 Distributed ML Accelerator: Two microcontrollers coordinating feature ingestion and INT8 inference over SPI/Wi-Fi.',
-            type: 'output',
-          });
-        } else {
-          newEntries.push({
-            text: `File not found. Try "cat readme" or "cat esp32"`,
-            type: 'error',
-          });
-        }
-        break;
-
-      case 'sudo':
-        newEntries.push({
-          text: 'Permission denied: UDAY OS kernel enforces read-only guest privileges for portfolio security.',
-          type: 'error',
-        });
-        break;
-
-      case 'systeminfo':
-        newEntries.push({
-          text: `OS: UDAY OS 2.0 (iPhone Simulator Architecture)
-Kernel: React 18.3 + TypeScript 5.6
-Framework: Vite 6.0 ESM
-Motion: Framer Motion Spring Engine
-Viewport: Responsive Virtual Phone Container
-Security: Pure Static Sandboxed Client Execution`,
-          type: 'output',
-        });
-        break;
-
       case 'clear':
         setLines([]);
         setInput('');
@@ -181,7 +255,7 @@ Security: Pure Static Sandboxed Client Execution`,
 
       default:
         newEntries.push({
-          text: `Command not found: "${cmd}". Type "help" for a list of valid commands.`,
+          text: `zsh: command not found: "${cmd}". Type "help" or hit [Tab] to auto-complete.`,
           type: 'error',
         });
     }
@@ -193,6 +267,12 @@ Security: Pure Static Sandboxed Client Execution`,
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleCommand(input);
+    } else if (e.key === 'Tab') {
+      e.preventDefault();
+      const match = availableCommands.find((c) => c.startsWith(input.toLowerCase().trim()));
+      if (match) {
+        setInput(match);
+      }
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       if (commandHistory.length > 0) {
@@ -218,6 +298,30 @@ Security: Pure Static Sandboxed Client Execution`,
 
   return (
     <div className="terminal-container" onClick={() => inputRef.current?.focus({ preventScroll: true })}>
+      {/* Matrix Digital Rain Overlay */}
+      {isMatrixActive && (
+        <div className="terminal-matrix-curtain">
+          <canvas ref={matrixCanvasRef} className="matrix-canvas" />
+          <button
+            type="button"
+            className="matrix-close-btn"
+            onClick={() => setIsMatrixActive(false)}
+            aria-label="Exit Matrix Mode"
+          >
+            <X size={16} /> Exit Matrix
+          </button>
+        </div>
+      )}
+
+      {/* Confetti / Celebration Banner */}
+      {isHiredCelebration && (
+        <div className="terminal-celebration-toast">
+          <Sparkles size={16} className="text-amber" />
+          <span>Root Granted: Welcome aboard Uday! 🎉</span>
+        </div>
+      )}
+
+      {/* Terminal Top Bar */}
       <div className="terminal-topbar">
         {onBack && (
           <button
@@ -239,10 +343,11 @@ Security: Pure Static Sandboxed Client Execution`,
           <span className="dot green" />
         </div>
         <span className="term-title">
-          <TerminalIcon size={12} /> bash — uday-os
+          <TerminalIcon size={12} /> zsh — uday@kl-university
         </span>
       </div>
 
+      {/* Scrollable Command Output Buffer */}
       <div className="terminal-scroll-area">
         {lines.map((l, index) => (
           <div key={index} className={`terminal-line line-${l.type}`}>
@@ -252,8 +357,9 @@ Security: Pure Static Sandboxed Client Execution`,
         <div ref={bottomRef} />
       </div>
 
+      {/* Interactive Command Prompt */}
       <div className="terminal-prompt-bar">
-        <span className="prompt-label">guest@uday-os:~$</span>
+        <span className="prompt-label">uday-os:~$</span>
         <input
           ref={inputRef}
           type="text"
@@ -262,6 +368,7 @@ Security: Pure Static Sandboxed Client Execution`,
           onKeyDown={handleKeyDown}
           className="prompt-input"
           aria-label="Terminal command input"
+          placeholder="type help or hit tab..."
           spellCheck={false}
           autoCapitalize="off"
           autoCorrect="off"

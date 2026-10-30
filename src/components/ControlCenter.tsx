@@ -16,6 +16,7 @@ import {
   BatteryCharging,
   X,
   Disc3,
+  Lock,
 } from 'lucide-react';
 import { sound } from '../services/sound';
 
@@ -27,6 +28,7 @@ interface ControlCenterProps {
   flashlightOn: boolean;
   setFlashlightOn: (on: boolean) => void;
   onOpenApp?: (route: string) => void;
+  onLockPhone?: () => void;
 }
 
 export function ControlCenter({
@@ -37,6 +39,7 @@ export function ControlCenter({
   flashlightOn,
   setFlashlightOn,
   onOpenApp,
+  onLockPhone,
 }: ControlCenterProps) {
   const [wifiOn, setWifiOn] = useState(true);
   const [bluetoothOn, setBluetoothOn] = useState(true);
@@ -234,6 +237,21 @@ export function ControlCenter({
                 >
                   <BatteryCharging size={20} />
                   <span>Power</span>
+                </button>
+
+                {/* Lock Screen Shortcut */}
+                <button
+                  type="button"
+                  className="cc-square-tool"
+                  onClick={() => {
+                    sound.playLockSound();
+                    onClose();
+                    onLockPhone?.();
+                  }}
+                  aria-label="Lock Screen"
+                >
+                  <Lock size={18} />
+                  <span>Lock</span>
                 </button>
 
                 {/* Camera shortcut */}
