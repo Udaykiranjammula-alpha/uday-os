@@ -207,6 +207,52 @@ class SoundService {
     } catch {}
   }
 
+  // Authentic Apple Pay Transaction & NFC Ding
+  public playApplePayChime() {
+    if (!this.enabled) return;
+    try {
+      this.initCtx();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+
+      // Haptic tick
+      const tickOsc = this.ctx.createOscillator();
+      const tickGain = this.ctx.createGain();
+      tickOsc.type = 'triangle';
+      tickOsc.frequency.setValueAtTime(520, now);
+      tickOsc.frequency.exponentialRampToValueAtTime(160, now + 0.03);
+      tickGain.gain.setValueAtTime(0.25, now);
+      tickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+      tickOsc.connect(tickGain);
+      tickGain.connect(this.ctx.destination);
+      tickOsc.start(now);
+      tickOsc.stop(now + 0.03);
+
+      // Rising harmonic bell (E6 -> A6)
+      const tone1 = this.ctx.createOscillator();
+      const toneGain1 = this.ctx.createGain();
+      tone1.type = 'sine';
+      tone1.frequency.setValueAtTime(1318.5, now + 0.05); // E6
+      toneGain1.gain.setValueAtTime(0.2, now + 0.05);
+      toneGain1.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+      tone1.connect(toneGain1);
+      toneGain1.connect(this.ctx.destination);
+      tone1.start(now + 0.05);
+      tone1.stop(now + 0.45);
+
+      const tone2 = this.ctx.createOscillator();
+      const toneGain2 = this.ctx.createGain();
+      tone2.type = 'sine';
+      tone2.frequency.setValueAtTime(1760.0, now + 0.16); // A6
+      toneGain2.gain.setValueAtTime(0.26, now + 0.16);
+      toneGain2.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+      tone2.connect(toneGain2);
+      toneGain2.connect(this.ctx.destination);
+      tone2.start(now + 0.16);
+      tone2.stop(now + 0.8);
+    } catch {}
+  }
+
   // Incoming Recruiter Phone Call Ringtone (Classic iOS Marimba motif)
   public playCallChime() {
     if (!this.enabled) return;

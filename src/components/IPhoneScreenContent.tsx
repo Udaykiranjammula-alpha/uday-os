@@ -26,6 +26,9 @@ import { ArcadeApp } from '../apps/ArcadeApp';
 import { ClockApp } from '../apps/ClockApp';
 import { AppStoreApp } from '../apps/AppStoreApp';
 import { MusicApp } from '../apps/MusicApp';
+import { CalculatorApp } from '../apps/CalculatorApp';
+import { WeatherApp } from '../apps/WeatherApp';
+import { WalletApp } from '../apps/WalletApp';
 import { RecruiterCallModal } from './RecruiterCallModal';
 import { AppSwitcher } from './AppSwitcher';
 import { LockScreen } from './LockScreen';
@@ -216,8 +219,13 @@ export function IPhoneScreenContent({
         </div>
       )}
 
-      {/* Dynamic Island */}
-      <DynamicIsland />
+      {/* Dynamic Island 2.0 with Live Activity & Flashlight */}
+      <DynamicIsland
+        flashlightOn={flashlightOn}
+        onToggleFlashlight={() => setFlashlightOn(!flashlightOn)}
+        onFlipToBack={onFlipToBack}
+        onNavigate={onNavigate}
+      />
 
       {/* Status Bar (Right side taps trigger iOS 18 Control Center, battery triggers MagSafe) */}
       <StatusBar
@@ -419,6 +427,45 @@ export function IPhoneScreenContent({
               exit={{ opacity: 0, scale: 0.96 }}
             >
               <MusicApp
+                onBack={() => onNavigate('home')}
+                onNavigate={onNavigate}
+              />
+            </motion.div>
+          ) : currentRoute === 'calculator' ? (
+            <motion.div
+              key="calculator-view"
+              className="page-screen-anim"
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+            >
+              <CalculatorApp
+                onBack={() => onNavigate('home')}
+                onNavigate={onNavigate}
+              />
+            </motion.div>
+          ) : currentRoute === 'weather' ? (
+            <motion.div
+              key="weather-view"
+              className="page-screen-anim"
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+            >
+              <WeatherApp
+                onBack={() => onNavigate('home')}
+                onNavigate={onNavigate}
+              />
+            </motion.div>
+          ) : currentRoute === 'wallet' ? (
+            <motion.div
+              key="wallet-view"
+              className="page-screen-anim"
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+            >
+              <WalletApp
                 onBack={() => onNavigate('home')}
                 onNavigate={onNavigate}
               />

@@ -195,6 +195,62 @@ export function IosHomeScreen({ onNavigate, onOpenSearch }: IosHomeScreenProps) 
         </button>
       </section>
 
+      {/* Essential Apps Grid - Row 3 (Native Apple Utilities) */}
+      <section className="apps-single-row row-three">
+        {/* Apple Calculator */}
+        <button
+          type="button"
+          className="ios-home-icon-btn"
+          onClick={() => handleNav('calculator')}
+          aria-label="Calculator application"
+        >
+          <div className="ios-icon-box calculator-home-box">
+            <span style={{ fontSize: 28 }}>🧮</span>
+          </div>
+          <span className="ios-icon-title">Calculator</span>
+        </button>
+
+        {/* Apple Weather */}
+        <button
+          type="button"
+          className="ios-home-icon-btn"
+          onClick={() => handleNav('weather')}
+          aria-label="Weather application"
+        >
+          <div className="ios-icon-box weather-home-box">
+            <span style={{ fontSize: 28 }}>🌦️</span>
+          </div>
+          <span className="ios-icon-title">Weather</span>
+        </button>
+
+        {/* Apple Wallet & Apple Pay */}
+        <button
+          type="button"
+          className="ios-home-icon-btn"
+          onClick={() => handleNav('wallet')}
+          aria-label="Wallet application"
+        >
+          <div className="ios-icon-box wallet-home-box">
+            <span style={{ fontSize: 28 }}>💳</span>
+            <span className="app-red-badge">PAY</span>
+          </div>
+          <span className="ios-icon-title">Wallet</span>
+        </button>
+
+        {/* Notes */}
+        <button
+          type="button"
+          className="ios-home-icon-btn"
+          onClick={() => handleNav('notes')}
+          aria-label="Notes application"
+        >
+          <div className="ios-icon-box notes-home-box">
+            <span style={{ fontSize: 28 }}>📝</span>
+          </div>
+          <span className="ios-icon-title">Notes</span>
+        </button>
+      </section>
+
       {/* Search Pill */}
       <div className="ios-search-pill-container">
         <button

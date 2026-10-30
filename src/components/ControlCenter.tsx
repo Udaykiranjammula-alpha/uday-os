@@ -308,6 +308,21 @@ export function ControlCenter({
                   <span style={{ fontSize: 18 }}>📸</span>
                   <span>Camera</span>
                 </button>
+
+                {/* Calculator shortcut */}
+                <button
+                  type="button"
+                  className="cc-square-tool"
+                  onClick={() => {
+                    sound.playTapSound();
+                    onClose();
+                    onOpenApp?.('calculator');
+                  }}
+                  aria-label="Open Calculator"
+                >
+                  <span style={{ fontSize: 18 }}>🧮</span>
+                  <span>Calc</span>
+                </button>
               </div>
             </div>
           </div>

@@ -9277,3 +9277,1138 @@ a {
   place-items: center;
   box-shadow: 0 4px 14px rgba(48, 209, 88, 0.4);
 }
+
+/* ========================================================
+   6. APPLE NATIVE SUITE: CALCULATOR, WEATHER, WALLET & CAMERA CONTROL
+   ======================================================== */
+
+/* Home Screen App Box Highlights */
+.calculator-home-box {
+  background: linear-gradient(135deg, #ff9f0a 0%, #d97706 100%) !important;
+  box-shadow: 0 4px 14px rgba(255, 159, 10, 0.35) !important;
+}
+.weather-home-box {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35) !important;
+}
+.wallet-home-box {
+  background: linear-gradient(135deg, #18181b 0%, #27272a 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45) !important;
+}
+.notes-home-box {
+  background: linear-gradient(135deg, #facc15 0%, #eab308 100%) !important;
+  box-shadow: 0 4px 14px rgba(234, 179, 8, 0.35) !important;
+}
+
+/* --- Apple Calculator --- */
+.ios-calculator-page {
+  position: absolute;
+  inset: 0;
+  background: #000000;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  padding: 48px 16px 24px;
+  box-sizing: border-box;
+  user-select: none;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+  z-index: 20;
+}
+.calc-nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 38px;
+  margin-bottom: 8px;
+}
+.calc-nav-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  border-radius: 20px;
+  padding: 6px 12px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.calc-nav-btn:active {
+  background: rgba(255, 255, 255, 0.25);
+}
+.calc-converter-pill {
+  background: rgba(255, 159, 10, 0.2);
+  color: #ff9f0a;
+  border: 1px solid rgba(255, 159, 10, 0.4);
+}
+.calc-display-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+  padding: 0 8px 16px;
+  overflow: hidden;
+}
+.calc-formula-sub {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 4px;
+  font-weight: 400;
+}
+.calc-main-digits {
+  font-weight: 300;
+  color: #ffffff;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  word-break: break-all;
+  text-align: right;
+  transition: font-size 0.15s ease;
+}
+.calc-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+}
+.calc-btn {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: none;
+  font-size: 24px;
+  font-weight: 400;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s ease, filter 0.15s ease;
+}
+.calc-btn:active {
+  transform: scale(0.93);
+  filter: brightness(1.25);
+}
+.calc-btn.btn-fn {
+  background: #a5a5a5;
+  color: #000000;
+  font-weight: 500;
+}
+.calc-btn.btn-num {
+  background: #333333;
+  color: #ffffff;
+}
+.calc-btn.btn-op {
+  background: #ff9f0a;
+  color: #ffffff;
+  font-size: 26px;
+  font-weight: 500;
+}
+.calc-btn.btn-op.active {
+  background: #ffffff;
+  color: #ff9f0a;
+}
+.calc-btn.btn-zero {
+  grid-column: span 2;
+  aspect-ratio: auto;
+  border-radius: 38px;
+  justify-content: flex-start;
+  padding-left: 26px;
+}
+.calc-drawer-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(20px);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.calc-drawer-content {
+  background: #1c1c1e;
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+  padding: 20px 18px 30px;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.6);
+  border-top: 0.5px solid rgba(255, 255, 255, 0.15);
+}
+.calc-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.calc-drawer-tabs {
+  display: flex;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 3px;
+  gap: 3px;
+  margin-bottom: 16px;
+}
+.calc-tab-btn {
+  flex: 1;
+  padding: 6px 8px;
+  border-radius: 9px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.calc-tab-btn.active {
+  background: #ff9f0a;
+  color: #ffffff;
+}
+
+/* --- Apple Weather --- */
+.ios-weather-page {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  user-select: none;
+}
+.ios-weather-page.sunny {
+  background: linear-gradient(180deg, #1e528e 0%, #468ac9 60%, #88b7e2 100%);
+}
+.ios-weather-page.rain {
+  background: linear-gradient(180deg, #1b263b 0%, #293241 60%, #415a77 100%);
+}
+.ios-weather-page.cloudy {
+  background: linear-gradient(180deg, #2b3a4a 0%, #3e4f61 100%);
+}
+.weather-canvas-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.weather-nav {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 44px 16px 8px;
+}
+.weather-back-btn {
+  background: rgba(0, 0, 0, 0.2);
+  border: none;
+  color: #ffffff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.weather-city-pills {
+  display: flex;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 3px;
+  border-radius: 18px;
+}
+.city-pill-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.city-pill-btn.active {
+  background: rgba(255, 255, 255, 0.28);
+  color: #ffffff;
+}
+.weather-scrollable {
+  position: relative;
+  z-index: 10;
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 16px 36px;
+  scrollbar-width: none;
+}
+.weather-scrollable::-webkit-scrollbar {
+  display: none;
+}
+.weather-hero {
+  text-align: center;
+  margin: 12px 0 24px;
+}
+.weather-hero h1 {
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.weather-hero-sub {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 2px;
+}
+.weather-temp-hero {
+  font-size: 68px;
+  font-weight: 200;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin: 8px 0 4px;
+}
+.weather-condition-hero {
+  font-size: 15px;
+  font-weight: 500;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+.weather-highlow-hero {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 2px;
+}
+.weather-card-glass {
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 12px;
+  border: 0.5px solid rgba(255, 255, 255, 0.15);
+}
+.weather-card-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 10px;
+}
+.weather-hourly-row {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+.hourly-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  min-width: 42px;
+}
+.weather-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.weather-metric-box {
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  padding: 12px;
+  border: 0.5px solid rgba(255, 255, 255, 0.15);
+}
+.metric-box-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 6px;
+}
+.metric-box-val {
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
+}
+.metric-box-sub {
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 4px;
+}
+
+/* --- Apple Wallet & Apple Pay --- */
+.ios-wallet-page {
+  position: absolute;
+  inset: 0;
+  background: #000000;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  user-select: none;
+}
+.ios-wallet-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 44px 16px 8px;
+}
+.ios-wallet-nav-back,
+.ios-wallet-nav-action {
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  border-radius: 20px;
+  padding: 6px 12px;
+  color: #ffffff;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+.ios-wallet-nav-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+.ios-wallet-scrollable {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 16px 40px;
+  scrollbar-width: none;
+}
+.ios-wallet-scrollable::-webkit-scrollbar {
+  display: none;
+}
+.ios-wallet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.ios-wallet-badge {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #a1a1aa;
+  letter-spacing: 0.05em;
+}
+.ios-wallet-greeting h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 2px 0 0;
+}
+.ios-apple-pay-hero-btn {
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.2);
+  transition: transform 0.15s ease;
+}
+.ios-apple-pay-hero-btn:active {
+  transform: scale(0.96);
+}
+.ios-apple-pay-logo {
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+}
+.apple-logo {
+  font-size: 16px;
+  margin-right: 2px;
+}
+.ios-pay-subtext {
+  font-size: 8.5px;
+  font-weight: 600;
+  color: #52525b;
+}
+
+/* Wallet Card Stacking */
+.ios-wallet-stack {
+  position: relative;
+  min-height: 270px;
+  margin-bottom: 24px;
+}
+.ios-wallet-card {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 180px;
+  border-radius: 16px;
+  padding: 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.35s ease;
+  overflow: hidden;
+}
+.ios-wallet-card.card-apple-card {
+  top: 0;
+  background: linear-gradient(135deg, #f5f5f7 0%, #e5e5ea 50%, #d1d1d6 100%);
+  color: #1d1d1f;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+.ios-wallet-card.card-klu-id {
+  top: 48px;
+  background: linear-gradient(135deg, #7b001b 0%, #a30026 50%, #1f1f3a 100%);
+  color: #ffffff;
+  box-shadow: 0 10px 30px rgba(123, 0, 27, 0.35);
+}
+.ios-wallet-card.card-github-pass {
+  top: 96px;
+  background: linear-gradient(135deg, #18181b 0%, #27272a 60%, #09090b 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+.ios-wallet-card.is-active {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+}
+.card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.card-chip-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-emv-chip {
+  width: 28px;
+  height: 20px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #e6ca65 0%, #b89728 100%);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+.card-contactless-icon {
+  width: 16px;
+  height: 16px;
+  color: #3a3a3c;
+}
+.card-brand {
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.card-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.card-benefit {
+  font-size: 10px;
+  color: #48484a;
+  margin-top: 3px;
+  font-weight: 500;
+}
+.card-bottom-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.card-holder-label {
+  font-size: 8px;
+  font-weight: 600;
+  color: #8e8e93;
+  letter-spacing: 0.08em;
+}
+.card-holder-name {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+.card-status-pill {
+  background: #34c759;
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 6px;
+}
+.klu-uni-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.klu-name {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #fef08a;
+}
+.klu-sub {
+  font-size: 8px;
+  color: rgba(255, 255, 255, 0.7);
+}
+.klu-verified-seal {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 3px 8px;
+  border-radius: 12px;
+  color: #34d399;
+}
+.klu-center-student {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.klu-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #7b001b;
+  font-weight: 800;
+  font-size: 14px;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+.klu-student-name {
+  font-size: 14px;
+  font-weight: 700;
+}
+.klu-dept {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.8);
+}
+.klu-batch {
+  font-size: 9px;
+  color: #fef08a;
+  font-weight: 600;
+}
+.github-stats-grid {
+  display: flex;
+  gap: 8px;
+}
+.github-stat-pill {
+  background: rgba(255, 255, 255, 0.07);
+  padding: 4px 10px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+}
+.stat-number {
+  font-size: 12px;
+  font-weight: 700;
+  color: #38bdf8;
+}
+.stat-label {
+  font-size: 8px;
+  color: #a1a1aa;
+}
+.github-live-dot {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9px;
+  font-weight: 700;
+  color: #4ade80;
+}
+.live-ping {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 8px #4ade80;
+}
+
+/* Pass Actions Pane */
+.pass-detail-pane {
+  background: #1c1c1e;
+  border-radius: 16px;
+  padding: 16px;
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+}
+.pass-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.pass-detail-header h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+.pass-status-active {
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(52, 199, 89, 0.15);
+  color: #34c759;
+  padding: 3px 8px;
+  border-radius: 10px;
+}
+.pass-status-verified {
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  padding: 3px 8px;
+  border-radius: 10px;
+}
+.pass-description {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #a1a1aa;
+  margin-bottom: 14px;
+}
+.pass-btn-group {
+  display: flex;
+  gap: 10px;
+}
+.pass-primary-btn {
+  flex: 1;
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  border-radius: 12px;
+  padding: 9px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.pass-primary-btn:active {
+  transform: scale(0.97);
+}
+.pass-secondary-btn {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 9px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Apple Pay Sheet Overlay */
+.ios-apple-pay-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(20px);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.ios-apple-pay-sheet {
+  background: #1c1c1e;
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+  padding: 16px 20px 28px;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.6);
+  border-top: 0.5px solid rgba(255, 255, 255, 0.18);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.ios-apple-pay-grabber {
+  width: 36px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 2px;
+  margin-bottom: 12px;
+}
+.ios-pay-header {
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 14px;
+}
+.pay-card-mini {
+  background: linear-gradient(135deg, #f5f5f7 0%, #d1d1d6 100%);
+  color: #1d1d1f;
+  width: 140px;
+  height: 85px;
+  border-radius: 10px;
+  padding: 8px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+.pay-card-chip {
+  width: 18px;
+  height: 12px;
+  border-radius: 2px;
+  background: #e6ca65;
+}
+.pay-card-name {
+  font-size: 7.5px;
+  font-weight: 700;
+  text-align: left;
+}
+.pay-card-num {
+  font-size: 8px;
+  color: #555;
+  text-align: right;
+}
+.ios-face-id-scanner {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 12px;
+}
+.face-id-crosshair {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: #38bdf8;
+  border-style: solid;
+}
+.face-id-crosshair.top-left {
+  top: 0;
+  left: 0;
+  border-width: 2.5px 0 0 2.5px;
+  border-top-left-radius: 4px;
+}
+.face-id-crosshair.top-right {
+  top: 0;
+  right: 0;
+  border-width: 2.5px 2.5px 0 0;
+  border-top-right-radius: 4px;
+}
+.face-id-crosshair.bottom-left {
+  bottom: 0;
+  left: 0;
+  border-width: 0 0 2.5px 2.5px;
+  border-bottom-left-radius: 4px;
+}
+.face-id-crosshair.bottom-right {
+  bottom: 0;
+  right: 0;
+  border-width: 0 2.5px 2.5px 0;
+  border-bottom-right-radius: 4px;
+}
+.face-id-smile-icon {
+  position: absolute;
+  inset: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.smile-eye {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #38bdf8;
+  display: inline-block;
+  margin: 0 5px;
+}
+.smile-mouth {
+  width: 14px;
+  height: 7px;
+  border-bottom: 2.5px solid #38bdf8;
+  border-radius: 0 0 10px 10px;
+  margin-top: 4px;
+}
+.pay-prompt-main {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 2px;
+}
+.pay-prompt-sub {
+  font-size: 11px;
+  color: #a1a1aa;
+  margin: 0;
+}
+.ios-pay-check-ring {
+  margin-bottom: 8px;
+}
+.pay-done-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+.pay-done-msg {
+  font-size: 12px;
+  color: #a1a1aa;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+.pay-done-actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 12px;
+}
+.pay-action-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 12px;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pay-action-btn.email {
+  background: #27272a;
+  color: #ffffff;
+}
+.pay-action-btn.interview {
+  background: #30d158;
+  color: #ffffff;
+}
+.ios-pay-close-btn {
+  background: transparent;
+  border: none;
+  color: #a1a1aa;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 6px 16px;
+}
+
+/* QR Pass Modal */
+.ios-qr-modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(16px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.ios-qr-modal-card {
+  background: #1c1c1e;
+  border-radius: 24px;
+  padding: 24px 20px;
+  width: 100%;
+  max-width: 290px;
+  text-align: center;
+  border: 0.5px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
+}
+.ios-qr-code-box {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 12px;
+  margin: 16px 0;
+  display: inline-block;
+}
+.qr-id-text {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: #38bdf8;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+.qr-desc-text {
+  font-size: 11px;
+  color: #a1a1aa;
+  margin-bottom: 16px;
+}
+.ios-qr-close-btn {
+  width: 100%;
+  padding: 10px;
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* --- Camera Control Capacitive Sensor & HUD --- */
+.camera-control-sensor-strip {
+  position: absolute;
+  right: 4px;
+  top: 48%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 110px;
+  z-index: 35;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: ns-resize;
+  touch-action: none;
+}
+.sensor-touch-surface {
+  width: 6px;
+  height: 84px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5), inset 0 0 4px rgba(255, 255, 255, 0.3);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  transition: width 0.15s ease, background 0.15s ease;
+}
+.camera-control-sensor-strip:hover .sensor-touch-surface,
+.camera-control-sensor-strip:active .sensor-touch-surface {
+  width: 8px;
+  background: rgba(255, 255, 255, 0.45);
+}
+.sensor-tick-mark {
+  width: 4px;
+  height: 1.5px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 1px;
+}
+.camera-control-hud {
+  position: absolute;
+  right: 32px;
+  top: 48%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(16px);
+  border: 0.5px solid rgba(255, 255, 255, 0.25);
+  border-radius: 14px;
+  padding: 6px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 40;
+  animation: hudFadeIn 0.18s ease-out;
+  pointer-events: none;
+}
+@keyframes hudFadeIn {
+  from { opacity: 0; transform: translateY(-50%) scale(0.9); }
+  to { opacity: 1; transform: translateY(-50%) scale(1); }
+}
+.hud-zoom-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffd60a;
+}
+.hud-lens-spec {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+/* --- Dynamic Island 2.0 Torch & Live Activity --- */
+.island-active-torch {
+  border-color: rgba(255, 214, 10, 0.6) !important;
+  box-shadow: 0 0 16px rgba(255, 214, 10, 0.35) !important;
+}
+.island-compact-torch {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 6px;
+}
+.island-mini-torch-icon {
+  font-size: 11px;
+}
+.island-torch-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffd60a;
+  box-shadow: 0 0 8px #ffd60a;
+  animation: pulseDot 1.2s infinite alternate;
+}
+@keyframes pulseDot {
+  from { opacity: 0.5; }
+  to { opacity: 1; }
+}
+.island-torch-banner {
+  background: rgba(255, 214, 10, 0.12);
+  border: 0.5px solid rgba(255, 214, 10, 0.35);
+  border-radius: 12px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.torch-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+}
+.torch-banner-left strong {
+  display: block;
+  font-size: 11px;
+  color: #ffd60a;
+}
+.torch-banner-left small {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.7);
+}
+.torch-banner-actions {
+  display: flex;
+  gap: 6px;
+}
+.island-mini-action-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: #ffffff;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+}
+.island-mini-action-btn.toggle-off {
+  background: rgba(255, 69, 58, 0.25);
+  color: #ff453a;
+}
+.island-app-shortcut-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 10px;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+

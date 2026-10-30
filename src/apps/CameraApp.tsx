@@ -22,6 +22,7 @@ interface CameraAppProps {
 
 type CameraMode = 'CINEMATIC' | 'VIDEO' | 'PHOTO' | 'PORTRAIT' | 'PANO';
 type FilterType = 'standard' | 'vivid' | 'warm' | 'cool' | 'noir' | 'dramatic';
+type ZoomLevel = '0.5x' | '1x' | '2x' | '5x';
 
 export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -32,7 +33,8 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [streamReady, setStreamReady] = useState(false);
   const [cameraMode, setCameraMode] = useState<CameraMode>('PHOTO');
-  const [zoomLevel, setZoomLevel] = useState<'0.5x' | '1x' | '2x'>('1x');
+  const [zoomLevel, setZoomLevel] = useState<ZoomLevel>('1x');
+  const [showCameraControlHud, setShowCameraControlHud] = useState(false);
   const [flashActive, setFlashActive] = useState(false);
   const [flashMode, setFlashMode] = useState<'off' | 'on' | 'auto'>('auto');
   const [hdrEnabled, setHdrEnabled] = useState(true);
@@ -179,8 +181,38 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
     dramatic: 'contrast(1.4) brightness(0.92) saturate(1.2)',
   };
 
-  // Zoom scale multiplier
-  const zoomScale = zoomLevel === '0.5x' ? 1 : zoomLevel === '1x' ? 1.25 : 1.95;
+  // Zoom scale multiplier with 5x telephoto support
+  const zoomScale =
+    zoomLevel === '0.5x' ? 1 : zoomLevel === '1x' ? 1.25 : zoomLevel === '2x' ? 1.95 : 3.1;
+
+  // Capacitive Camera Control Sensor drag & tap handler
+  const handleSensorPointer = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    const rect = e.currentTarget.getBoundingClientRect();
+    const relativeY = (e.clientY - rect.top) / rect.height; // 0 (top) to 1 (bottom)
+    let nextZoom: ZoomLevel = '1x';
+
+    if (relativeY < 0.25) {
+      nextZoom = '5x';
+    } else if (relativeY < 0.5) {
+      nextZoom = '2x';
+    } else if (relativeY < 0.75) {
+      nextZoom = '1x';
+    } else {
+      nextZoom = '0.5x';
+    }
+
+    if (nextZoom !== zoomLevel) {
+      sound.playActionClickSound();
+      setZoomLevel(nextZoom);
+    }
+
+    setShowCameraControlHud(true);
+    window.clearTimeout((window as unknown as { _camControlTimer?: number })._camControlTimer);
+    (window as unknown as { _camControlTimer?: number })._camControlTimer = window.setTimeout(() => {
+      setShowCameraControlHud(false);
+    }, 2000);
+  };
 
   // Shutter action (Photos & Video recording)
   const handleShutterAction = () => {
@@ -490,7 +522,7 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
 
         {/* Interactive Zoom Selector Capsule */}
         <div className="camera-zoom-capsule">
-          {(['0.5x', '1x', '2x'] as const).map((z) => (
+          {(['0.5x', '1x', '2x', '5x'] as const).map((z) => (
             <button
               key={z}
               type="button"
@@ -505,6 +537,40 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
             </button>
           ))}
         </div>
+
+        {/* Right Rail: Apple Camera Control Sensor (Capacitive slide & tap) */}
+        <div
+          className="camera-control-sensor-strip"
+          title="Camera Control: Slide up/down to adjust zoom"
+          onPointerDown={handleSensorPointer}
+          onPointerMove={(e) => {
+            if (e.buttons === 1) handleSensorPointer(e);
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="sensor-touch-surface">
+            <span className="sensor-tick-mark t-5x" />
+            <span className="sensor-tick-mark t-2x" />
+            <span className="sensor-tick-mark t-1x" />
+            <span className="sensor-tick-mark t-05x" />
+          </div>
+        </div>
+
+        {/* Camera Control HUD Visual Indicator */}
+        {showCameraControlHud && (
+          <div className="camera-control-hud">
+            <span className="hud-zoom-value">{zoomLevel}</span>
+            <span className="hud-lens-spec">
+              {zoomLevel === '0.5x'
+                ? '13mm Ultra-Wide'
+                : zoomLevel === '1x'
+                ? '24mm Fusion'
+                : zoomLevel === '2x'
+                ? '48mm 2x Crop'
+                : '120mm 5x Telephoto'}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Interactive Mode Picker Strip (CINEMATIC | VIDEO | PHOTO | PORTRAIT | PANO) */}

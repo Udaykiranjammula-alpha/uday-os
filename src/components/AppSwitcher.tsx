@@ -12,8 +12,12 @@ export interface AppCard {
 }
 
 export const DEFAULT_APP_DECK: AppCard[] = [
+  { id: 'calculator', title: 'Calculator', icon: '🧮', color: '#ff9f0a', subtitle: 'Math & Tech Converter' },
+  { id: 'weather', title: 'Weather', icon: '🌦️', color: '#1c3d5a', subtitle: 'Vijayawada 31°C · Sunny' },
+  { id: 'wallet', title: 'Wallet', icon: '💳', color: '#27272a', subtitle: 'Titanium Pass & Student ID' },
   { id: 'camera', title: 'Camera', icon: '📸', color: '#1c1c1e', subtitle: 'Live ProRAW Viewfinder' },
   { id: 'arcade', title: 'Arcade', icon: '🕹️', color: '#0b0f19', subtitle: 'Dev Dash: Byte Runner' },
+  { id: 'music', title: 'Music', icon: '🎵', color: '#fa2d48', subtitle: 'Lo-Fi Systems Stream' },
   { id: 'github', title: 'GitHub', icon: '🐙', color: '#0d1117', subtitle: 'Udaykiranjammula-alpha' },
   { id: 'linkedin', title: 'LinkedIn', icon: '💼', color: '#0a66c2', subtitle: 'Turning Ideas Into Impact' },
   { id: 'leetcode', title: 'LeetCode', icon: '⚡', color: '#1a1a1a', subtitle: '184+ Solved · Top Algorithms' },
