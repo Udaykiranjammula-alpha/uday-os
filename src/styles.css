@@ -2192,64 +2192,113 @@ a {
   flex-direction: column;
   overflow: hidden;
 }
+/* LinkedIn Light Mode Optimization */
 .iphone-screen.appearance-light .ios-linkedin-page {
   background: #f3f2ef;
-  color: #1c1c1e;
+  color: #191919;
 }
 .iphone-screen.appearance-light .linkedin-header-bar {
   background: #ffffff;
   border-bottom: 1px solid #e0e0e0;
 }
-.iphone-screen.appearance-light .search-fake-input {
+.iphone-screen.appearance-light .linkedin-back-btn {
+  color: #191919;
+}
+.iphone-screen.appearance-light .linkedin-search-capsule {
   background: #edf3f8;
-  color: #1c1c1e;
 }
-.iphone-screen.appearance-light .linkedin-card-box {
-  background: #ffffff;
-  border-color: #e0e0e0;
+.iphone-screen.appearance-light .search-glass-icon {
+  color: #595959;
 }
-.iphone-screen.appearance-light .linkedin-user-name,
-.iphone-screen.appearance-light .card-section-title,
-.iphone-screen.appearance-light .role-title,
-.iphone-screen.appearance-light .skill-badge-text {
-  color: #1c1c1e;
+.iphone-screen.appearance-light .search-fake-input {
+  background: transparent;
+  color: #191919;
 }
-.iphone-screen.appearance-light .user-subline-text,
-.iphone-screen.appearance-light .user-geo-text,
-.iphone-screen.appearance-light .company-subline,
-.iphone-screen.appearance-light .card-body-desc {
-  color: #666666;
-}
-.iphone-screen.appearance-light .linkedin-msg-pill {
-  background: #ffffff;
-  border-color: #0a66c2;
-  color: #0a66c2;
-}
-.iphone-screen.appearance-light .linkedin-more-pill {
-  border-color: #666666;
-  color: #666666;
+.iphone-screen.appearance-light .icon-with-badge {
+  color: #595959;
 }
 .iphone-screen.appearance-light .linkedin-profile-card {
   background: #ffffff;
   border-bottom: 8px solid #ebebeb;
 }
 .iphone-screen.appearance-light .profile-avatar-wrap {
-  border-color: #ffffff;
+  border: 3.5px solid #ffffff;
   background: #ffffff;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
 }
-.iphone-screen.appearance-light .experience-item-row + .experience-item-row {
-  border-top-color: #e0e0e0;
+.iphone-screen.appearance-light .profile-full-name {
+  color: #191919 !important;
 }
-.iphone-screen.appearance-light .linkedin-stat-card {
-  background: #f8f9fa;
-  border-color: #e0e0e0;
+.iphone-screen.appearance-light .profile-headline {
+  color: #191919 !important;
 }
-.iphone-screen.appearance-light .stat-number {
-  color: #1c1c1e;
+.iphone-screen.appearance-light .affiliation-text {
+  color: #191919 !important;
 }
-.iphone-screen.appearance-light .stat-label {
-  color: #666666;
+.iphone-screen.appearance-light .profile-location-line {
+  color: #595959 !important;
+}
+.iphone-screen.appearance-light .contact-info-link {
+  color: #0a66c2 !important;
+}
+.iphone-screen.appearance-light .connections-count {
+  color: #0a66c2 !important;
+}
+.iphone-screen.appearance-light .linkedin-btn-secondary {
+  background: #ffffff !important;
+  border: 1px solid #0a66c2 !important;
+  color: #0a66c2 !important;
+}
+.iphone-screen.appearance-light .linkedin-btn-icon {
+  background: #ffffff !important;
+  border: 1px solid #595959 !important;
+  color: #595959 !important;
+}
+.iphone-screen.appearance-light .linkedin-grouped-section {
+  background: #ffffff !important;
+  border-top: 1px solid #e0e0e0 !important;
+  border-bottom: 8px solid #ebebeb !important;
+}
+.iphone-screen.appearance-light .section-title {
+  color: #191919 !important;
+}
+.iphone-screen.appearance-light .private-sub-label {
+  color: #595959 !important;
+}
+.iphone-screen.appearance-light .analytic-card {
+  background: #f8f9fa !important;
+  border: 1px solid #e0e0e0 !important;
+}
+.iphone-screen.appearance-light .analytic-icon-wrap {
+  color: #0a66c2 !important;
+}
+.iphone-screen.appearance-light .analytic-metric {
+  color: #191919 !important;
+}
+.iphone-screen.appearance-light .analytic-desc {
+  color: #595959 !important;
+}
+.iphone-screen.appearance-light .about-text-body {
+  color: #191919 !important;
+}
+.iphone-screen.appearance-light .experience-item-row {
+  border-bottom: 1px solid #e0e0e0 !important;
+}
+.iphone-screen.appearance-light .exp-details .exp-role {
+  color: #191919 !important;
+}
+.iphone-screen.appearance-light .exp-company {
+  color: #191919 !important;
+}
+.iphone-screen.appearance-light .exp-dates {
+  color: #595959 !important;
+}
+.iphone-screen.appearance-light .exp-summary {
+  color: #595959 !important;
+}
+.iphone-screen.appearance-light .see-all-exp-link {
+  border-top: 1px solid #e0e0e0 !important;
+  color: #0a66c2 !important;
 }
 .linkedin-header-bar {
   height: 52px;
@@ -2618,6 +2667,41 @@ a {
   padding: 12px 16px 40px;
   display: flex;
   flex-direction: column;
+}
+/* iOS Settings App - Light Mode */
+.iphone-screen.appearance-light .ios-settings-page {
+  background: #f2f2f7 !important;
+  color: #000000 !important;
+}
+.iphone-screen.appearance-light .settings-page-title {
+  color: #000000 !important;
+}
+.iphone-screen.appearance-light .ios-apple-id-card {
+  background: #ffffff !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+.iphone-screen.appearance-light .apple-id-name {
+  color: #000000 !important;
+  font-weight: 600;
+}
+.iphone-screen.appearance-light .apple-id-sub {
+  color: #8e8e93 !important;
+}
+.iphone-screen.appearance-light .ios-settings-group {
+  background: #ffffff !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+.iphone-screen.appearance-light .ios-settings-row {
+  border-bottom: 1px solid #e5e5ea !important;
+}
+.iphone-screen.appearance-light .ios-settings-row:hover {
+  background: #f2f2f7 !important;
+}
+.iphone-screen.appearance-light .row-label {
+  color: #000000 !important;
+}
+.iphone-screen.appearance-light .row-chevron {
+  color: #c7c7cc !important;
 }
 .ios-settings-page::-webkit-scrollbar { display: none; }
 .settings-top-nav {
@@ -4934,6 +5018,172 @@ a {
   max-width: 260px;
   margin: 0;
   line-height: 1.45;
+}
+
+/* Notes App Styles */
+.notes-layout {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--app-background);
+  color: var(--app-ink);
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding: 12px 16px 80px;
+}
+.notes-tab-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.notes-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--app-group);
+  color: var(--app-secondary);
+  border: 0.5px solid var(--app-divider);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+.notes-tab.active {
+  background: var(--app-blue);
+  color: #ffffff;
+  border-color: var(--app-blue);
+}
+.dev-notes-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.dev-notes-strip {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+.dev-note-pill {
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--app-surface);
+  border: 0.5px solid var(--app-divider);
+  color: var(--app-ink);
+  cursor: pointer;
+  text-align: left;
+  min-width: 130px;
+  flex-shrink: 0;
+  transition: all 0.18s ease;
+}
+.dev-note-pill.active {
+  border-color: var(--app-blue);
+  background: var(--app-group);
+}
+.pill-category {
+  font-size: 9px;
+  text-transform: uppercase;
+  color: var(--app-blue);
+  font-weight: 700;
+  display: block;
+}
+.pill-title {
+  font-size: 11.5px;
+  font-weight: 650;
+  color: var(--app-ink);
+  margin-top: 2px;
+  display: block;
+}
+.active-note-reader {
+  background: var(--app-surface);
+  border: 0.5px solid var(--app-divider);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+.reader-category {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--app-blue);
+}
+.reader-title {
+  font-size: 15px;
+  font-weight: 750;
+  color: var(--app-ink);
+  margin: 3px 0 6px;
+}
+.reader-date-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: var(--app-muted);
+  margin-bottom: 12px;
+}
+.reader-content-body p {
+  font-size: 12px;
+  color: var(--app-secondary);
+  line-height: 1.5;
+  margin: 0 0 8px;
+}
+.visitor-scratchpad {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.scratchpad-form {
+  display: flex;
+  gap: 8px;
+}
+.scratchpad-input {
+  flex: 1;
+  background: var(--app-surface);
+  border: 0.5px solid var(--app-divider);
+  border-radius: 10px;
+  padding: 8px 12px;
+  color: var(--app-ink);
+  font-size: 12px;
+  outline: none;
+}
+.scratchpad-add-btn {
+  background: var(--app-blue);
+  color: #ffffff;
+  border-radius: 10px;
+  padding: 0 14px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.scratchpad-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.scratchpad-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--app-surface);
+  border: 0.5px solid var(--app-divider);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--app-ink);
+}
+.scratchpad-del-btn {
+  color: var(--app-muted);
+  cursor: pointer;
+}
+.scratchpad-del-btn:hover {
+  color: #ef4444;
 }
 
 
