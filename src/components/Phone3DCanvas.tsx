@@ -116,6 +116,7 @@ export function Phone3DCanvas({
   const velYRef = useRef<number>(0);
   const velXRef = useRef<number>(0);
   const isDraggingRef = useRef<boolean>(false);
+  const ambientTiltRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const justDraggedRef = useRef<boolean>(false);
   const needsCssRenderRef = useRef<boolean>(true);
   const dragStartRef = useRef<{
@@ -549,8 +550,25 @@ export function Phone3DCanvas({
       }
     };
 
+    // Subtle 3D Gyroscope & Desktop Parallax
+    const handleDeviceOrientation = (e: DeviceOrientationEvent) => {
+      if (isDraggingRef.current || e.gamma === null || e.beta === null) return;
+      ambientTiltRef.current.y = (Math.max(-30, Math.min(30, e.gamma)) / 30) * 0.12;
+      ambientTiltRef.current.x = (Math.max(-20, Math.min(20, e.beta - 45)) / 20) * 0.08;
+    };
+
+    const handleWindowPointerHover = (e: PointerEvent) => {
+      if (isDraggingRef.current || e.pointerType === 'touch') return;
+      const nx = (e.clientX / window.innerWidth - 0.5) * 2;
+      const ny = (e.clientY / window.innerHeight - 0.5) * 2;
+      ambientTiltRef.current.y = nx * 0.06;
+      ambientTiltRef.current.x = -ny * 0.04;
+    };
+
     container.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointermove', handleWindowPointerHover, { passive: true });
+    window.addEventListener('deviceorientation', handleDeviceOrientation, { passive: true });
     window.addEventListener('pointerup', onPointerUp);
     window.addEventListener('pointercancel', onPointerUp);
     container.addEventListener('click', onClickCapture, true);
@@ -567,8 +585,10 @@ export function Phone3DCanvas({
       let isMoving = isDraggingRef.current;
 
       if (!isDraggingRef.current) {
-        const diffY = Math.abs(currentRotYRef.current - flipTargetRef.current);
-        const diffX = Math.abs(currentRotXRef.current);
+        const targetY = flipTargetRef.current + ambientTiltRef.current.y;
+        const targetX = ambientTiltRef.current.x;
+        const diffY = Math.abs(currentRotYRef.current - targetY);
+        const diffX = Math.abs(currentRotXRef.current - targetX);
 
         if (
           diffY < 0.001 &&
@@ -577,18 +597,18 @@ export function Phone3DCanvas({
           Math.abs(velXRef.current) < 0.005
         ) {
           // Snapped to rest!
-          currentRotYRef.current = flipTargetRef.current;
+          currentRotYRef.current = targetY;
           velYRef.current = 0;
-          currentRotXRef.current = 0;
+          currentRotXRef.current = targetX;
           velXRef.current = 0;
         } else {
           // Spring smoothly to target
           isMoving = true;
-          const stepY = springStep(currentRotYRef.current, velYRef.current, flipTargetRef.current, dt);
+          const stepY = springStep(currentRotYRef.current, velYRef.current, targetY, dt);
           currentRotYRef.current = stepY.position;
           velYRef.current = stepY.velocity;
 
-          const stepX = springStep(currentRotXRef.current, velXRef.current, 0, dt);
+          const stepX = springStep(currentRotXRef.current, velXRef.current, targetX, dt);
           currentRotXRef.current = stepX.position;
           velXRef.current = stepX.velocity;
         }
@@ -629,6 +649,8 @@ export function Phone3DCanvas({
       window.removeEventListener('resize', handleResize);
       container.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointermove', handleWindowPointerHover);
+      window.removeEventListener('deviceorientation', handleDeviceOrientation);
       window.removeEventListener('pointerup', onPointerUp);
       window.removeEventListener('pointercancel', onPointerUp);
       container.removeEventListener('click', onClickCapture, true);

@@ -82,14 +82,14 @@ export function IosHomeScreen({ onNavigate, onOpenSearch }: IosHomeScreenProps) 
         </div>
       </section>
 
-      {/* Third Row: 4 Essential Apps */}
+      {/* Essential Apps Grid - Row 1 */}
       <section className="apps-single-row">
-        {/* Uday AI Assistant */}
+        {/* Uday AI Voice Assistant */}
         <button
           type="button"
           className="ios-home-icon-btn"
           onClick={() => handleNav('ai')}
-          aria-label="Uday AI Siri Assistant"
+          aria-label="Uday AI Siri Voice Assistant"
         >
           <div className="ios-icon-box">
             <img src="/ios/ai.svg" alt="Uday AI" width={52} height={52} />
@@ -111,6 +111,36 @@ export function IosHomeScreen({ onNavigate, onOpenSearch }: IosHomeScreenProps) 
           <span className="ios-icon-title">LeetCode</span>
         </button>
 
+        {/* Apple Arcade: Dev Dash Game */}
+        <button
+          type="button"
+          className="ios-home-icon-btn"
+          onClick={() => handleNav('arcade')}
+          aria-label="Apple Arcade Dev Dash mini-game"
+        >
+          <div className="ios-icon-box arcade-home-box">
+            <span className="arcade-emoji-icon">🕹️</span>
+            <span className="app-red-badge">GAME</span>
+          </div>
+          <span className="ios-icon-title">Arcade</span>
+        </button>
+
+        {/* World Clock & Stopwatch */}
+        <button
+          type="button"
+          className="ios-home-icon-btn"
+          onClick={() => handleNav('clock')}
+          aria-label="Clock application"
+        >
+          <div className="ios-icon-box clock-home-box">
+            <span className="clock-emoji-icon">⏱️</span>
+          </div>
+          <span className="ios-icon-title">Clock</span>
+        </button>
+      </section>
+
+      {/* Essential Apps Grid - Row 2 */}
+      <section className="apps-single-row row-two">
         {/* Resume */}
         <button
           type="button"
@@ -135,6 +165,32 @@ export function IosHomeScreen({ onNavigate, onOpenSearch }: IosHomeScreenProps) 
             <img src="/ios/settings.png" alt="Settings" width={52} height={52} />
           </div>
           <span className="ios-icon-title">Settings</span>
+        </button>
+
+        {/* Notes */}
+        <button
+          type="button"
+          className="ios-home-icon-btn"
+          onClick={() => handleNav('notes')}
+          aria-label="Notes application"
+        >
+          <div className="ios-icon-box notes-home-box">
+            <span style={{ fontSize: 28 }}>📝</span>
+          </div>
+          <span className="ios-icon-title">Notes</span>
+        </button>
+
+        {/* Technical Skills */}
+        <button
+          type="button"
+          className="ios-home-icon-btn"
+          onClick={() => handleNav('skills')}
+          aria-label="Skills overview application"
+        >
+          <div className="ios-icon-box skills-home-box">
+            <span style={{ fontSize: 28 }}>⚡</span>
+          </div>
+          <span className="ios-icon-title">Skills</span>
         </button>
       </section>
 

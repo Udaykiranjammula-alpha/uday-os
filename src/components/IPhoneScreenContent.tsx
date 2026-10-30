@@ -22,6 +22,9 @@ import { CameraApp } from '../apps/CameraApp';
 import { AiAssistantApp } from '../apps/AiAssistantApp';
 import { LeetCodeApp } from '../apps/LeetCodeApp';
 import { MessagesApp } from '../apps/MessagesApp';
+import { ArcadeApp } from '../apps/ArcadeApp';
+import { ClockApp } from '../apps/ClockApp';
+import { AppSwitcher } from './AppSwitcher';
 import { LockScreen } from './LockScreen';
 import { SpotlightSearch } from './SpotlightSearch';
 import type { Project } from '../types';
@@ -60,6 +63,7 @@ export function IPhoneScreenContent({
   onFlipToBack,
 }: IPhoneScreenContentProps) {
   const [isControlCenterOpen, setIsControlCenterOpen] = useState(false);
+  const [isAppSwitcherOpen, setIsAppSwitcherOpen] = useState(false);
   const [brightness, setBrightness] = useState(1.0);
   const [isLocked, setIsLocked] = useState(false);
 
@@ -345,7 +349,38 @@ export function IPhoneScreenContent({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 15 }}
             >
-              <AiAssistantApp onBack={() => onNavigate('home')} />
+              <AiAssistantApp
+                onBack={() => onNavigate('home')}
+                onNavigate={onNavigate}
+                onToggleFlashlight={() => setFlashlightOn(!flashlightOn)}
+                onToggleMusic={() => sound.toggleAmbientMusic()}
+              />
+            </motion.div>
+          ) : currentRoute === 'arcade' ? (
+            <motion.div
+              key="arcade-view"
+              className="page-screen-anim"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+            >
+              <ArcadeApp
+                onBack={() => onNavigate('home')}
+                onNavigate={onNavigate}
+              />
+            </motion.div>
+          ) : currentRoute === 'clock' ? (
+            <motion.div
+              key="clock-view"
+              className="page-screen-anim"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+            >
+              <ClockApp
+                onBack={() => onNavigate('home')}
+                onNavigate={onNavigate}
+              />
             </motion.div>
           ) : currentRoute === 'leetcode' ? (
             <motion.div
@@ -479,7 +514,19 @@ export function IPhoneScreenContent({
         />
       )}
 
-      {/* iOS Home Indicator Bar */}
+      {/* iOS 18 Multitasking App Switcher Overlay */}
+      <AppSwitcher
+        isOpen={isAppSwitcherOpen}
+        onClose={() => setIsAppSwitcherOpen(false)}
+        onSelectApp={(appId) => {
+          setActiveProject(null);
+          setIsDemoOpen(false);
+          onNavigate(appId);
+        }}
+        currentApp={currentRoute}
+      />
+
+      {/* iOS Home Indicator Bar with App Switcher gesture */}
       <div
         className="ios-home-indicator-pill"
         onClick={() => {
@@ -487,6 +534,16 @@ export function IPhoneScreenContent({
           setIsDemoOpen(false);
           onNavigate('home');
         }}
+        onDoubleClick={() => {
+          sound.playTapSound();
+          setIsAppSwitcherOpen(true);
+        }}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          sound.playTapSound();
+          setIsAppSwitcherOpen(true);
+        }}
+        title="Tap: Home · Double-Click / Right-Click: App Switcher"
         role="button"
         tabIndex={0}
         onKeyDown={(e) => {
@@ -496,7 +553,7 @@ export function IPhoneScreenContent({
             onNavigate('home');
           }
         }}
-        aria-label="Return to iOS Home Screen"
+        aria-label="Return to iOS Home Screen or Open App Switcher"
       />
     </div>
   );
