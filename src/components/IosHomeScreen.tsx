@@ -1,22 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { GitHubWidget } from './GitHubWidget';
 import { CalWidget } from './CalWidget';
-import { Search } from 'lucide-react';
+import { Search, Sliders, Check, Sparkles, X } from 'lucide-react';
 import { sound } from '../services/sound';
 
 interface IosHomeScreenProps {
   onNavigate: (route: string) => void;
   onOpenSearch: () => void;
+  onOpenStandBy?: () => void;
 }
 
-export function IosHomeScreen({ onNavigate, onOpenSearch }: IosHomeScreenProps) {
+type AppearanceMode = 'default' | 'dark' | 'tinted';
+type TintColor = 'amber' | 'cyan' | 'plum' | 'emerald' | 'violet';
+type IconSize = 'small' | 'large';
+
+export function IosHomeScreen({ onNavigate, onOpenSearch, onOpenStandBy }: IosHomeScreenProps) {
+  const [appearance, setAppearance] = useState<AppearanceMode>('default');
+  const [tintColor, setTintColor] = useState<TintColor>('amber');
+  const [iconSize, setIconSize] = useState<IconSize>('small');
+  const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
+
   const handleNav = (route: string) => {
     sound.playTapSound();
     onNavigate(route);
   };
 
+  const getContainerClasses = () => {
+    const list = ['ios-homescreen-view'];
+    if (appearance === 'tinted') list.push(`home-tint-${tintColor}`);
+    if (appearance === 'dark') list.push('home-dark-icons');
+    if (iconSize === 'large') list.push('icons-large');
+    return list.join(' ');
+  };
+
   return (
-    <div className="ios-homescreen-view">
+    <div className={getContainerClasses()}>
       {/* Top Wide GitHub Heatmap Widget (Clicking opens GitHub & showcases all projects) */}
       <section className="widget-row-top">
         <GitHubWidget onClick={() => handleNav('github')} />
@@ -168,17 +186,17 @@ export function IosHomeScreen({ onNavigate, onOpenSearch }: IosHomeScreenProps) 
           <span className="ios-icon-title">Music</span>
         </button>
 
-        {/* Resume */}
+        {/* Apple Fitness Activity Rings */}
         <button
           type="button"
           className="ios-home-icon-btn"
-          onClick={() => handleNav('resume')}
-          aria-label="Resume application"
+          onClick={() => handleNav('fitness')}
+          aria-label="Apple Fitness Activity Rings"
         >
-          <div className="ios-icon-box">
-            <img src="/ios/resume.png" alt="Resume" width={52} height={52} />
+          <div className="ios-icon-box fitness-home-box">
+            <span style={{ fontSize: 28 }}>⭕</span>
           </div>
-          <span className="ios-icon-title">Resume</span>
+          <span className="ios-icon-title">Fitness</span>
         </button>
 
         {/* Settings */}
@@ -251,7 +269,7 @@ export function IosHomeScreen({ onNavigate, onOpenSearch }: IosHomeScreenProps) 
         </button>
       </section>
 
-      {/* Search Pill */}
+      {/* Search & iOS 18 Customize Bar */}
       <div className="ios-search-pill-container">
         <button
           type="button"
@@ -265,6 +283,35 @@ export function IosHomeScreen({ onNavigate, onOpenSearch }: IosHomeScreenProps) 
           <Search size={12} className="search-pill-icon" />
           <span>Search</span>
         </button>
+
+        <button
+          type="button"
+          className="ios-customize-capsule"
+          onClick={() => {
+            sound.playTapSound();
+            setIsCustomizeOpen(true);
+          }}
+          aria-label="Customize Home Screen"
+          title="iOS 18 Tint & Size Customizer"
+        >
+          <Sliders size={12} className="mr-1" />
+          <span>Customize</span>
+        </button>
+
+        {onOpenStandBy && (
+          <button
+            type="button"
+            className="ios-customize-capsule standby"
+            onClick={() => {
+              sound.playTapSound();
+              onOpenStandBy();
+            }}
+            aria-label="Open iOS StandBy mode"
+            title="StandBy Mode"
+          >
+            <span>StandBy</span>
+          </button>
+        )}
       </div>
 
       {/* Floating Glass Dock with 4 Core Apps */}
@@ -316,6 +363,113 @@ export function IosHomeScreen({ onNavigate, onOpenSearch }: IosHomeScreenProps) 
           </button>
         </div>
       </div>
+
+      {/* iOS 18 Home Screen Customizer Sheet */}
+      {isCustomizeOpen && (
+        <div
+          className="ios-customize-sheet-overlay"
+          onClick={() => setIsCustomizeOpen(false)}
+        >
+          <div
+            className="ios-customize-sheet"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="customize-sheet-grabber" />
+
+            <div className="customize-header">
+              <h3>Home Screen Customizer</h3>
+              <button
+                type="button"
+                className="customize-done-btn"
+                onClick={() => setIsCustomizeOpen(false)}
+              >
+                Done
+              </button>
+            </div>
+
+            {/* Appearance Toggles */}
+            <div className="customize-segmented-control">
+              <button
+                type="button"
+                className={`seg-btn ${appearance === 'default' ? 'active' : ''}`}
+                onClick={() => {
+                  sound.playTapSound();
+                  setAppearance('default');
+                }}
+              >
+                Default
+              </button>
+              <button
+                type="button"
+                className={`seg-btn ${appearance === 'dark' ? 'active' : ''}`}
+                onClick={() => {
+                  sound.playTapSound();
+                  setAppearance('dark');
+                }}
+              >
+                Dark
+              </button>
+              <button
+                type="button"
+                className={`seg-btn ${appearance === 'tinted' ? 'active' : ''}`}
+                onClick={() => {
+                  sound.playTapSound();
+                  setAppearance('tinted');
+                }}
+              >
+                Tinted
+              </button>
+            </div>
+
+            {/* Tint Colors Selector */}
+            {appearance === 'tinted' && (
+              <div className="customize-tints-row">
+                {(['amber', 'cyan', 'plum', 'emerald', 'violet'] as TintColor[]).map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    className={`tint-swatch-btn ${tintColor === c ? 'active' : ''} tint-${c}`}
+                    onClick={() => {
+                      sound.playTapSound();
+                      setTintColor(c);
+                    }}
+                    title={c.toUpperCase()}
+                  >
+                    {tintColor === c && <Check size={14} className="text-white" />}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Icon Sizing */}
+            <div className="customize-size-row">
+              <span className="size-label">Icon Size</span>
+              <div className="customize-size-pills">
+                <button
+                  type="button"
+                  className={`size-pill ${iconSize === 'small' ? 'active' : ''}`}
+                  onClick={() => {
+                    sound.playTapSound();
+                    setIconSize('small');
+                  }}
+                >
+                  Small
+                </button>
+                <button
+                  type="button"
+                  className={`size-pill ${iconSize === 'large' ? 'active' : ''}`}
+                  onClick={() => {
+                    sound.playTapSound();
+                    setIconSize('large');
+                  }}
+                >
+                  Large (Hide Labels)
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

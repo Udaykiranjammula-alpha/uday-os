@@ -29,6 +29,9 @@ import { MusicApp } from '../apps/MusicApp';
 import { CalculatorApp } from '../apps/CalculatorApp';
 import { WeatherApp } from '../apps/WeatherApp';
 import { WalletApp } from '../apps/WalletApp';
+import { FitnessApp } from '../apps/FitnessApp';
+import { StandByApp } from '../apps/StandByApp';
+import { AppleIntelligenceGlow } from './AppleIntelligenceGlow';
 import { RecruiterCallModal } from './RecruiterCallModal';
 import { AppSwitcher } from './AppSwitcher';
 import { LockScreen } from './LockScreen';
@@ -74,6 +77,7 @@ export function IPhoneScreenContent({
   const [showMagSafe, setShowMagSafe] = useState(false);
   const [brightness, setBrightness] = useState(1.0);
   const [isLocked, setIsLocked] = useState(false);
+  const [isStandByOpen, setIsStandByOpen] = useState(false);
 
   const triggerMagSafe = () => {
     sound.playMagSafeSound();
@@ -492,6 +496,19 @@ export function IPhoneScreenContent({
                 onNavigate={onNavigate}
               />
             </motion.div>
+          ) : currentRoute === 'fitness' ? (
+            <motion.div
+              key="fitness-view"
+              className="page-screen-anim"
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+            >
+              <FitnessApp
+                onBack={() => onNavigate('home')}
+                onNavigate={onNavigate}
+              />
+            </motion.div>
           ) : currentRoute === 'leetcode' ? (
             <motion.div
               key="leetcode-view"
@@ -590,6 +607,7 @@ export function IPhoneScreenContent({
               <IosHomeScreen
                 onNavigate={onNavigate}
                 onOpenSearch={onOpenSearch}
+                onOpenStandBy={() => setIsStandByOpen(true)}
               />
             </motion.div>
           )}
@@ -691,6 +709,24 @@ export function IPhoneScreenContent({
         }}
         aria-label="Return to iOS Home Screen or Open App Switcher"
       />
+
+      {/* Apple Intelligence Glowing Multicolor Edge Bezel Ribbon */}
+      <AppleIntelligenceGlow
+        isActive={currentRoute === 'ai' || currentRoute === 'assistant'}
+        statusText="Apple Intelligence · Ready to assist"
+        isListening={currentRoute === 'ai'}
+      />
+
+      {/* iOS 18 StandBy Mode Overlay */}
+      {isStandByOpen && (
+        <StandByApp
+          onClose={() => setIsStandByOpen(false)}
+          onNavigate={(route) => {
+            setIsStandByOpen(false);
+            onNavigate(route);
+          }}
+        />
+      )}
     </div>
   );
 }

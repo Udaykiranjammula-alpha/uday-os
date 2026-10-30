@@ -12,6 +12,7 @@ export interface AppCard {
 }
 
 export const DEFAULT_APP_DECK: AppCard[] = [
+  { id: 'fitness', title: 'Activity', icon: '⭕', color: '#ff2d55', subtitle: 'Closed 3 Activity Rings' },
   { id: 'calculator', title: 'Calculator', icon: '🧮', color: '#ff9f0a', subtitle: 'Math & Tech Converter' },
   { id: 'weather', title: 'Weather', icon: '🌦️', color: '#1c3d5a', subtitle: 'Vijayawada 31°C · Sunny' },
   { id: 'wallet', title: 'Wallet', icon: '💳', color: '#27272a', subtitle: 'Titanium Pass & Student ID' },
