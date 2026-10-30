@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Phone3DCanvas } from './components/Phone3DCanvas';
 import { IPhoneScreenContent } from './components/IPhoneScreenContent';
 import { Rotate3d } from 'lucide-react';
@@ -14,6 +14,10 @@ export default function App() {
   });
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [isDemoOpen, setIsDemoOpen] = useState(false);
+
+  const handleFlipChange = useCallback((flipped: boolean) => {
+    setIsFlipped(flipped);
+  }, []);
 
   // Sync route with window.location.hash
   useEffect(() => {
@@ -154,7 +158,7 @@ export default function App() {
         <Phone3DCanvas
           finish={finishKey}
           isFlipped={isFlipped}
-          onFlipChange={(flipped) => setIsFlipped(flipped)}
+          onFlipChange={handleFlipChange}
         >
           <IPhoneScreenContent
             color={color}

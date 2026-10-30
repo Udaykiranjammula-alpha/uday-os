@@ -3075,6 +3075,39 @@ a {
   align-items: center;
   pointer-events: auto;
 }
+/* Fallback CSS Phone Chassis (used when WebGL is unavailable or fails to initialize) */
+.phone-stage.phone-fallback {
+  pointer-events: auto;
+}
+.phone-stage.phone-fallback .phone-fallback-shell {
+  position: relative;
+  width: 372px;
+  height: 806px;
+  border-radius: 54px;
+  padding: 11px;
+  background: linear-gradient(145deg, #1f1118, #562e43 38%, #1f1118);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.14),
+    0 20px 48px rgba(0, 0, 0, 0.45),
+    0 45px 95px rgba(0, 0, 0, 0.65);
+  box-sizing: content-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.phone-stage.phone-fallback.cosmic-orange .phone-fallback-shell {
+  background: linear-gradient(145deg, #3d2011, #d76c2d 38%, #3d2011);
+}
+.phone-stage.phone-fallback.dark-cherry .phone-fallback-shell {
+  background: linear-gradient(145deg, #1f1118, #562e43 38%, #1f1118);
+}
+.phone-stage.phone-fallback .phone-surface {
+  position: relative;
+  width: 372px;
+  height: 806px;
+  border-radius: 46px;
+  overflow: hidden;
+}
 .phone-stage.phone-dragging {
   cursor: grabbing;
 }

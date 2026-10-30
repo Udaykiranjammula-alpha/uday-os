@@ -79,7 +79,12 @@ export function Phone3DCanvas({
   const [fallbackMode, setFallbackMode] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // References to mutable Three.js objects
+  // References to mutable Three.js objects & callbacks
+  const onFlipChangeRef = useRef(onFlipChange);
+  onFlipChangeRef.current = onFlipChange;
+  const finishRef = useRef(finish);
+  finishRef.current = finish;
+
   const modelRef = useRef<THREE.Group | null>(null);
   const updateMaterialsRef = useRef<((f: PhoneFinish) => void) | null>(null);
   const flipTargetRef = useRef<number>(-0.045);
@@ -89,7 +94,7 @@ export function Phone3DCanvas({
   const velXRef = useRef<number>(0);
   const isDraggingRef = useRef<boolean>(false);
   const justDraggedRef = useRef<boolean>(false);
-  const needsRenderRef = useRef<boolean>(true);
+  const needsCssRenderRef = useRef<boolean>(true);
   const dragStartRef = useRef<{
     x: number;
     y: number;
@@ -102,14 +107,15 @@ export function Phone3DCanvas({
   // Update target angle when isFlipped prop changes
   useEffect(() => {
     flipTargetRef.current = isFlipped ? Math.PI - 0.045 : -0.045;
-    needsRenderRef.current = true;
+    needsCssRenderRef.current = true;
   }, [isFlipped]);
 
-  // Update materials when finish changes
+  // Update materials when finish changes (in-place without re-mounting)
   useEffect(() => {
+    finishRef.current = finish;
     if (updateMaterialsRef.current) {
       updateMaterialsRef.current(finish);
-      needsRenderRef.current = true;
+      needsCssRenderRef.current = true;
     }
   }, [finish]);
 
@@ -118,31 +124,49 @@ export function Phone3DCanvas({
     if (!container) return;
 
     let webglRenderer: THREE.WebGLRenderer;
+    let pmrem: THREE.PMREMGenerator;
+    let envTexture: THREE.Texture;
+
     try {
       webglRenderer = new THREE.WebGLRenderer({
         alpha: true,
         antialias: true,
-        powerPreference: 'high-performance',
+        powerPreference: 'default',
+        preserveDrawingBuffer: true,
       });
-    } catch {
+
+      if (!webglRenderer.getContext()) {
+        throw new Error('WebGL context is unavailable');
+      }
+
+      webglRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      webglRenderer.setClearColor(0x000000, 0);
+      webglRenderer.outputColorSpace = THREE.SRGBColorSpace;
+      webglRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+      webglRenderer.toneMappingExposure = 1.0;
+      webglRenderer.shadowMap.enabled = true;
+      webglRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      webglRenderer.domElement.className = 'phone-canvas';
+      webglRenderer.domElement.setAttribute('aria-hidden', 'true');
+      container.appendChild(webglRenderer.domElement);
+
+      // Setup PMREM Environment safely
+      pmrem = new THREE.PMREMGenerator(webglRenderer);
+      const room = new RoomEnvironment();
+      envTexture = pmrem.fromScene(room, 0.04).texture;
+      room.dispose();
+      pmrem.dispose();
+    } catch (err) {
+      console.warn('WebGL initialization failed, falling back to CSS 3D:', err);
       setFallbackMode(true);
       return;
     }
 
-    webglRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    webglRenderer.setClearColor(0x000000, 0);
-    webglRenderer.outputColorSpace = THREE.SRGBColorSpace;
-    webglRenderer.toneMapping = THREE.ACESFilmicToneMapping;
-    webglRenderer.toneMappingExposure = 1.0;
-    webglRenderer.shadowMap.enabled = true;
-    webglRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    webglRenderer.domElement.className = 'phone-canvas';
-    webglRenderer.domElement.setAttribute('aria-hidden', 'true');
-    container.appendChild(webglRenderer.domElement);
-
     // Setup Scenes & Groups
     const webglScene = new THREE.Scene();
     const cssScene = new THREE.Scene();
+    webglScene.environment = envTexture;
+    webglScene.environmentIntensity = 0.75;
 
     const modelGroup = new THREE.Group();
     const cssGroup = new THREE.Group();
@@ -152,15 +176,6 @@ export function Phone3DCanvas({
     // Camera
     const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
     camera.position.set(0, 0, 19);
-
-    // PMREM Environment
-    const pmrem = new THREE.PMREMGenerator(webglRenderer);
-    const room = new RoomEnvironment();
-    const envTexture = pmrem.fromScene(room, 0.04).texture;
-    webglScene.environment = envTexture;
-    webglScene.environmentIntensity = 0.75;
-    room.dispose();
-    pmrem.dispose();
 
     // Lighting
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0x998877, 0.7);
@@ -220,12 +235,20 @@ export function Phone3DCanvas({
           }
         }
       });
-      needsRenderRef.current = true;
+      needsCssRenderRef.current = true;
     };
     updateMaterialsRef.current = applyMaterials;
 
-    // Load GLTF Model with MeshoptDecoder
+    // Load GLTF Model with MeshoptDecoder & automatic fallback
     let active = true;
+
+    // Timeout safety: if 3D model takes > 6s on slow mobile, gracefully switch to fallback
+    const loadTimeout = setTimeout(() => {
+      if (active && !modelRef.current) {
+        console.warn('3D model load timeout, falling back to CSS 3D representation.');
+        setFallbackMode(true);
+      }
+    }, 6000);
 
     const initAndLoad = async () => {
       try {
@@ -236,58 +259,67 @@ export function Phone3DCanvas({
         const loader = new GLTFLoader();
         loader.setMeshoptDecoder(MeshoptDecoder);
 
-        loader.load(
-          '/models/iphone-17-pro.glb',
-          (gltf: { scene: THREE.Group }) => {
-            if (!active) return;
-            const root = gltf.scene;
-            root.rotation.y = Math.PI;
-            root.scale.set(V_SCALE, W_SCALE, V_SCALE);
+        const tryLoad = (primaryUrl: string, secondaryUrl: string) => {
+          loader.load(
+            primaryUrl,
+            (gltf: { scene: THREE.Group }) => {
+              if (!active) return;
+              clearTimeout(loadTimeout);
+              const root = gltf.scene;
+              root.rotation.y = Math.PI;
+              root.scale.set(V_SCALE, W_SCALE, V_SCALE);
 
-            root.traverse((child: THREE.Object3D) => {
-              if (child instanceof THREE.Mesh) {
-                child.castShadow = true;
-                child.receiveShadow = true;
-                const mats = Array.isArray(child.material) ? child.material : [child.material];
-                for (const mat of mats) {
-                  if (mat instanceof THREE.MeshStandardMaterial) {
-                    if (NORMAL_EXCLUSIONS.has(mat.name) && mat.normalMap) {
-                      mat.normalMap = null;
-                      mat.needsUpdate = true;
+              root.traverse((child: THREE.Object3D) => {
+                if (child instanceof THREE.Mesh) {
+                  child.castShadow = true;
+                  child.receiveShadow = true;
+                  const mats = Array.isArray(child.material) ? child.material : [child.material];
+                  for (const mat of mats) {
+                    if (mat instanceof THREE.MeshStandardMaterial) {
+                      if (NORMAL_EXCLUSIONS.has(mat.name) && mat.normalMap) {
+                        mat.normalMap = null;
+                        mat.needsUpdate = true;
+                      }
                     }
                   }
                 }
-              }
-            });
+              });
 
-            applyMaterials(finish, root);
-            modelGroup.add(root);
-            modelRef.current = modelGroup;
-            setIsLoaded(true);
-            needsRenderRef.current = true;
-          },
-          undefined,
-          (err: unknown) => {
-            console.warn('Failed to load 3D GLTF model, falling back to CSS 3D:', err);
-            setFallbackMode(true);
-          }
-        );
+              applyMaterials(finishRef.current, root);
+              modelGroup.add(root);
+              modelRef.current = modelGroup;
+              setIsLoaded(true);
+              needsCssRenderRef.current = true;
+            },
+            undefined,
+            (err: unknown) => {
+              if (!active) return;
+              if (secondaryUrl) {
+                console.warn(`Primary URL ${primaryUrl} failed, trying secondary ${secondaryUrl}`);
+                tryLoad(secondaryUrl, '');
+              } else {
+                console.warn('Failed to load 3D GLTF model, falling back to CSS 3D:', err);
+                clearTimeout(loadTimeout);
+                setFallbackMode(true);
+              }
+            }
+          );
+        };
+
+        tryLoad('/models/iphone-17-pro.glb', '/iphone-17-pro.glb');
       } catch (err) {
         console.warn('Meshopt init error, falling back to CSS 3D:', err);
-        setFallbackMode(true);
+        clearTimeout(loadTimeout);
+        if (active) setFallbackMode(true);
       }
     };
-    initAndLoad();
+    void initAndLoad();
 
     // Resize Handler
     const handleResize = () => {
       const rect = container.getBoundingClientRect();
       if (!rect.width || !rect.height) return;
       camera.aspect = rect.width / rect.height;
-      // Phone model height is ~8.14 units.
-      // dist = 12.2 ensures the phone height takes up ~66% of the viewport height,
-      // leaving generous margins so the phone NEVER clips the top bar or bottom dock,
-      // matching prsd.dev's exact vertical framing.
       const dist = Math.max(12.2, 5.8 / camera.aspect);
       camera.position.z = dist / (2 * Math.tan(THREE.MathUtils.degToRad(16)));
       camera.position.y = 0;
@@ -296,12 +328,17 @@ export function Phone3DCanvas({
       camera.updateProjectionMatrix();
       webglRenderer.setSize(rect.width, rect.height);
       cssRenderer.setSize(rect.width, rect.height);
-      needsRenderRef.current = true;
+      needsCssRenderRef.current = true;
     };
 
     const resizeObserver = new ResizeObserver(handleResize);
     resizeObserver.observe(container);
+    window.addEventListener('resize', handleResize);
     handleResize();
+
+    // Secondary timers to guarantee correct sizing once webfonts or DOM layout settles
+    const t1 = setTimeout(handleResize, 60);
+    const t2 = setTimeout(handleResize, 350);
 
     // Mouse / Touch Interaction Handlers
     const onPointerDown = (e: PointerEvent) => {
@@ -339,7 +376,7 @@ export function Phone3DCanvas({
         currentRotXRef.current = Math.max(-0.35, Math.min(0.35, dragStartRef.current.pitch + dy * 0.008));
         velYRef.current = 0;
         velXRef.current = 0;
-        needsRenderRef.current = true;
+        needsCssRenderRef.current = true;
       }
     };
 
@@ -352,8 +389,8 @@ export function Phone3DCanvas({
         // Dragged: settle to nearest multiple of PI
         flipTargetRef.current = roundToPi(currentRotYRef.current);
         const settledFlipped = Math.cos(flipTargetRef.current) < 0;
-        onFlipChange?.(settledFlipped);
-        needsRenderRef.current = true;
+        onFlipChangeRef.current?.(settledFlipped);
+        needsCssRenderRef.current = true;
         justDraggedRef.current = true;
         setTimeout(() => {
           justDraggedRef.current = false;
@@ -363,8 +400,8 @@ export function Phone3DCanvas({
         const facingAngle = Math.cos(currentRotYRef.current) * Math.cos(currentRotXRef.current);
         if (facingAngle < -0.2) {
           flipTargetRef.current = -0.045;
-          onFlipChange?.(false);
-          needsRenderRef.current = true;
+          onFlipChangeRef.current?.(false);
+          needsCssRenderRef.current = true;
         }
       }
 
@@ -391,7 +428,7 @@ export function Phone3DCanvas({
     window.addEventListener('pointercancel', onPointerUp);
     container.addEventListener('click', onClickCapture, true);
 
-    // Animation Loop with REST / FREEZE optimization to eliminate cursor flickering
+    // Animation Loop with separated WebGL & CSS rendering
     let animFrame: number;
     let lastTime = performance.now();
 
@@ -399,6 +436,8 @@ export function Phone3DCanvas({
       animFrame = requestAnimationFrame(animate);
       const dt = Math.min((time - lastTime) / 1000, 0.05);
       lastTime = time;
+
+      let isMoving = isDraggingRef.current;
 
       if (!isDraggingRef.current) {
         const diffY = Math.abs(currentRotYRef.current - flipTargetRef.current);
@@ -415,16 +454,9 @@ export function Phone3DCanvas({
           velYRef.current = 0;
           currentRotXRef.current = 0;
           velXRef.current = 0;
-
-          if (!needsRenderRef.current) {
-            // REST STATE: Do not re-render or touch DOM transforms.
-            // This prevents Chrome from invalidating the hover hit-test cache,
-            // eliminating 100% of cursor flickering on the home screen!
-            return;
-          }
-          needsRenderRef.current = false;
         } else {
           // Spring smoothly to target
+          isMoving = true;
           const stepY = springStep(currentRotYRef.current, velYRef.current, flipTargetRef.current, dt);
           currentRotYRef.current = stepY.position;
           velYRef.current = stepY.velocity;
@@ -432,31 +464,42 @@ export function Phone3DCanvas({
           const stepX = springStep(currentRotXRef.current, velXRef.current, 0, dt);
           currentRotXRef.current = stepX.position;
           velXRef.current = stepX.velocity;
-          needsRenderRef.current = true;
         }
       }
 
       modelGroup.rotation.y = currentRotYRef.current;
       modelGroup.rotation.x = currentRotXRef.current;
-      cssGroup.rotation.copy(modelGroup.rotation);
 
-      // Smooth front face visibility without abrupt blinking
-      const facingAngle = Math.cos(currentRotYRef.current) * Math.cos(currentRotXRef.current);
-      const isFacingBack = facingAngle < -0.12;
-      phoneSurface.style.pointerEvents = isFacingBack ? 'none' : 'auto';
-      phoneSurface.style.opacity = facingAngle < -0.2 ? '0' : '1';
-      phoneSurface.inert = isFacingBack;
-
+      // Always render WebGL so 3D phone chassis is NEVER blank or unrendered
       webglRenderer.render(webglScene, camera);
-      cssRenderer.render(cssScene, camera);
+
+      // Only update CSS transforms when moving or flagged (eliminates 100% of cursor flickering on home screen)
+      if (isMoving || needsCssRenderRef.current) {
+        cssGroup.rotation.copy(modelGroup.rotation);
+
+        const facingAngle = Math.cos(currentRotYRef.current) * Math.cos(currentRotXRef.current);
+        const isFacingBack = facingAngle < -0.12;
+        phoneSurface.style.pointerEvents = isFacingBack ? 'none' : 'auto';
+        phoneSurface.style.opacity = facingAngle < -0.2 ? '0' : '1';
+        phoneSurface.inert = isFacingBack;
+
+        cssRenderer.render(cssScene, camera);
+        if (!isMoving) {
+          needsCssRenderRef.current = false;
+        }
+      }
     };
 
     animate(performance.now());
 
     return () => {
       active = false;
+      clearTimeout(loadTimeout);
+      clearTimeout(t1);
+      clearTimeout(t2);
       cancelAnimationFrame(animFrame);
       resizeObserver.disconnect();
+      window.removeEventListener('resize', handleResize);
       container.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
@@ -467,7 +510,7 @@ export function Phone3DCanvas({
       webglRenderer.domElement.remove();
       cssRenderer.domElement.remove();
     };
-  }, [finish, onFlipChange]);
+  }, []); // Run ONCE on mount; finish and route changes do NOT re-initialize Three.js
 
   if (fallbackMode) {
     return (
