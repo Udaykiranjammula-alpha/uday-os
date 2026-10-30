@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Phone3DCanvas } from './components/Phone3DCanvas';
+import { Phone3DCanvas, type PhoneFinish } from './components/Phone3DCanvas';
 import { IPhoneScreenContent } from './components/IPhoneScreenContent';
 import { Rotate3d, Share2, QrCode, Copy, Check, X, Sparkles } from 'lucide-react';
 import type { Project } from './types';
@@ -8,7 +8,7 @@ import { sound } from './services/sound';
 import { toggleHardwareTorch } from './services/torch';
 
 export default function App() {
-  const [color, setColor] = useState<'plum' | 'desert'>('plum');
+  const [color, setColor] = useState<'plum' | 'desert' | 'natural' | 'black'>('plum');
   const [studioLighting, setStudioLighting] = useState<'keynote' | 'cyberpunk' | 'golden'>('keynote');
   const [isFlipped, setIsFlipped] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
@@ -67,7 +67,14 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentRoute]);
 
-  const finishKey = color === 'desert' ? 'cosmic-orange' : 'dark-cherry';
+  const finishKey: PhoneFinish =
+    color === 'desert'
+      ? 'cosmic-orange'
+      : color === 'natural'
+      ? 'natural-titanium'
+      : color === 'black'
+      ? 'black-titanium'
+      : 'dark-cherry';
 
   const handleCopyLink = () => {
     sound.playTapSound();
@@ -114,6 +121,38 @@ export default function App() {
             }}
           >
             <i style={{ background: '#3a1e27' }} />
+          </button>
+
+          {/* Natural Titanium */}
+          <button
+            type="button"
+            role="radio"
+            aria-checked={color === 'natural'}
+            aria-label="Natural Brushed Titanium Finish"
+            title="Natural Titanium"
+            onClick={() => {
+              sound.playTapSound();
+              setColor('natural');
+              if (isFlipped) setIsFlipped(false);
+            }}
+          >
+            <i style={{ background: '#9b9893' }} />
+          </button>
+
+          {/* Space Black Titanium */}
+          <button
+            type="button"
+            role="radio"
+            aria-checked={color === 'black'}
+            aria-label="Space Black Stealth Titanium Finish"
+            title="Space Black Titanium"
+            onClick={() => {
+              sound.playTapSound();
+              setColor('black');
+              if (isFlipped) setIsFlipped(false);
+            }}
+          >
+            <i style={{ background: '#1c1c1e' }} />
           </button>
         </div>
 

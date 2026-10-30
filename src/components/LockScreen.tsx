@@ -8,7 +8,7 @@ interface LockScreenProps {
   onUnlock: (targetRoute?: string) => void;
   flashlightOn?: boolean;
   onToggleFlashlight?: () => void;
-  color?: 'plum' | 'desert';
+  color?: 'plum' | 'desert' | 'natural' | 'black';
   time?: Date;
   reducedMotion?: boolean;
 }

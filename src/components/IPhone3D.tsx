@@ -5,8 +5,8 @@ import { IPhoneScreenContent } from './IPhoneScreenContent';
 import type { Project } from '../types';
 
 interface IPhone3DProps {
-  color: 'plum' | 'desert';
-  setColor: (c: 'plum' | 'desert') => void;
+  color: 'plum' | 'desert' | 'natural' | 'black';
+  setColor: (c: 'plum' | 'desert' | 'natural' | 'black') => void;
   isFlipped: boolean;
   onFlip: () => void;
   currentRoute: string;

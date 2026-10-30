@@ -6,9 +6,10 @@ import { sound } from '../services/sound';
 interface StatusBarProps {
   time?: Date;
   onOpenControlCenter?: () => void;
+  onTriggerMagSafe?: () => void;
 }
 
-export function StatusBar({ time: propTime, onOpenControlCenter }: StatusBarProps) {
+export function StatusBar({ time: propTime, onOpenControlCenter, onTriggerMagSafe }: StatusBarProps) {
   const clockTime = useClock();
   const time = propTime || clockTime;
   const formattedTime = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -31,8 +32,16 @@ export function StatusBar({ time: propTime, onOpenControlCenter }: StatusBarProp
       >
         <Wifi size={12} strokeWidth={2.4} aria-label="Wi-Fi full signal" />
         <span className="status-network">5G</span>
-        <div className="status-battery-container" aria-label="Battery 98 percent">
-          <span className="battery-level-text">98%</span>
+        <div
+          className="status-battery-container"
+          onClick={(e) => {
+            e.stopPropagation();
+            onTriggerMagSafe?.();
+          }}
+          title="Tap to snap MagSafe Charger"
+          aria-label="Battery 100 percent · Tap for MagSafe"
+        >
+          <span className="battery-level-text">100%</span>
           <Battery size={14} strokeWidth={2} />
         </div>
       </div>

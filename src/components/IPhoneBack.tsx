@@ -2,7 +2,7 @@ import React from 'react';
 import { AppleLogoIcon } from './IosIcons';
 
 interface IPhoneBackProps {
-  color: 'plum' | 'desert';
+  color: 'plum' | 'desert' | 'natural' | 'black';
   onFlip: () => void;
 }
 

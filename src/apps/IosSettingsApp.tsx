@@ -18,8 +18,8 @@ import { profile } from '../data/profile';
 
 interface IosSettingsAppProps {
   onBack: () => void;
-  color: 'plum' | 'desert';
-  setColor: (c: 'plum' | 'desert') => void;
+  color: 'plum' | 'desert' | 'natural' | 'black';
+  setColor: (c: 'plum' | 'desert' | 'natural' | 'black') => void;
   onOpenApp: (app: string) => void;
 }
 

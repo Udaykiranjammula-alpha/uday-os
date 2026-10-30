@@ -24,6 +24,9 @@ import { LeetCodeApp } from '../apps/LeetCodeApp';
 import { MessagesApp } from '../apps/MessagesApp';
 import { ArcadeApp } from '../apps/ArcadeApp';
 import { ClockApp } from '../apps/ClockApp';
+import { AppStoreApp } from '../apps/AppStoreApp';
+import { MusicApp } from '../apps/MusicApp';
+import { RecruiterCallModal } from './RecruiterCallModal';
 import { AppSwitcher } from './AppSwitcher';
 import { LockScreen } from './LockScreen';
 import { SpotlightSearch } from './SpotlightSearch';
@@ -32,8 +35,8 @@ import { projects } from '../data/projects';
 import { sound } from '../services/sound';
 
 export interface IPhoneScreenContentProps {
-  color: 'plum' | 'desert';
-  setColor: (c: 'plum' | 'desert') => void;
+  color: 'plum' | 'desert' | 'natural' | 'black';
+  setColor: (c: 'plum' | 'desert' | 'natural' | 'black') => void;
   currentRoute: string;
   onNavigate: (route: string) => void;
   activeProject: Project | null;
@@ -64,8 +67,16 @@ export function IPhoneScreenContent({
 }: IPhoneScreenContentProps) {
   const [isControlCenterOpen, setIsControlCenterOpen] = useState(false);
   const [isAppSwitcherOpen, setIsAppSwitcherOpen] = useState(false);
+  const [isCallModalOpen, setIsCallModalOpen] = useState(false);
+  const [showMagSafe, setShowMagSafe] = useState(false);
   const [brightness, setBrightness] = useState(1.0);
   const [isLocked, setIsLocked] = useState(false);
+
+  const triggerMagSafe = () => {
+    sound.playMagSafeSound();
+    setShowMagSafe(true);
+    setTimeout(() => setShowMagSafe(false), 2400);
+  };
 
   const isInApp = currentRoute !== 'home' || activeProject !== null || isDemoOpen;
 
@@ -208,8 +219,12 @@ export function IPhoneScreenContent({
       {/* Dynamic Island */}
       <DynamicIsland />
 
-      {/* Status Bar (Right side taps trigger iOS 18 Control Center) */}
-      <StatusBar time={time} onOpenControlCenter={() => setIsControlCenterOpen(true)} />
+      {/* Status Bar (Right side taps trigger iOS 18 Control Center, battery triggers MagSafe) */}
+      <StatusBar
+        time={time}
+        onOpenControlCenter={() => setIsControlCenterOpen(true)}
+        onTriggerMagSafe={triggerMagSafe}
+      />
 
       {/* Screen Router Viewport */}
       <div className="iphone-screen-viewport">
@@ -382,6 +397,32 @@ export function IPhoneScreenContent({
                 onNavigate={onNavigate}
               />
             </motion.div>
+          ) : currentRoute === 'appstore' ? (
+            <motion.div
+              key="appstore-view"
+              className="page-screen-anim"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+            >
+              <AppStoreApp
+                onBack={() => onNavigate('home')}
+                onNavigate={onNavigate}
+              />
+            </motion.div>
+          ) : currentRoute === 'music' ? (
+            <motion.div
+              key="music-view"
+              className="page-screen-anim"
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+            >
+              <MusicApp
+                onBack={() => onNavigate('home')}
+                onNavigate={onNavigate}
+              />
+            </motion.div>
           ) : currentRoute === 'leetcode' ? (
             <motion.div
               key="leetcode-view"
@@ -512,6 +553,32 @@ export function IPhoneScreenContent({
           onToggleFlashlight={() => setFlashlightOn(!flashlightOn)}
           color={color}
         />
+      )}
+
+      {/* Dynamic Island Recruiter Call Simulation Modal */}
+      <RecruiterCallModal
+        isOpen={isCallModalOpen || currentRoute === 'call'}
+        onClose={() => {
+          setIsCallModalOpen(false);
+          if (currentRoute === 'call') onNavigate('home');
+        }}
+        onOpenContact={() => {
+          setIsCallModalOpen(false);
+          onNavigate('contact');
+        }}
+      />
+
+      {/* Apple MagSafe Charging Circular Ring */}
+      {showMagSafe && (
+        <div className="magsafe-snap-overlay" onClick={() => setShowMagSafe(false)}>
+          <div className="magsafe-charging-circle">
+            <div className="magsafe-green-ring" />
+            <div className="magsafe-center-info">
+              <span className="magsafe-bolt-icon">⚡</span>
+              <strong className="magsafe-percentage">100%</strong>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* iOS 18 Multitasking App Switcher Overlay */}

@@ -141,6 +141,33 @@ export function IosHomeScreen({ onNavigate, onOpenSearch }: IosHomeScreenProps) 
 
       {/* Essential Apps Grid - Row 2 */}
       <section className="apps-single-row row-two">
+        {/* Apple App Store */}
+        <button
+          type="button"
+          className="ios-home-icon-btn"
+          onClick={() => handleNav('appstore')}
+          aria-label="Apple App Store project releases"
+        >
+          <div className="ios-icon-box appstore-home-box">
+            <span style={{ fontSize: 28 }}>🏪</span>
+            <span className="app-red-badge">STORE</span>
+          </div>
+          <span className="ios-icon-title">App Store</span>
+        </button>
+
+        {/* Apple Music */}
+        <button
+          type="button"
+          className="ios-home-icon-btn"
+          onClick={() => handleNav('music')}
+          aria-label="Apple Music application"
+        >
+          <div className="ios-icon-box music-home-box">
+            <span style={{ fontSize: 28 }}>🎵</span>
+          </div>
+          <span className="ios-icon-title">Music</span>
+        </button>
+
         {/* Resume */}
         <button
           type="button"
@@ -166,32 +193,6 @@ export function IosHomeScreen({ onNavigate, onOpenSearch }: IosHomeScreenProps) 
           </div>
           <span className="ios-icon-title">Settings</span>
         </button>
-
-        {/* Notes */}
-        <button
-          type="button"
-          className="ios-home-icon-btn"
-          onClick={() => handleNav('notes')}
-          aria-label="Notes application"
-        >
-          <div className="ios-icon-box notes-home-box">
-            <span style={{ fontSize: 28 }}>📝</span>
-          </div>
-          <span className="ios-icon-title">Notes</span>
-        </button>
-
-        {/* Technical Skills */}
-        <button
-          type="button"
-          className="ios-home-icon-btn"
-          onClick={() => handleNav('skills')}
-          aria-label="Skills overview application"
-        >
-          <div className="ios-icon-box skills-home-box">
-            <span style={{ fontSize: 28 }}>⚡</span>
-          </div>
-          <span className="ios-icon-title">Skills</span>
-        </button>
       </section>
 
       {/* Search Pill */}
@@ -213,14 +214,16 @@ export function IosHomeScreen({ onNavigate, onOpenSearch }: IosHomeScreenProps) 
       {/* Floating Glass Dock with 4 Core Apps */}
       <div className="ios-dock-container">
         <div className="ios-dock-glass-bar">
-          {/* Projects */}
+          {/* Phone / Recruiter Call Simulation */}
           <button
             type="button"
             className="dock-item-btn"
-            onClick={() => handleNav('projects')}
-            aria-label="Projects application"
+            onClick={() => handleNav('call')}
+            aria-label="Phone & Recruiter Call"
           >
-            <img src="/ios/projects.png" alt="Projects" width={52} height={52} />
+            <div className="dock-icon-relative dock-phone-box">
+              <span style={{ fontSize: 26 }}>📞</span>
+            </div>
           </button>
 
           {/* iMessage Recruiter Chat */}

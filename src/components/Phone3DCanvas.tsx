@@ -6,7 +6,7 @@ import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.j
 import { CSS3DRenderer, CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
-export type PhoneFinish = 'cosmic-orange' | 'dark-cherry';
+export type PhoneFinish = 'cosmic-orange' | 'dark-cherry' | 'natural-titanium' | 'black-titanium';
 
 export interface PhoneFinishConfig {
   label: string;
@@ -33,12 +33,32 @@ export const PHONE_FINISHES: Record<PhoneFinish, PhoneFinishConfig> = {
   'dark-cherry': {
     label: 'Dark Cherry',
     swatch: '#3a1e27',
-    appearance: 'light',
+    appearance: 'dark',
     wallpaper: 'burgundy',
     aluminum: '#5e3341',
     back: '#3d2029',
     tint: '#2c1620',
     antenna: '#7d5766',
+  },
+  'natural-titanium': {
+    label: 'Natural Titanium',
+    swatch: '#9b9893',
+    appearance: 'dark',
+    wallpaper: 'natural',
+    aluminum: '#8e8b85',
+    back: '#9a9791',
+    tint: '#797670',
+    antenna: '#b0ada7',
+  },
+  'black-titanium': {
+    label: 'Black Titanium',
+    swatch: '#1c1c1e',
+    appearance: 'dark',
+    wallpaper: 'black',
+    aluminum: '#222326',
+    back: '#18191b',
+    tint: '#111213',
+    antenna: '#3a3b3e',
   },
 };
 
