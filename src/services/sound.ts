@@ -230,6 +230,17 @@ class SoundService {
     }
   }
 
+  public setVolume(ratio: number) {
+    if (this.ambientGain && this.ctx) {
+      try {
+        const val = Math.max(0, Math.min(1, ratio)) * 0.2;
+        this.ambientGain.gain.setValueAtTime(val, this.ctx.currentTime);
+      } catch {
+        // Ignored
+      }
+    }
+  }
+
   public stopAmbientMusic() {
     this.isAmbientPlaying = false;
     if (this.ambientInterval !== null) {

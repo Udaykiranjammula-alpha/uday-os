@@ -5346,8 +5346,16 @@ a {
 }
 .control-center-sheet {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  scrollbar-width: none;
+}
+.control-center-sheet::-webkit-scrollbar {
+  display: none;
 }
 .cc-handle-bar {
   display: flex;
@@ -5465,6 +5473,9 @@ a {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  cursor: ns-resize;
+  touch-action: none;
+  user-select: none;
 }
 .cc-slider-fill {
   position: absolute;
@@ -5528,6 +5539,71 @@ a {
   color: #ffffff;
   border-color: #af52de;
 }
+/* Torch / Flashlight Interactive Status Pill (Matches iOS 18 Live Activity) */
+.phone-flashlight-status-pill {
+  position: absolute;
+  top: 54px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 120;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(30, 24, 10, 0.94);
+  border: 1px solid rgba(251, 191, 36, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 6px 14px;
+  border-radius: 24px;
+  box-shadow: 0 4px 20px rgba(251, 191, 36, 0.4), 0 0 12px rgba(251, 191, 36, 0.25);
+  cursor: pointer;
+  white-space: nowrap;
+  animation: pillPulse 2.2s ease-in-out infinite alternate;
+  user-select: none;
+}
+@keyframes pillPulse {
+  0% { transform: translateX(-50%) scale(1); box-shadow: 0 4px 16px rgba(251, 191, 36, 0.35); }
+  100% { transform: translateX(-50%) scale(1.02); box-shadow: 0 6px 26px rgba(251, 191, 36, 0.65); }
+}
+.torch-pulse-ring {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fbbf24;
+  box-shadow: 0 0 8px #fbbf24;
+  animation: ringFlash 1s infinite alternate;
+}
+@keyframes ringFlash {
+  0% { opacity: 0.4; transform: scale(0.85); }
+  100% { opacity: 1; transform: scale(1.2); }
+}
+.torch-beam-icon {
+  font-size: 14px;
+}
+.torch-pill-text {
+  font-size: 11px;
+  font-weight: 700;
+  color: #fef3c7;
+  letter-spacing: -0.01em;
+}
+.torch-off-x {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: #fde68a;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  margin-left: 2px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.torch-off-x:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
 /* Fullscreen Flashlight Effect */
 .phone-flashlight-beam {
   position: absolute;

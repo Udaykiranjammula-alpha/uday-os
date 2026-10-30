@@ -5,6 +5,7 @@ import { Rotate3d, Share2, QrCode, Copy, Check, X, Sparkles } from 'lucide-react
 import type { Project } from './types';
 import { profile } from './data/profile';
 import { sound } from './services/sound';
+import { toggleHardwareTorch } from './services/torch';
 
 export default function App() {
   const [color, setColor] = useState<'plum' | 'desert'>('plum');
@@ -19,6 +20,12 @@ export default function App() {
   });
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [isDemoOpen, setIsDemoOpen] = useState(false);
+  const [flashlightOn, setFlashlightOn] = useState(false);
+
+  const handleToggleFlashlight = useCallback((on: boolean) => {
+    setFlashlightOn(on);
+    void toggleHardwareTorch(on);
+  }, []);
 
   const handleFlipChange = useCallback((flipped: boolean) => {
     setIsFlipped(flipped);
@@ -222,6 +229,7 @@ export default function App() {
           finish={finishKey}
           isFlipped={isFlipped}
           onFlipChange={handleFlipChange}
+          flashlightOn={flashlightOn}
         >
           <IPhoneScreenContent
             color={color}
@@ -233,6 +241,9 @@ export default function App() {
             isDemoOpen={isDemoOpen}
             setIsDemoOpen={setIsDemoOpen}
             onOpenSearch={() => navigateTo('search')}
+            flashlightOn={flashlightOn}
+            setFlashlightOn={handleToggleFlashlight}
+            onFlipToBack={() => setIsFlipped(true)}
           />
         </Phone3DCanvas>
       </div>

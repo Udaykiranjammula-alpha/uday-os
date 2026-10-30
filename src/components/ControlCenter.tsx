@@ -59,6 +59,22 @@ export function ControlCenter({
     setFlashlightOn(!flashlightOn);
   };
 
+  const handleBrightnessPointer = (e: React.PointerEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const offsetY = rect.bottom - e.clientY;
+    const ratio = Math.max(0.15, Math.min(1.0, offsetY / rect.height));
+    setBrightness(ratio);
+  };
+
+  const handleVolumePointer = (e: React.PointerEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const offsetY = rect.bottom - e.clientY;
+    const ratio = Math.max(0, Math.min(1.0, offsetY / rect.height));
+    const newVol = Math.round(ratio * 100);
+    setVolume(newVol);
+    sound.setVolume(ratio);
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -158,19 +174,30 @@ export function ControlCenter({
               {/* Middle Row: Brightness Slider + Volume Slider */}
               <div className="cc-sliders-row">
                 {/* Vertical Brightness Slider */}
-                <div className="cc-slider-capsule">
+                <div
+                  className="cc-slider-capsule"
+                  onPointerDown={(e) => {
+                    e.currentTarget.setPointerCapture(e.pointerId);
+                    handleBrightnessPointer(e);
+                  }}
+                  onPointerMove={(e) => {
+                    if (e.buttons === 1) handleBrightnessPointer(e);
+                  }}
+                  onWheel={(e) => {
+                    e.stopPropagation();
+                    const delta = e.deltaY < 0 ? 0.05 : -0.05;
+                    setBrightness(Math.max(0.15, Math.min(1.0, brightness + delta)));
+                  }}
+                  role="slider"
+                  aria-valuemin={15}
+                  aria-valuemax={100}
+                  aria-valuenow={Math.round(brightness * 100)}
+                  aria-label="Screen brightness"
+                  tabIndex={0}
+                >
                   <div
                     className="cc-slider-fill brightness"
                     style={{ height: `${brightness * 100}%` }}
-                  />
-                  <input
-                    type="range"
-                    min="30"
-                    max="100"
-                    value={brightness * 100}
-                    onChange={(e) => setBrightness(Number(e.target.value) / 100)}
-                    className="cc-vertical-range"
-                    aria-label="Screen brightness"
                   />
                   <div className="cc-slider-icon">
                     <Sun size={20} />
@@ -178,19 +205,32 @@ export function ControlCenter({
                 </div>
 
                 {/* Vertical Volume Slider */}
-                <div className="cc-slider-capsule">
+                <div
+                  className="cc-slider-capsule"
+                  onPointerDown={(e) => {
+                    e.currentTarget.setPointerCapture(e.pointerId);
+                    handleVolumePointer(e);
+                  }}
+                  onPointerMove={(e) => {
+                    if (e.buttons === 1) handleVolumePointer(e);
+                  }}
+                  onWheel={(e) => {
+                    e.stopPropagation();
+                    const delta = e.deltaY < 0 ? 5 : -5;
+                    const newVol = Math.max(0, Math.min(100, volume + delta));
+                    setVolume(newVol);
+                    sound.setVolume(newVol / 100);
+                  }}
+                  role="slider"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={volume}
+                  aria-label="Audio volume"
+                  tabIndex={0}
+                >
                   <div
                     className="cc-slider-fill volume"
                     style={{ height: `${volume}%` }}
-                  />
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={volume}
-                    onChange={(e) => setVolume(Number(e.target.value))}
-                    className="cc-vertical-range"
-                    aria-label="Audio volume"
                   />
                   <div className="cc-slider-icon">
                     {volume === 0 ? <VolumeX size={20} /> : <Volume2 size={20} />}

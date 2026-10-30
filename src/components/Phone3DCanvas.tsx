@@ -49,6 +49,24 @@ const F_SCALE = (4.04 / 0.0731025) * 0.06681;
 const Y_SCALE = ((4.04 * 163.4) / 78 / 0.15000003) * 0.14429;
 const NORMAL_EXCLUSIONS = new Set(['Anodized aluminum', 'Frosted glass', 'Plastic antena']);
 
+function createTorchTexture(): THREE.CanvasTexture {
+  const canvas = document.createElement('canvas');
+  canvas.width = 128;
+  canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  if (ctx) {
+    const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+    grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+    grad.addColorStop(0.25, 'rgba(255, 248, 190, 0.95)');
+    grad.addColorStop(0.55, 'rgba(255, 215, 110, 0.4)');
+    grad.addColorStop(1, 'rgba(255, 180, 50, 0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 128, 128);
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  return texture;
+}
+
 function roundToPi(angle: number): number {
   return Math.round(angle / Math.PI) * Math.PI - 0.045;
 }
@@ -65,6 +83,7 @@ interface Phone3DCanvasProps {
   finish: PhoneFinish;
   isFlipped: boolean;
   onFlipChange?: (flipped: boolean) => void;
+  flashlightOn?: boolean;
   children: React.ReactNode;
 }
 
@@ -72,6 +91,7 @@ export function Phone3DCanvas({
   finish,
   isFlipped,
   onFlipChange,
+  flashlightOn = false,
   children,
 }: Phone3DCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -84,6 +104,9 @@ export function Phone3DCanvas({
   onFlipChangeRef.current = onFlipChange;
   const finishRef = useRef(finish);
   finishRef.current = finish;
+  const flashlightRef = useRef(Boolean(flashlightOn));
+  flashlightRef.current = Boolean(flashlightOn);
+  const updateFlashlightRef = useRef<((on: boolean) => void) | null>(null);
 
   const modelRef = useRef<THREE.Group | null>(null);
   const updateMaterialsRef = useRef<((f: PhoneFinish) => void) | null>(null);
@@ -109,6 +132,13 @@ export function Phone3DCanvas({
     flipTargetRef.current = isFlipped ? Math.PI - 0.045 : -0.045;
     needsCssRenderRef.current = true;
   }, [isFlipped]);
+
+  // Live real 3D flashlight sync
+  useEffect(() => {
+    flashlightRef.current = Boolean(flashlightOn);
+    updateFlashlightRef.current?.(Boolean(flashlightOn));
+    needsCssRenderRef.current = true;
+  }, [flashlightOn]);
 
   // Update materials when finish changes (in-place without re-mounting)
   useEffect(() => {
@@ -250,6 +280,11 @@ export function Phone3DCanvas({
       }
     }, 6000);
 
+    let flareTexture: THREE.CanvasTexture | null = null;
+    let flareMat: THREE.SpriteMaterial | null = null;
+    let beamGeo: THREE.ConeGeometry | null = null;
+    let beamMat: THREE.MeshBasicMaterial | null = null;
+
     const initAndLoad = async () => {
       try {
         if (MeshoptDecoder && (MeshoptDecoder as any).ready) {
@@ -258,6 +293,36 @@ export function Phone3DCanvas({
         if (!active) return;
         const loader = new GLTFLoader();
         loader.setMeshoptDecoder(MeshoptDecoder);
+
+        // Real 3D Flashlight Components on the Camera Module
+        const torchPointLight = new THREE.PointLight(0xfff5cc, 0, 18, 1.8);
+        const torchSpotLight = new THREE.SpotLight(0xfffae6, 0, 45, Math.PI / 4, 0.85, 1.5);
+        const torchTarget = new THREE.Object3D();
+
+        flareTexture = createTorchTexture();
+        flareMat = new THREE.SpriteMaterial({
+          map: flareTexture,
+          color: 0xffffff,
+          transparent: true,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        });
+        const torchFlare = new THREE.Sprite(flareMat);
+        torchFlare.scale.set(1.4, 1.4, 1.4);
+        torchFlare.visible = false;
+
+        beamGeo = new THREE.ConeGeometry(3.0, 12, 24, 1, true);
+        beamGeo.translate(0, -6, 0);
+        beamGeo.rotateX(-Math.PI / 2);
+        beamMat = new THREE.MeshBasicMaterial({
+          color: 0xfff8d6,
+          transparent: true,
+          opacity: 0,
+          blending: THREE.AdditiveBlending,
+          side: THREE.DoubleSide,
+          depthWrite: false,
+        });
+        const torchBeam = new THREE.Mesh(beamGeo, beamMat);
 
         const tryLoad = (primaryUrl: string, secondaryUrl: string) => {
           loader.load(
@@ -269,6 +334,7 @@ export function Phone3DCanvas({
               root.rotation.y = Math.PI;
               root.scale.set(V_SCALE, W_SCALE, V_SCALE);
 
+              let ledFound = false;
               root.traverse((child: THREE.Object3D) => {
                 if (child instanceof THREE.Mesh) {
                   child.castShadow = true;
@@ -280,6 +346,27 @@ export function Phone3DCanvas({
                         mat.normalMap = null;
                         mat.needsUpdate = true;
                       }
+                      if ((mat.name === 'LED' || mat.name === 'Plastic LED') && !ledFound) {
+                        ledFound = true;
+                        child.geometry.computeBoundingBox();
+                        const center = new THREE.Vector3();
+                        if (child.geometry.boundingBox) {
+                          child.geometry.boundingBox.getCenter(center);
+                        }
+                        torchPointLight.position.copy(center);
+                        torchSpotLight.position.copy(center);
+                        torchTarget.position.set(center.x, center.y, center.z - 25);
+                        child.add(torchTarget);
+                        torchSpotLight.target = torchTarget;
+
+                        torchFlare.position.copy(center);
+                        torchBeam.position.copy(center);
+
+                        child.add(torchPointLight);
+                        child.add(torchSpotLight);
+                        child.add(torchFlare);
+                        child.add(torchBeam);
+                      }
                     }
                   }
                 }
@@ -288,6 +375,40 @@ export function Phone3DCanvas({
               applyMaterials(finishRef.current, root);
               modelGroup.add(root);
               modelRef.current = modelGroup;
+
+              const applyFlashlight = (on: boolean) => {
+                if (modelRef.current) {
+                  modelRef.current.traverse((child: THREE.Object3D) => {
+                    if (child instanceof THREE.Mesh) {
+                      const mats = Array.isArray(child.material) ? child.material : [child.material];
+                      for (const mat of mats) {
+                        if (mat instanceof THREE.MeshStandardMaterial) {
+                          if (mat.name === 'LED') {
+                            mat.emissive.set(on ? 0xfff099 : 0x000000);
+                            mat.emissiveIntensity = on ? 16.0 : 0.0;
+                            mat.toneMapped = !on;
+                            mat.needsUpdate = true;
+                          } else if (mat.name === 'Plastic LED') {
+                            mat.emissive.set(on ? 0xfffae6 : 0x000000);
+                            mat.emissiveIntensity = on ? 8.0 : 0.0;
+                            mat.toneMapped = !on;
+                            mat.needsUpdate = true;
+                          }
+                        }
+                      }
+                    }
+                  });
+                }
+
+                torchPointLight.intensity = on ? 5.5 : 0;
+                torchSpotLight.intensity = on ? 10.0 : 0;
+                torchFlare.visible = on;
+                if (beamMat) beamMat.opacity = on ? 0.3 : 0;
+                needsCssRenderRef.current = true;
+              };
+              updateFlashlightRef.current = applyFlashlight;
+              applyFlashlight(flashlightRef.current);
+
               setIsLoaded(true);
               needsCssRenderRef.current = true;
             },
@@ -511,6 +632,10 @@ export function Phone3DCanvas({
       window.removeEventListener('pointerup', onPointerUp);
       window.removeEventListener('pointercancel', onPointerUp);
       container.removeEventListener('click', onClickCapture, true);
+      flareTexture?.dispose();
+      flareMat?.dispose();
+      beamGeo?.dispose();
+      beamMat?.dispose();
       webglRenderer.dispose();
       envTexture.dispose();
       webglRenderer.domElement.remove();
@@ -520,9 +645,10 @@ export function Phone3DCanvas({
 
   if (fallbackMode) {
     return (
-      <div className={`phone-stage phone-fallback phone-ready ${finish}`}>
+      <div className={`phone-stage phone-fallback phone-ready ${finish} ${flashlightOn ? 'torch-active' : ''}`}>
         <div className="phone-fallback-shell">
           <div className="phone-surface">{children}</div>
+          {flashlightOn && <div className="fallback-torch-beam" />}
         </div>
       </div>
     );

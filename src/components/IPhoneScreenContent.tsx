@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DynamicIsland } from './DynamicIsland';
 import { StatusBar } from './StatusBar';
@@ -26,6 +26,7 @@ import { LockScreen } from './LockScreen';
 import { SpotlightSearch } from './SpotlightSearch';
 import type { Project } from '../types';
 import { projects } from '../data/projects';
+import { sound } from '../services/sound';
 
 export interface IPhoneScreenContentProps {
   color: 'plum' | 'desert';
@@ -38,6 +39,9 @@ export interface IPhoneScreenContentProps {
   setIsDemoOpen: (open: boolean) => void;
   time?: Date;
   onOpenSearch: () => void;
+  flashlightOn?: boolean;
+  setFlashlightOn?: (on: boolean) => void;
+  onFlipToBack?: () => void;
 }
 
 export function IPhoneScreenContent({
@@ -51,10 +55,12 @@ export function IPhoneScreenContent({
   setIsDemoOpen,
   time,
   onOpenSearch,
+  flashlightOn = false,
+  setFlashlightOn = () => {},
+  onFlipToBack,
 }: IPhoneScreenContentProps) {
   const [isControlCenterOpen, setIsControlCenterOpen] = useState(false);
   const [brightness, setBrightness] = useState(1.0);
-  const [flashlightOn, setFlashlightOn] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
 
   const isInApp = currentRoute !== 'home' || activeProject !== null || isDemoOpen;
@@ -74,12 +80,27 @@ export function IPhoneScreenContent({
     hasMoved: false,
   });
 
+  // Global window pointerup/cancel to prevent drag locks when cursor exits the frame
+  useEffect(() => {
+    const handleGlobalPointerUp = () => {
+      dragScrollRef.current.isDown = false;
+      dragScrollRef.current.scrollTarget = null;
+    };
+    window.addEventListener('pointerup', handleGlobalPointerUp);
+    window.addEventListener('pointercancel', handleGlobalPointerUp);
+    return () => {
+      window.removeEventListener('pointerup', handleGlobalPointerUp);
+      window.removeEventListener('pointercancel', handleGlobalPointerUp);
+    };
+  }, []);
+
   const onScreenPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     // Only handle mouse drag-scrolling; touch devices already have native touch scroll
     if (e.pointerType !== 'mouse' || e.button !== 0) return;
 
     const target = e.target as HTMLElement | null;
-    if (target?.closest('input, textarea, select, .camera-screen, .control-center-sheet, .brightness-slider-container, .volume-slider-container')) {
+    // Exclude form controls and specialized slider capsules
+    if (target?.closest('input, textarea, select, .camera-screen, .cc-slider-capsule, .brightness-slider-container, .volume-slider-container')) {
       return;
     }
 
@@ -97,6 +118,10 @@ export function IPhoneScreenContent({
     }
 
     if (!scrollEl) return;
+
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {}
 
     dragScrollRef.current = {
       isDown: true,
@@ -120,7 +145,12 @@ export function IPhoneScreenContent({
     }
   };
 
-  const onScreenPointerUp = () => {
+  const onScreenPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    try {
+      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      }
+    } catch {}
     dragScrollRef.current.isDown = false;
     dragScrollRef.current.scrollTarget = null;
   };
@@ -143,15 +173,31 @@ export function IPhoneScreenContent({
       onPointerCancel={onScreenPointerUp}
       onClickCapture={onScreenClickCapture}
     >
-      {/* Fullscreen Flashlight Beam Effect */}
+      {/* Real Flashlight Active Indicator with Quick Flip */}
       {flashlightOn && (
         <div
-          className="phone-flashlight-beam"
-          onClick={() => setFlashlightOn(false)}
-          title="Tap to turn off flashlight"
+          className="phone-flashlight-status-pill"
+          onClick={() => {
+            sound.playTapSound();
+            onFlipToBack?.();
+          }}
+          title="Back Camera Torch Active · Tap to View 3D Back"
         >
-          <div className="beam-glow" />
-          <span className="beam-hint">Torch Active · Tap to Turn Off</span>
+          <div className="torch-pulse-ring" />
+          <span className="torch-beam-icon">🔦</span>
+          <span className="torch-pill-text">Back Flashlight Active · View 3D Back</span>
+          <button
+            type="button"
+            className="torch-off-x"
+            onClick={(e) => {
+              e.stopPropagation();
+              setFlashlightOn(false);
+            }}
+            aria-label="Turn off flashlight"
+            title="Turn off"
+          >
+            ✕
+          </button>
         </div>
       )}
 
