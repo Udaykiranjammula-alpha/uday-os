@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DynamicIsland } from './DynamicIsland';
 import { StatusBar } from './StatusBar';
 import { IosHomeScreen } from './IosHomeScreen';
+import { ControlCenter } from './ControlCenter';
 import { IosSettingsApp } from '../apps/IosSettingsApp';
 import { IosExperienceApp } from '../apps/IosExperienceApp';
 import { IosProjectsApp } from '../apps/IosProjectsApp';
@@ -17,6 +18,9 @@ import { SkillsApp } from '../apps/SkillsApp';
 import { ResumeApp } from '../apps/ResumeApp';
 import { NotesApp } from '../apps/NotesApp';
 import { TerminalApp } from '../apps/TerminalApp';
+import { CameraApp } from '../apps/CameraApp';
+import { AiAssistantApp } from '../apps/AiAssistantApp';
+import { LeetCodeApp } from '../apps/LeetCodeApp';
 import { SpotlightSearch } from './SpotlightSearch';
 import type { Project } from '../types';
 
@@ -45,15 +49,34 @@ export function IPhoneScreenContent({
   time,
   onOpenSearch,
 }: IPhoneScreenContentProps) {
+  const [isControlCenterOpen, setIsControlCenterOpen] = useState(false);
+  const [brightness, setBrightness] = useState(1.0);
+  const [flashlightOn, setFlashlightOn] = useState(false);
+
   const isInApp = currentRoute !== 'home' || activeProject !== null || isDemoOpen;
 
   return (
-    <div className={`iphone-screen iphone-amoled-display ${color === 'desert' ? 'appearance-dark' : 'appearance-light'} ${isInApp ? 'in-app' : `wallpaper-${color}`}`}>
+    <div
+      className={`iphone-screen iphone-amoled-display appearance-dark ${isInApp ? 'in-app' : `wallpaper-${color}`}`}
+      style={{ filter: brightness < 1 ? `brightness(${brightness})` : undefined }}
+    >
+      {/* Fullscreen Flashlight Beam Effect */}
+      {flashlightOn && (
+        <div
+          className="phone-flashlight-beam"
+          onClick={() => setFlashlightOn(false)}
+          title="Tap to turn off flashlight"
+        >
+          <div className="beam-glow" />
+          <span className="beam-hint">Torch Active · Tap to Turn Off</span>
+        </div>
+      )}
+
       {/* Dynamic Island */}
       <DynamicIsland />
 
-      {/* Status Bar */}
-      <StatusBar />
+      {/* Status Bar (Right side taps trigger iOS 18 Control Center) */}
+      <StatusBar time={time} onOpenControlCenter={() => setIsControlCenterOpen(true)} />
 
       {/* Screen Router Viewport */}
       <div className="iphone-screen-viewport">
@@ -161,7 +184,43 @@ export function IPhoneScreenContent({
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <PhotosApp onBack={() => onNavigate('home')} />
+              <PhotosApp
+                onBack={() => onNavigate('home')}
+                onOpenCamera={() => onNavigate('camera')}
+              />
+            </motion.div>
+          ) : currentRoute === 'camera' ? (
+            <motion.div
+              key="camera-view"
+              className="page-screen-anim"
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+            >
+              <CameraApp
+                onBack={() => onNavigate('home')}
+                onOpenPhotos={() => onNavigate('photos')}
+              />
+            </motion.div>
+          ) : currentRoute === 'ai' || currentRoute === 'assistant' ? (
+            <motion.div
+              key="ai-view"
+              className="page-screen-anim"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 15 }}
+            >
+              <AiAssistantApp onBack={() => onNavigate('home')} />
+            </motion.div>
+          ) : currentRoute === 'leetcode' ? (
+            <motion.div
+              key="leetcode-view"
+              className="page-screen-anim"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+            >
+              <LeetCodeApp onBack={() => onNavigate('home')} />
             </motion.div>
           ) : currentRoute === 'instagram' ? (
             <motion.div
@@ -246,6 +305,20 @@ export function IPhoneScreenContent({
           )}
         </AnimatePresence>
       </div>
+
+      {/* iOS 18 Control Center Overlay */}
+      <ControlCenter
+        isOpen={isControlCenterOpen}
+        onClose={() => setIsControlCenterOpen(false)}
+        brightness={brightness}
+        setBrightness={setBrightness}
+        flashlightOn={flashlightOn}
+        setFlashlightOn={setFlashlightOn}
+        onOpenApp={(app) => {
+          setIsControlCenterOpen(false);
+          onNavigate(app);
+        }}
+      />
 
       {/* iOS Home Indicator Bar */}
       <div

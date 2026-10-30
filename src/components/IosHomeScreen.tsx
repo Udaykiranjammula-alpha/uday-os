@@ -2,6 +2,7 @@ import React from 'react';
 import { GitHubWidget } from './GitHubWidget';
 import { CalWidget } from './CalWidget';
 import { Search } from 'lucide-react';
+import { sound } from '../services/sound';
 
 interface IosHomeScreenProps {
   onNavigate: (route: string) => void;
@@ -9,37 +10,42 @@ interface IosHomeScreenProps {
 }
 
 export function IosHomeScreen({ onNavigate, onOpenSearch }: IosHomeScreenProps) {
+  const handleNav = (route: string) => {
+    sound.playTapSound();
+    onNavigate(route);
+  };
+
   return (
     <div className="ios-homescreen-view">
       {/* Top Wide GitHub Heatmap Widget (Clicking opens GitHub & showcases all projects) */}
       <section className="widget-row-top">
-        <GitHubWidget onClick={() => onNavigate('github')} />
+        <GitHubWidget onClick={() => handleNav('github')} />
       </section>
 
       {/* Middle Row: Cal.com 15-min call + 2x2 App Icons */}
       <section className="widget-grid-middle">
-        <CalWidget onClick={() => onNavigate('contact')} />
+        <CalWidget onClick={() => handleNav('contact')} />
 
         <div className="apps-quad-grid">
-          {/* Experience App */}
+          {/* Experience App (LinkedIn) */}
           <button
             type="button"
             className="ios-home-icon-btn"
-            onClick={() => onNavigate('experience')}
-            aria-label="Experience application"
+            onClick={() => handleNav('linkedin')}
+            aria-label="LinkedIn Experience application"
           >
             <div className="ios-icon-box">
-              <img src="/ios/experience.svg" alt="Experience" width={52} height={52} />
+              <img src="/ios/linkedin.svg" alt="LinkedIn" width={52} height={52} />
               <span className="app-red-badge">WORK</span>
             </div>
-            <span className="ios-icon-title">Experience</span>
+            <span className="ios-icon-title">LinkedIn</span>
           </button>
 
           {/* Toolkit / Skills App */}
           <button
             type="button"
             className="ios-home-icon-btn"
-            onClick={() => onNavigate('skills')}
+            onClick={() => handleNav('skills')}
             aria-label="Toolkit application"
           >
             <div className="ios-icon-box">
@@ -52,63 +58,64 @@ export function IosHomeScreen({ onNavigate, onOpenSearch }: IosHomeScreenProps) 
           <button
             type="button"
             className="ios-home-icon-btn"
-            onClick={() => onNavigate('projects')}
-            aria-label="Safari application"
+            onClick={() => handleNav('projects')}
+            aria-label="Projects application"
           >
             <div className="ios-icon-box">
               <img src="/ios/safari.svg" alt="Safari" width={52} height={52} />
             </div>
-            <span className="ios-icon-title">Safari</span>
+            <span className="ios-icon-title">Projects</span>
           </button>
 
-          {/* LinkedIn App */}
+          {/* Interactive Camera App */}
           <button
             type="button"
             className="ios-home-icon-btn"
-            onClick={() => onNavigate('linkedin')}
-            aria-label="LinkedIn application"
+            onClick={() => handleNav('camera')}
+            aria-label="Camera application"
           >
             <div className="ios-icon-box">
-              <img src="/ios/linkedin.svg" alt="LinkedIn" width={52} height={52} />
+              <img src="/ios/camera.svg" alt="Camera" width={52} height={52} />
             </div>
-            <span className="ios-icon-title">LinkedIn</span>
+            <span className="ios-icon-title">Camera</span>
           </button>
         </div>
       </section>
 
-      {/* Third Row: 4 Icons */}
+      {/* Third Row: 4 Essential Apps */}
       <section className="apps-single-row">
-        {/* GitHub */}
+        {/* Uday AI Assistant */}
         <button
           type="button"
           className="ios-home-icon-btn"
-          onClick={() => onNavigate('github')}
-          aria-label="GitHub application"
+          onClick={() => handleNav('ai')}
+          aria-label="Uday AI Siri Assistant"
         >
           <div className="ios-icon-box">
-            <img src="/ios/github.svg" alt="GitHub" width={52} height={52} />
+            <img src="/ios/ai.svg" alt="Uday AI" width={52} height={52} />
+            <span className="app-ai-glow-ring" />
           </div>
-          <span className="ios-icon-title">GitHub</span>
+          <span className="ios-icon-title">Uday AI</span>
         </button>
 
-        {/* Instagram */}
+        {/* LeetCode App */}
         <button
           type="button"
           className="ios-home-icon-btn"
-          onClick={() => onNavigate('instagram')}
-          aria-label="Instagram application"
+          onClick={() => handleNav('leetcode')}
+          aria-label="LeetCode Profile application"
         >
           <div className="ios-icon-box">
-            <img src="/ios/instagram.svg" alt="Instagram" width={52} height={52} />
+            <img src="/ios/leetcode.svg" alt="LeetCode" width={52} height={52} />
           </div>
-          <span className="ios-icon-title">Instagram</span>
+          <span className="ios-icon-title">LeetCode</span>
         </button>
 
         {/* Notes */}
         <button
           type="button"
           className="ios-home-icon-btn"
-          onClick={() => onNavigate('notes')}
+          onClick={() => handleNav('notes')}
           aria-label="Notes application"
         >
           <div className="ios-icon-box">
@@ -121,7 +128,7 @@ export function IosHomeScreen({ onNavigate, onOpenSearch }: IosHomeScreenProps) 
         <button
           type="button"
           className="ios-home-icon-btn"
-          onClick={() => onNavigate('settings')}
+          onClick={() => handleNav('settings')}
           aria-label="Settings application"
         >
           <div className="ios-icon-box">
@@ -136,7 +143,10 @@ export function IosHomeScreen({ onNavigate, onOpenSearch }: IosHomeScreenProps) 
         <button
           type="button"
           className="ios-search-capsule"
-          onClick={onOpenSearch}
+          onClick={() => {
+            sound.playTapSound();
+            onOpenSearch();
+          }}
           aria-label="Search apps and projects"
         >
           <Search size={12} className="search-pill-icon" />
@@ -150,7 +160,7 @@ export function IosHomeScreen({ onNavigate, onOpenSearch }: IosHomeScreenProps) 
           <button
             type="button"
             className="dock-item-btn"
-            onClick={() => onNavigate('projects')}
+            onClick={() => handleNav('projects')}
             aria-label="Projects application"
           >
             <img src="/ios/projects.png" alt="Projects" width={52} height={52} />
@@ -159,7 +169,7 @@ export function IosHomeScreen({ onNavigate, onOpenSearch }: IosHomeScreenProps) 
           <button
             type="button"
             className="dock-item-btn"
-            onClick={() => onNavigate('github')}
+            onClick={() => handleNav('github')}
             aria-label="GitHub application"
           >
             <img src="/ios/github.svg" alt="GitHub" width={52} height={52} />
@@ -168,16 +178,16 @@ export function IosHomeScreen({ onNavigate, onOpenSearch }: IosHomeScreenProps) 
           <button
             type="button"
             className="dock-item-btn"
-            onClick={() => onNavigate('contact')}
-            aria-label="Contact application"
+            onClick={() => handleNav('photos')}
+            aria-label="Photos Gallery application"
           >
-            <img src="/ios/contact.png" alt="Contact" width={52} height={52} />
+            <img src="/ios/photos.png" alt="Photos" width={52} height={52} />
           </button>
 
           <button
             type="button"
             className="dock-item-btn"
-            onClick={() => onNavigate('resume')}
+            onClick={() => handleNav('resume')}
             aria-label="Resume application"
           >
             <img src="/ios/resume.png" alt="Resume" width={52} height={52} />

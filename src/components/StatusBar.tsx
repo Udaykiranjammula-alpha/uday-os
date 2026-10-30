@@ -1,20 +1,34 @@
 import React from 'react';
 import { Battery, Wifi } from 'lucide-react';
 import { useClock } from '../hooks/useClock';
+import { sound } from '../services/sound';
 
 interface StatusBarProps {
   time?: Date;
+  onOpenControlCenter?: () => void;
 }
 
-export function StatusBar({ time: propTime }: StatusBarProps) {
+export function StatusBar({ time: propTime, onOpenControlCenter }: StatusBarProps) {
   const clockTime = useClock();
   const time = propTime || clockTime;
   const formattedTime = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+  const handleClickRight = () => {
+    sound.playTapSound();
+    onOpenControlCenter?.();
+  };
+
   return (
     <div className="status-bar" aria-label={`Status bar, time is ${formattedTime}`}>
       <span className="status-time">{formattedTime}</span>
-      <div className="status-icons">
+      <div
+        className="status-icons status-control-center-trigger"
+        onClick={handleClickRight}
+        role="button"
+        tabIndex={0}
+        title="Tap to open iOS 18 Control Center"
+        aria-label="Open Control Center"
+      >
         <Wifi size={12} strokeWidth={2.4} aria-label="Wi-Fi full signal" />
         <span className="status-network">5G</span>
         <div className="status-battery-container" aria-label="Battery 98 percent">

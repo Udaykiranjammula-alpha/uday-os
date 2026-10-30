@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="lc-bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#282828"/>
+      <stop offset="100%" stop-color="#141414"/>
+    </linearGradient>
+    <linearGradient id="lc-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffa116"/>
+      <stop offset="100%" stop-color="#ff6b00"/>
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="22" fill="url(#lc-bg)"/>
+  <!-- LeetCode brackets & bar -->
+  <path d="M42 28 L28 42 L28 58 L42 72" fill="none" stroke="#e0e0e0" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M58 28 L72 42 L72 58 L58 72" fill="none" stroke="url(#lc-gold)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="38" y1="50" x2="62" y2="50" stroke="#ffa116" stroke-width="6" stroke-linecap="round"/>
+</svg>
