@@ -181,6 +181,23 @@ export function IPhoneScreenContent({
     }
   };
 
+  // Mouse wheel listener ensuring scrolling works smoothly across all desktop browsers in 3D CSS
+  const onScreenWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    let node = e.target as HTMLElement | null;
+    while (node && !node.classList.contains('iphone-screen')) {
+      const style = window.getComputedStyle(node);
+      const overflowY = style.overflowY;
+      if (
+        (overflowY === 'auto' || overflowY === 'scroll') &&
+        node.scrollHeight > node.clientHeight + 2
+      ) {
+        node.scrollTop += e.deltaY;
+        break;
+      }
+      node = node.parentElement;
+    }
+  };
+
   return (
     <div
       className={`iphone-screen iphone-amoled-display appearance-dark ${isInApp ? 'in-app' : `wallpaper-${color}`}`}
@@ -190,6 +207,7 @@ export function IPhoneScreenContent({
       onPointerUp={onScreenPointerUp}
       onPointerCancel={onScreenPointerUp}
       onClickCapture={onScreenClickCapture}
+      onWheel={onScreenWheel}
     >
       {/* Real Flashlight Active Indicator with Quick Flip */}
       {flashlightOn && (

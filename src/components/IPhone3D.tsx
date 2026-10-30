@@ -17,6 +17,7 @@ interface IPhone3DProps {
   setIsDemoOpen: (open: boolean) => void;
   time?: Date;
   onOpenSearch: () => void;
+  flashlightOn?: boolean;
 }
 
 export function IPhone3D({
@@ -32,6 +33,7 @@ export function IPhone3D({
   setIsDemoOpen,
   time,
   onOpenSearch,
+  flashlightOn = false,
 }: IPhone3DProps) {
   return (
     <div className={`iphone-3d-scene ${color} ${isFlipped ? 'is-flipped' : ''}`}>
@@ -69,7 +71,7 @@ export function IPhone3D({
 
         {/* ================= BACK SIDE (TRIPLE CAMERA) ================= */}
         <div className="iphone-face iphone-face-back">
-          <IPhoneBack color={color} onFlip={onFlip} />
+          <IPhoneBack color={color} onFlip={onFlip} flashlightOn={flashlightOn} />
         </div>
       </motion.div>
     </div>

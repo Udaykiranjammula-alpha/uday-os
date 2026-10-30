@@ -4,9 +4,10 @@ import { AppleLogoIcon } from './IosIcons';
 interface IPhoneBackProps {
   color: 'plum' | 'desert' | 'natural' | 'black';
   onFlip: () => void;
+  flashlightOn?: boolean;
 }
 
-export function IPhoneBack({ color, onFlip }: IPhoneBackProps) {
+export function IPhoneBack({ color, onFlip, flashlightOn = false }: IPhoneBackProps) {
   return (
     <div
       className={`iphone-back-chassis ${color}`}
@@ -68,9 +69,10 @@ export function IPhoneBack({ color, onFlip }: IPhoneBackProps) {
 
               {/* Right Column: True Tone Flash, LiDAR Scanner & Mic */}
               <div className="visor-modules-right">
-                <div className="truetone-flash-disc">
+                <div className={`truetone-flash-disc ${flashlightOn ? 'torch-active' : ''}`}>
                   <div className="flash-amber-diode" />
                   <div className="flash-cool-diode" />
+                  {flashlightOn && <div className="flash-lens-flare" />}
                 </div>
 
                 <div className="mic-pinhole-dot" />
