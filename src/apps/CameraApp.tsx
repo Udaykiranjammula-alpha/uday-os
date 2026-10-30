@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { ChevronLeft, Zap, ZapOff, RefreshCw, Aperture, Image as ImageIcon } from 'lucide-react';
 import { sound } from '../services/sound';
 
@@ -10,11 +10,14 @@ interface CameraAppProps {
 export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const [streamReady, setStreamReady] = useState(false);
   const [flashActive, setFlashActive] = useState(false);
   const [flashEnabled, setFlashEnabled] = useState(false);
   const [zoomLevel, setZoomLevel] = useState<'0.5x' | '1x' | '2x'>('1x');
-  const [cameraPermission, setCameraPermission] = useState<'prompt' | 'granted' | 'denied'>('prompt');
+  const [isFrontCamera, setIsFrontCamera] = useState(true);
   const [latestPhoto, setLatestPhoto] = useState<string | null>(null);
 
   // Load latest photo from localStorage
@@ -28,56 +31,92 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
         }
       }
     } catch {
-      // Ignore localStorage errors
+      // Ignore
+    }
+  }, []);
+
+  // Stop active stream helper
+  const stopCurrentStream = useCallback(() => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => {
+        try {
+          track.stop();
+        } catch {
+          // Ignore
+        }
+      });
+      streamRef.current = null;
     }
   }, []);
 
   // Initialize camera stream
-  useEffect(() => {
-    let activeStream: MediaStream | null = null;
-    let isMounted = true;
+  const startCamera = useCallback(async (facingUser: boolean) => {
+    stopCurrentStream();
+    setStreamReady(false);
 
-    async function initCamera() {
-      try {
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-          const s = await navigator.mediaDevices.getUserMedia({
-            video: {
-              facingMode: 'user',
-              width: { ideal: 720 },
-              height: { ideal: 1280 },
-            },
-            audio: false,
-          });
-          if (isMounted) {
-            activeStream = s;
-            setStream(s);
-            setCameraPermission('granted');
-            if (videoRef.current) {
-              videoRef.current.srcObject = s;
-              void videoRef.current.play();
-            }
-          } else {
-            s.getTracks().forEach((track) => track.stop());
-          }
-        } else {
-          setCameraPermission('denied');
-        }
-      } catch {
-        if (isMounted) {
-          setCameraPermission('denied');
-        }
-      }
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      return;
     }
 
-    void initCamera();
+    try {
+      // Try with facingMode constraint
+      let mediaStream: MediaStream;
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: facingUser ? 'user' : 'environment',
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
+          audio: false,
+        });
+      } catch {
+        // Fallback to generic video stream for laptop webcams without facingMode
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false,
+        });
+      }
+
+      streamRef.current = mediaStream;
+      setStream(mediaStream);
+
+      // Bind directly to video element
+      if (videoRef.current) {
+        videoRef.current.srcObject = mediaStream;
+        videoRef.current.muted = true;
+        try {
+          await videoRef.current.play();
+          setStreamReady(true);
+        } catch {
+          // Play was prevented or deferred
+        }
+      }
+    } catch (err) {
+      console.warn('Camera access error or denied:', err);
+      setStream(null);
+      setStreamReady(false);
+    }
+  }, [stopCurrentStream]);
+
+  // Mount effect to start camera
+  useEffect(() => {
+    void startCamera(isFrontCamera);
 
     return () => {
-      isMounted = false;
-      if (activeStream) {
-        activeStream.getTracks().forEach((track) => track.stop());
-      }
+      stopCurrentStream();
     };
-  }, []);
+  }, [isFrontCamera, startCamera, stopCurrentStream]);
+
+  // Re-bind stream if video element re-mounts
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video && stream && video.srcObject !== stream) {
+      video.srcObject = stream;
+      video.muted = true;
+      video.play().then(() => setStreamReady(true)).catch(() => {});
+    }
+  }, [stream]);
 
   // Capture photo
   const handleCapture = () => {
@@ -91,11 +130,29 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
     const ctx = canvas.getContext('2d');
 
     if (ctx) {
-      if (stream && videoRef.current && videoRef.current.readyState >= 2) {
-        // Draw live webcam frame
-        ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+      const video = videoRef.current;
+      const isVideoPlaying = video && video.readyState >= 2 && video.videoWidth > 0;
+
+      if (isVideoPlaying) {
+        // Center crop the video feed to fill 720x960
+        const vRatio = video.videoWidth / video.videoHeight;
+        const cRatio = canvas.width / canvas.height;
+        let sWidth = video.videoWidth;
+        let sHeight = video.videoHeight;
+        let sx = 0;
+        let sy = 0;
+
+        if (vRatio > cRatio) {
+          sWidth = video.videoHeight * cRatio;
+          sx = (video.videoWidth - sWidth) / 2;
+        } else {
+          sHeight = video.videoWidth / cRatio;
+          sy = (video.videoHeight - sHeight) / 2;
+        }
+
+        ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
       } else {
-        // Generate simulated iPhone camera shot with timestamp and stylized art
+        // Fallback: Generate stylized simulated iPhone photo
         const grad = ctx.createLinearGradient(0, 0, 720, 960);
         grad.addColorStop(0, '#0f172a');
         grad.addColorStop(0.5, '#1e1b4b');
@@ -155,6 +212,11 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
     }
   };
 
+  const handleFlipCamera = () => {
+    sound.playTapSound();
+    setIsFrontCamera((prev) => !prev);
+  };
+
   return (
     <div className="camera-viewfinder-app">
       {/* Hidden processing canvas */}
@@ -202,15 +264,25 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
 
       {/* Live Viewfinder Body */}
       <div className={`camera-viewfinder-screen zoom-${zoomLevel}`}>
-        {cameraPermission === 'granted' ? (
-          <video
-            ref={videoRef}
-            playsInline
-            muted
-            autoPlay
-            className="camera-live-video"
-          />
-        ) : (
+        {/* Video Element is ALWAYS mounted in DOM to guarantee ref is never null */}
+        <video
+          ref={videoRef}
+          playsInline
+          muted
+          autoPlay
+          onLoadedMetadata={() => {
+            setStreamReady(true);
+            videoRef.current?.play().catch(() => {});
+          }}
+          className="camera-live-video"
+          style={{
+            display: streamReady ? 'block' : 'none',
+            transform: isFrontCamera ? 'scaleX(-1)' : 'none', // Mirror front camera like real iPhone selfie cam
+          }}
+        />
+
+        {/* Viewfinder Telemetry Placeholder (visible when webcam is connecting or denied) */}
+        {!streamReady && (
           <div className="camera-simulated-view">
             <div className="camera-sim-grid">
               <div className="sim-focus-box">
@@ -222,7 +294,7 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
               </div>
             </div>
             <div className="camera-telemetry-hud">
-              <span>48MP RAW</span>
+              <span>48MP FUSION</span>
               <span>f/1.78</span>
               <span>1/120s</span>
               <span>ISO 64</span>
@@ -292,11 +364,8 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
         <button
           type="button"
           className="camera-flip-btn"
-          onClick={() => {
-            sound.playTapSound();
-            const next = zoomLevel === '1x' ? '2x' : '1x';
-            setZoomLevel(next);
-          }}
+          onClick={handleFlipCamera}
+          title="Flip camera (Front / Back)"
           aria-label="Toggle camera"
         >
           <RefreshCw size={20} />
