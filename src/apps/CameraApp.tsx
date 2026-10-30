@@ -1,5 +1,18 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { ChevronLeft, Zap, ZapOff, RefreshCw, Aperture, Image as ImageIcon } from 'lucide-react';
+import {
+  ChevronLeft,
+  Zap,
+  ZapOff,
+  RefreshCw,
+  Sliders,
+  Image as ImageIcon,
+  Sparkles,
+  Circle,
+  Square,
+  Sun,
+  Flame,
+  Check,
+} from 'lucide-react';
 import { sound } from '../services/sound';
 
 interface CameraAppProps {
@@ -7,18 +20,33 @@ interface CameraAppProps {
   onOpenPhotos: () => void;
 }
 
+type CameraMode = 'CINEMATIC' | 'VIDEO' | 'PHOTO' | 'PORTRAIT' | 'PANO';
+type FilterType = 'standard' | 'vivid' | 'warm' | 'cool' | 'noir' | 'dramatic';
+
 export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
+  // Core camera states
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [streamReady, setStreamReady] = useState(false);
-  const [flashActive, setFlashActive] = useState(false);
-  const [flashEnabled, setFlashEnabled] = useState(false);
+  const [cameraMode, setCameraMode] = useState<CameraMode>('PHOTO');
   const [zoomLevel, setZoomLevel] = useState<'0.5x' | '1x' | '2x'>('1x');
+  const [flashActive, setFlashActive] = useState(false);
+  const [flashMode, setFlashMode] = useState<'off' | 'on' | 'auto'>('auto');
+  const [hdrEnabled, setHdrEnabled] = useState(true);
+  const [activeFilter, setActiveFilter] = useState<FilterType>('standard');
+  const [showFiltersMenu, setShowFiltersMenu] = useState(false);
   const [isFrontCamera, setIsFrontCamera] = useState(true);
   const [latestPhoto, setLatestPhoto] = useState<string | null>(null);
+
+  // Video Recording States
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordSeconds, setRecordSeconds] = useState(0);
+
+  // Tap-to-focus indicator
+  const [focusPoint, setFocusPoint] = useState<{ x: number; y: number } | null>(null);
 
   // Load latest photo from localStorage
   useEffect(() => {
@@ -34,6 +62,19 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
       // Ignore
     }
   }, []);
+
+  // Video recording timer
+  useEffect(() => {
+    let timer: number;
+    if (isRecording) {
+      timer = window.setInterval(() => {
+        setRecordSeconds((s) => s + 1);
+      }, 1000);
+    } else {
+      setRecordSeconds(0);
+    }
+    return () => clearInterval(timer);
+  }, [isRecording]);
 
   // Stop active stream helper
   const stopCurrentStream = useCallback(() => {
@@ -59,7 +100,6 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
     }
 
     try {
-      // Try with facingMode constraint
       let mediaStream: MediaStream;
       try {
         mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -71,7 +111,7 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
           audio: false,
         });
       } catch {
-        // Fallback to generic video stream for laptop webcams without facingMode
+        // Fallback for laptop webcams without facingMode
         mediaStream = await navigator.mediaDevices.getUserMedia({
           video: true,
           audio: false,
@@ -81,7 +121,6 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
       streamRef.current = mediaStream;
       setStream(mediaStream);
 
-      // Bind directly to video element
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
         videoRef.current.muted = true;
@@ -89,7 +128,7 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
           await videoRef.current.play();
           setStreamReady(true);
         } catch {
-          // Play was prevented or deferred
+          // Play was deferred
         }
       }
     } catch (err) {
@@ -118,12 +157,55 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
     }
   }, [stream]);
 
-  // Capture photo
-  const handleCapture = () => {
-    sound.playShutterSound();
-    setFlashActive(true);
-    setTimeout(() => setFlashActive(false), 240);
+  // Tap-to-focus on viewfinder
+  const handleViewfinderClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    setFocusPoint({ x, y });
+    sound.playTapSound();
+    setTimeout(() => {
+      setFocusPoint(null);
+    }, 2200);
+  };
 
+  // Filter CSS styles
+  const filterStyles: Record<FilterType, string> = {
+    standard: 'none',
+    vivid: 'saturate(1.45) contrast(1.1)',
+    warm: 'sepia(0.28) saturate(1.25) hue-rotate(-10deg)',
+    cool: 'saturate(1.1) hue-rotate(18deg) brightness(1.04)',
+    noir: 'grayscale(1) contrast(1.3) brightness(0.95)',
+    dramatic: 'contrast(1.4) brightness(0.92) saturate(1.2)',
+  };
+
+  // Zoom scale multiplier
+  const zoomScale = zoomLevel === '0.5x' ? 1 : zoomLevel === '1x' ? 1.25 : 1.95;
+
+  // Shutter action (Photos & Video recording)
+  const handleShutterAction = () => {
+    if (cameraMode === 'VIDEO' || cameraMode === 'CINEMATIC') {
+      sound.playActionClickSound();
+      if (!isRecording) {
+        setIsRecording(true);
+      } else {
+        // Stop recording and save a video snapshot
+        setIsRecording(false);
+        saveSnapshot(`Video Clip (${recordSeconds}s)`);
+      }
+      return;
+    }
+
+    // Photo / Portrait / Pano mode
+    sound.playShutterSound();
+    if (flashMode === 'on' || (flashMode === 'auto' && Math.random() > 0.5)) {
+      setFlashActive(true);
+      setTimeout(() => setFlashActive(false), 260);
+    }
+    saveSnapshot();
+  };
+
+  const saveSnapshot = (customLabel?: string) => {
     const canvas = canvasRef.current || document.createElement('canvas');
     canvas.width = 720;
     canvas.height = 960;
@@ -134,7 +216,9 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
       const isVideoPlaying = video && video.readyState >= 2 && video.videoWidth > 0;
 
       if (isVideoPlaying) {
-        // Center crop the video feed to fill 720x960
+        // Apply active filter to snapshot canvas
+        ctx.filter = filterStyles[activeFilter];
+
         const vRatio = video.videoWidth / video.videoHeight;
         const cRatio = canvas.width / canvas.height;
         let sWidth = video.videoWidth;
@@ -150,9 +234,15 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
           sy = (video.videoHeight - sHeight) / 2;
         }
 
+        ctx.save();
+        if (isFrontCamera) {
+          ctx.translate(canvas.width, 0);
+          ctx.scale(-1, 1);
+        }
         ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
+        ctx.restore();
       } else {
-        // Fallback: Generate stylized simulated iPhone photo
+        // Simulated iPhone shot
         const grad = ctx.createLinearGradient(0, 0, 720, 960);
         grad.addColorStop(0, '#0f172a');
         grad.addColorStop(0.5, '#1e1b4b');
@@ -160,36 +250,16 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, 720, 960);
 
-        // Grid lines
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(240, 0); ctx.lineTo(240, 960);
-        ctx.moveTo(480, 0); ctx.lineTo(480, 960);
-        ctx.moveTo(0, 320); ctx.lineTo(720, 320);
-        ctx.moveTo(0, 640); ctx.lineTo(720, 640);
-        ctx.stroke();
-
-        // Shutter focus ring
         ctx.strokeStyle = '#38bdf8';
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.arc(360, 480, 80, 0, Math.PI * 2);
         ctx.stroke();
 
-        // Watermark typography
         ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('UDAY OS · Shot on iPhone 17 Pro', 360, 470);
-
-        ctx.font = '18px -apple-system, BlinkMacSystemFont, sans-serif';
-        ctx.fillStyle = '#94a3b8';
-        ctx.fillText('Dual 48MP Fusion Camera · KL University', 360, 510);
-
-        ctx.font = '14px monospace';
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-        ctx.fillText(new Date().toLocaleString(), 360, 545);
       }
 
       const photoData = canvas.toDataURL('image/jpeg', 0.85);
@@ -201,14 +271,31 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
         const newPhoto = {
           id: `photo-${Date.now()}`,
           dataUrl: photoData,
+          mode: cameraMode,
+          filter: activeFilter,
+          label: customLabel,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
         };
         const updated = [...existing, newPhoto];
         localStorage.setItem('uday-os-user-photos', JSON.stringify(updated));
       } catch {
-        // LocalStorage quota or blocked
+        // Ignore quota
       }
+    }
+  };
+
+  const formatTimer = (sec: number) => {
+    const mins = Math.floor(sec / 60).toString().padStart(2, '0');
+    const s = (sec % 60).toString().padStart(2, '0');
+    return `${mins}:${s}`;
+  };
+
+  const handleModeChange = (mode: CameraMode) => {
+    sound.playTapSound();
+    setCameraMode(mode);
+    if (isRecording) {
+      setIsRecording(false);
     }
   };
 
@@ -218,7 +305,7 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
   };
 
   return (
-    <div className="camera-viewfinder-app">
+    <div className={`camera-viewfinder-app mode-${cameraMode.toLowerCase()}`}>
       {/* Hidden processing canvas */}
       <canvas ref={canvasRef} style={{ display: 'none' }} width={720} height={960} />
 
@@ -227,6 +314,7 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
 
       {/* Top Controls Header */}
       <header className="camera-top-bar">
+        {/* Back to Home */}
         <button
           type="button"
           className="camera-ctrl-btn"
@@ -236,35 +324,90 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
           <ChevronLeft size={20} />
         </button>
 
+        {/* Center Indicators / Recording Timer */}
         <div className="camera-header-center">
-          <button
-            type="button"
-            className={`camera-pill-btn ${flashEnabled ? 'active' : ''}`}
-            onClick={() => setFlashEnabled(!flashEnabled)}
-            aria-label="Toggle flash"
-          >
-            {flashEnabled ? <Zap size={14} className="text-amber" /> : <ZapOff size={14} />}
-          </button>
-          <span className="camera-hdr-pill">HDR</span>
+          {isRecording ? (
+            <div className="camera-recording-badge">
+              <span className="rec-red-dot" />
+              <span>{formatTimer(recordSeconds)}</span>
+            </div>
+          ) : (
+            <>
+              {/* Flash Cycle Button */}
+              <button
+                type="button"
+                className={`camera-pill-btn ${flashMode !== 'off' ? 'active' : ''}`}
+                onClick={() => {
+                  sound.playTapSound();
+                  setFlashMode((prev) => (prev === 'off' ? 'on' : prev === 'on' ? 'auto' : 'off'));
+                }}
+                aria-label="Toggle Flash Mode"
+                title={`Flash: ${flashMode.toUpperCase()}`}
+              >
+                {flashMode === 'off' ? (
+                  <ZapOff size={14} />
+                ) : (
+                  <Zap size={14} className={flashMode === 'on' ? 'text-amber' : ''} />
+                )}
+                <span className="pill-sub">{flashMode === 'auto' ? 'A' : ''}</span>
+              </button>
+
+              {/* HDR Toggle Button */}
+              <button
+                type="button"
+                className={`camera-hdr-pill-btn ${hdrEnabled ? 'active' : ''}`}
+                onClick={() => {
+                  sound.playTapSound();
+                  setHdrEnabled(!hdrEnabled);
+                }}
+                aria-label="Toggle HDR"
+              >
+                HDR
+              </button>
+            </>
+          )}
         </div>
 
+        {/* Photographic Styles / Filters Toggle */}
         <button
           type="button"
-          className="camera-ctrl-btn"
+          className={`camera-ctrl-btn ${showFiltersMenu || activeFilter !== 'standard' ? 'active-filter' : ''}`}
           onClick={() => {
             sound.playTapSound();
-            const next = zoomLevel === '0.5x' ? '1x' : zoomLevel === '1x' ? '2x' : '0.5x';
-            setZoomLevel(next);
+            setShowFiltersMenu(!showFiltersMenu);
           }}
-          aria-label="Toggle zoom ratio"
+          aria-label="Photographic Filters"
+          title="Styles & Filters"
         >
-          <Aperture size={18} />
+          <Sliders size={17} />
         </button>
       </header>
 
-      {/* Live Viewfinder Body */}
-      <div className={`camera-viewfinder-screen zoom-${zoomLevel}`}>
-        {/* Video Element is ALWAYS mounted in DOM to guarantee ref is never null */}
+      {/* Expandable Live Filters Strip */}
+      {showFiltersMenu && (
+        <div className="camera-filters-strip">
+          {(['standard', 'vivid', 'warm', 'cool', 'noir', 'dramatic'] as FilterType[]).map((f) => (
+            <button
+              key={f}
+              type="button"
+              className={`filter-chip ${activeFilter === f ? 'active' : ''}`}
+              onClick={() => {
+                sound.playTapSound();
+                setActiveFilter(f);
+              }}
+            >
+              <span>{f.toUpperCase()}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Live Viewfinder Body with Tap-to-Focus */}
+      <div
+        className={`camera-viewfinder-screen ${cameraMode === 'CINEMATIC' ? 'letterbox-cinematic' : ''}`}
+        onClick={handleViewfinderClick}
+      >
+        {/* Live Webcam Element */}
         <video
           ref={videoRef}
           playsInline
@@ -277,11 +420,13 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
           className="camera-live-video"
           style={{
             display: streamReady ? 'block' : 'none',
-            transform: isFrontCamera ? 'scaleX(-1)' : 'none', // Mirror front camera like real iPhone selfie cam
+            transform: `scale(${zoomScale}) ${isFrontCamera ? 'scaleX(-1)' : 'scaleX(1)'}`,
+            filter: filterStyles[activeFilter],
+            transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease',
           }}
         />
 
-        {/* Viewfinder Telemetry Placeholder (visible when webcam is connecting or denied) */}
+        {/* Viewfinder Telemetry Placeholder (visible if webcam disconnected) */}
         {!streamReady && (
           <div className="camera-simulated-view">
             <div className="camera-sim-grid">
@@ -302,17 +447,56 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
           </div>
         )}
 
+        {/* Tap-To-Focus Yellow Ring */}
+        {focusPoint && (
+          <div
+            className="camera-tap-focus-ring"
+            style={{ left: focusPoint.x - 30, top: focusPoint.y - 30 }}
+          >
+            <div className="focus-ring-box" />
+            <Sun size={12} className="focus-exposure-sun" />
+          </div>
+        )}
+
+        {/* Portrait Mode: Natural Light Bokeh Hexagon */}
+        {cameraMode === 'PORTRAIT' && (
+          <div className="portrait-bokeh-badge">
+            <div className="bokeh-hexagon">
+              <Sun size={14} className="text-amber" />
+            </div>
+            <span>NATURAL LIGHT</span>
+          </div>
+        )}
+
+        {/* Pano Mode: Panorama Tracking Guide */}
+        {cameraMode === 'PANO' && (
+          <div className="camera-pano-guideline">
+            <div className="pano-arrow-track">
+              <span className="pano-arrow">➔</span>
+              <span className="pano-text">Move iPhone continuously</span>
+            </div>
+          </div>
+        )}
+
+        {/* Cinematic 24fps Badge */}
+        {cameraMode === 'CINEMATIC' && (
+          <div className="camera-cinematic-badge">
+            <span>4K · 24 FPS</span>
+          </div>
+        )}
+
         {/* 3x3 Composition Grid */}
         <div className="camera-rule-of-thirds-grid" />
 
-        {/* Zoom Selector Capsule */}
+        {/* Interactive Zoom Selector Capsule */}
         <div className="camera-zoom-capsule">
           {(['0.5x', '1x', '2x'] as const).map((z) => (
             <button
               key={z}
               type="button"
               className={`zoom-btn ${zoomLevel === z ? 'active' : ''}`}
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 sound.playTapSound();
                 setZoomLevel(z);
               }}
@@ -323,13 +507,20 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
         </div>
       </div>
 
-      {/* Bottom Mode Picker */}
-      <div className="camera-mode-strip">
-        <span className="camera-mode-label">CINEMATIC</span>
-        <span className="camera-mode-label">VIDEO</span>
-        <span className="camera-mode-label active">PHOTO</span>
-        <span className="camera-mode-label">PORTRAIT</span>
-        <span className="camera-mode-label">PANO</span>
+      {/* Interactive Mode Picker Strip (CINEMATIC | VIDEO | PHOTO | PORTRAIT | PANO) */}
+      <div className="camera-mode-strip" role="tablist">
+        {(['CINEMATIC', 'VIDEO', 'PHOTO', 'PORTRAIT', 'PANO'] as CameraMode[]).map((mode) => (
+          <button
+            key={mode}
+            type="button"
+            role="tab"
+            aria-selected={cameraMode === mode}
+            className={`camera-mode-btn ${cameraMode === mode ? 'active' : ''}`}
+            onClick={() => handleModeChange(mode)}
+          >
+            {mode}
+          </button>
+        ))}
       </div>
 
       {/* Bottom Shutter Action Bar */}
@@ -340,6 +531,7 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
           className="camera-gallery-thumb-btn"
           onClick={onOpenPhotos}
           aria-label="Open Photos Library"
+          title="Open Photos Gallery"
         >
           {latestPhoto ? (
             <img src={latestPhoto} alt="Latest taken photo" className="camera-thumb-img" />
@@ -350,22 +542,30 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
           )}
         </button>
 
-        {/* Native iOS Shutter Button */}
+        {/* Native iOS Shutter / Record Button */}
         <button
           type="button"
-          className="camera-ios-shutter-btn"
-          onClick={handleCapture}
-          aria-label="Take picture"
+          className={`camera-ios-shutter-btn mode-${cameraMode.toLowerCase()} ${isRecording ? 'recording' : ''}`}
+          onClick={handleShutterAction}
+          aria-label={
+            cameraMode === 'VIDEO' || cameraMode === 'CINEMATIC'
+              ? isRecording
+                ? 'Stop recording'
+                : 'Start recording'
+              : 'Take picture'
+          }
         >
-          <div className="shutter-inner-circle" />
+          <div className="shutter-inner-circle">
+            {isRecording && <Square size={16} fill="currentColor" />}
+          </div>
         </button>
 
-        {/* Flip Lens Button */}
+        {/* Flip Lens / Selfie Camera Button */}
         <button
           type="button"
           className="camera-flip-btn"
           onClick={handleFlipCamera}
-          title="Flip camera (Front / Back)"
+          title="Flip camera (Front / Rear)"
           aria-label="Toggle camera"
         >
           <RefreshCw size={20} />
