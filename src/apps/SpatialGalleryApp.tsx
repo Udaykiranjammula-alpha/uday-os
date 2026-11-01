@@ -121,7 +121,15 @@ export function SpatialGalleryApp({
             style={{
               transform: `translateZ(${15 * separationFactor}px)`,
               borderColor: `${activeProject.accent}66`,
+              cursor: onSelectProject ? 'pointer' : 'default',
             }}
+            onClick={() => {
+              if (onSelectProject) {
+                sound.playTapSound();
+                onSelectProject(activeProject);
+              }
+            }}
+            title={onSelectProject ? 'Tap to view full project architecture' : undefined}
           >
             <div className="subject-card-inner">
               <div className="subject-top-row">
@@ -155,6 +163,23 @@ export function SpatialGalleryApp({
                 <Sparkles size={11} />
                 <span>3D Parallax Active</span>
               </span>
+
+              {onSelectProject && (
+                <button
+                  type="button"
+                  className="fg-action-link"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    sound.playTapSound();
+                    onSelectProject(activeProject);
+                  }}
+                  title="Inspect Architecture"
+                  style={{ cursor: 'pointer', border: 'none', background: 'rgba(255,255,255,0.14)', color: '#fff' }}
+                >
+                  <Eye size={12} />
+                  <span>Inspect</span>
+                </button>
+              )}
 
               <a
                 href={activeProject.repo}

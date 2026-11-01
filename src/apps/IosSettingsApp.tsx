@@ -15,15 +15,25 @@ import {
   Mail,
 } from 'lucide-react';
 import { profile } from '../data/profile';
+import { sound } from '../services/sound';
 
-interface IosSettingsAppProps {
+export interface IosSettingsAppProps {
   onBack: () => void;
   color: 'plum' | 'desert' | 'natural' | 'black';
   setColor: (c: 'plum' | 'desert' | 'natural' | 'black') => void;
   onOpenApp: (app: string) => void;
+  assistiveTouchEnabled?: boolean;
+  onToggleAssistiveTouch?: (enabled: boolean) => void;
 }
 
-export function IosSettingsApp({ onBack, color, setColor, onOpenApp }: IosSettingsAppProps) {
+export function IosSettingsApp({
+  onBack,
+  color,
+  setColor,
+  onOpenApp,
+  assistiveTouchEnabled = true,
+  onToggleAssistiveTouch,
+}: IosSettingsAppProps) {
   const [activeSubView, setActiveSubView] = useState<string | null>(null);
 
   if (activeSubView === 'profile') {
@@ -118,6 +128,65 @@ export function IosSettingsApp({ onBack, color, setColor, onOpenApp }: IosSettin
     );
   }
 
+  if (activeSubView === 'accessibility') {
+    return (
+      <div className="ios-settings-page">
+        <div className="settings-top-nav">
+          <button type="button" className="settings-back-btn" onClick={() => setActiveSubView(null)}>
+            <ChevronLeft size={20} />
+            <span>Settings</span>
+          </button>
+        </div>
+        <h2 className="settings-page-title">Accessibility</h2>
+
+        <div className="settings-section-header">PHYSICAL AND MOTOR</div>
+        <div className="ios-settings-group">
+          <div className="ios-settings-row" style={{ cursor: 'default' }}>
+            <div className="row-icon-cell bg-dark">
+              <svg width="18" height="18" viewBox="0 0 36 36" fill="none">
+                <circle cx="18" cy="18" r="14" stroke="rgba(255,255,255,0.4)" strokeWidth="3" />
+                <circle cx="18" cy="18" r="9" stroke="rgba(255,255,255,0.8)" strokeWidth="3" />
+                <circle cx="18" cy="18" r="4.5" fill="#ffffff" />
+              </svg>
+            </div>
+            <span className="row-label" style={{ flex: 1 }}>AssistiveTouch</span>
+            <button
+              type="button"
+              className={`ios-toggle-switch ${assistiveTouchEnabled ? 'is-active' : ''}`}
+              onClick={() => {
+                sound.playTapSound();
+                onToggleAssistiveTouch?.(!assistiveTouchEnabled);
+              }}
+              aria-label="Toggle AssistiveTouch"
+              role="switch"
+              aria-checked={assistiveTouchEnabled}
+            >
+              <div className="ios-toggle-thumb" />
+            </button>
+          </div>
+        </div>
+        <p className="accessibility-footnote">
+          AssistiveTouch allows you to perform custom actions, access the App Switcher, and navigate shortcuts without using physical gestures.
+        </p>
+
+        <div className="settings-section-header">SYSTEM & ARCHITECTURE</div>
+        <div className="ios-settings-group">
+          <button
+            type="button"
+            className="ios-settings-row"
+            onClick={() => onOpenApp('skills')}
+          >
+            <div className="row-icon-cell bg-blue">
+              <Accessibility size={16} />
+            </div>
+            <span className="row-label">Skills & Capabilities</span>
+            <ChevronRight size={18} className="row-chevron" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="ios-settings-page">
       {/* Top Bar with Back Button */}
@@ -162,12 +231,15 @@ export function IosSettingsApp({ onBack, color, setColor, onOpenApp }: IosSettin
         <button
           type="button"
           className="ios-settings-row"
-          onClick={() => onOpenApp('skills')}
+          onClick={() => setActiveSubView('accessibility')}
         >
           <div className="row-icon-cell bg-blue">
             <Accessibility size={17} />
           </div>
-          <span className="row-label">Accessibility & Skills</span>
+          <span className="row-label">Accessibility</span>
+          <span style={{ fontSize: '13px', color: 'var(--app-muted)', marginRight: '6px' }}>
+            {assistiveTouchEnabled ? 'On' : 'Off'}
+          </span>
           <ChevronRight size={18} className="row-chevron" />
         </button>
 

@@ -139,13 +139,16 @@ a {
 
 /* Studio Nav - Exact Right Editorial Navigation */
 .studio-nav {
-  position: absolute;
-  top: 50%;
-  right: clamp(24px, 5vw, 64px);
-  z-index: 10;
-  transform: translateY(-50%);
+  position: fixed;
+  top: 24px;
+  right: clamp(20px, 3.5vw, 48px);
+  z-index: 20;
   text-align: right;
-  max-width: 280px;
+  max-width: 320px;
+  pointer-events: none;
+}
+.studio-nav * {
+  pointer-events: auto;
 }
 .studio-nav-name {
   display: block;
@@ -15993,9 +15996,9 @@ a {
 /* ==========================================================================
    RESPONSIVE LAYOUT FIX (PREVENTS ANY BUTTON OVERLAY OVER PHONE)
    ========================================================================== */
-@media (max-width: 1300px) {
+@media (max-width: 1680px) {
   .phone-world {
-    transform: none !important; /* Perfect center on all screens below 1300px */
+    transform: none !important; /* Perfect center on all screens below 1680px */
   }
   .studio-nav {
     position: fixed !important;
@@ -16003,8 +16006,11 @@ a {
     right: 24px !important;
     transform: none !important;
     z-index: 90 !important;
-    max-width: 280px !important;
+    max-width: 320px !important;
     text-align: right !important;
+    pointer-events: none !important;
+  }
+  .studio-nav * {
     pointer-events: auto !important;
   }
   .studio-nav-name {
@@ -16019,7 +16025,7 @@ a {
   .studio-flip-dock {
     margin-top: 6px !important;
     gap: 6px !important;
-    max-width: 280px !important;
+    max-width: 320px !important;
     justify-content: flex-end !important;
   }
   .studio-flip-pill {
@@ -16045,3 +16051,299 @@ a {
 
 
 
+
+/* ========================================================
+   iOS 18 ASSISTIVETOUCH: FLOATING CONTROLLER & OVERLAY
+   ======================================================== */
+.assistive-touch-float {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 54px;
+  height: 54px;
+  border-radius: 15px;
+  background: rgba(30, 30, 34, 0.72);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.45),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  z-index: 920;
+  transition: opacity 0.35s ease, filter 0.35s ease;
+}
+
+.assistive-touch-float:active,
+.assistive-touch-float.is-dragging {
+  cursor: grabbing;
+}
+
+.assistive-touch-float.is-idle {
+  opacity: 0.45;
+  filter: contrast(0.92);
+}
+
+.assistive-touch-float:hover {
+  opacity: 1 !important;
+  filter: contrast(1) !important;
+  box-shadow: 
+    0 10px 28px rgba(0, 0, 0, 0.55),
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.4),
+    0 0 14px rgba(255, 255, 255, 0.18);
+}
+
+.assistive-touch-icon-svg {
+  pointer-events: none;
+  display: block;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+  transition: transform 0.2s ease;
+}
+
+.assistive-touch-float:hover .assistive-touch-icon-svg {
+  transform: scale(1.05);
+}
+
+/* AssistiveTouch Full-Screen Modal Overlay */
+.assistive-touch-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 950;
+  background: rgba(0, 0, 0, 0.36);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.assistive-touch-menu {
+  width: 292px;
+  background: rgba(28, 28, 30, 0.88);
+  backdrop-filter: blur(40px) saturate(210%);
+  -webkit-backdrop-filter: blur(40px) saturate(210%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 36px;
+  box-shadow: 
+    0 24px 60px rgba(0, 0, 0, 0.75),
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.28),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.4);
+  padding: 16px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.assistive-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px;
+}
+
+.assistive-header-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.assistive-header-action {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.assistive-header-action:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+/* 3x3 Radial / Grid Matrix */
+.assistive-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 10px 6px;
+}
+
+.assistive-action-btn {
+  background: transparent;
+  border: none;
+  outline: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 2px;
+  cursor: pointer;
+  transition: transform 0.16s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.assistive-action-btn:hover {
+  transform: scale(1.06);
+}
+
+.assistive-action-btn:active {
+  transform: scale(0.92);
+}
+
+.assistive-action-icon-wrap {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.25),
+    inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  transition: all 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+.assistive-action-btn:hover .assistive-action-icon-wrap {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 6px 16px rgba(0, 0, 0, 0.35),
+    inset 0 1px 1px rgba(255, 255, 255, 0.35),
+    0 0 12px rgba(255, 255, 255, 0.15);
+}
+
+/* Center Close Button Special Accent */
+.assistive-center-btn .center-wrap {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+.assistive-center-btn:hover .center-wrap {
+  background: rgba(255, 255, 255, 0.24);
+  border-color: rgba(255, 255, 255, 0.36);
+}
+
+/* AI Glow Wrap with Apple Intelligence Theme */
+.assistive-action-icon-wrap.ai-glow-wrap {
+  background: radial-gradient(circle at center, rgba(175, 82, 222, 0.28), rgba(0, 122, 255, 0.16) 70%);
+  border-color: rgba(175, 82, 222, 0.45);
+  box-shadow: 0 0 14px rgba(175, 82, 222, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.assistive-action-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  margin-top: 5px;
+  text-align: center;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.center-label {
+  color: rgba(255, 255, 255, 0.62) !important;
+}
+
+/* Authentic iOS Glyphs & Accent Shadows */
+.assistive-glyph.text-amber {
+  color: #ffcc00;
+  filter: drop-shadow(0 0 6px rgba(255, 204, 0, 0.45));
+}
+
+.assistive-glyph.text-orange {
+  color: #ff9500;
+  filter: drop-shadow(0 0 6px rgba(255, 149, 0, 0.45));
+}
+
+.assistive-glyph.text-sky {
+  color: #5ac8fa;
+  filter: drop-shadow(0 0 6px rgba(90, 200, 250, 0.45));
+}
+
+.assistive-glyph.text-silver {
+  color: #ebebf5;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.3));
+}
+
+.assistive-glyph.text-rose {
+  color: #ff2d55;
+  filter: drop-shadow(0 0 6px rgba(255, 45, 85, 0.45));
+}
+
+.assistive-glyph.text-purple {
+  color: #af52de;
+  filter: drop-shadow(0 0 6px rgba(175, 82, 222, 0.45));
+}
+
+.assistive-glyph.text-green {
+  color: #34c759;
+  filter: drop-shadow(0 0 6px rgba(52, 199, 89, 0.45));
+}
+
+.assistive-glyph.assistive-ai-glow {
+  color: #c4b5fd;
+  filter: drop-shadow(0 0 8px rgba(192, 132, 252, 0.75));
+}
+
+/* iOS Toggle Switch for Accessibility Settings */
+.ios-toggle-switch {
+  position: relative;
+  width: 50px;
+  height: 30px;
+  background: #39393d;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+  border: none;
+  padding: 2px;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.ios-toggle-switch.is-active {
+  background: #34c759;
+}
+
+.ios-toggle-thumb {
+  width: 26px;
+  height: 26px;
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+.ios-toggle-switch.is-active .ios-toggle-thumb {
+  transform: translateX(20px);
+}
+
+.accessibility-footnote {
+  font-size: 11.5px;
+  color: var(--app-secondary);
+  line-height: 1.4;
+  padding: 6px 14px 14px;
+  margin: 0;
+}

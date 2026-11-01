@@ -18,6 +18,7 @@ import {
   Check,
 } from 'lucide-react';
 import { sound } from '../services/sound';
+import { profile } from '../data/profile';
 
 interface WalletAppProps {
   onBack: () => void;
@@ -338,7 +339,7 @@ export function WalletApp({ onBack, onNavigate }: WalletAppProps) {
                   </button>
                 )}
                 <a
-                  href="https://github.com/udaykiran0"
+                  href={profile.github}
                   target="_blank"
                   rel="noreferrer"
                   onClick={() => sound.playTapSound()}

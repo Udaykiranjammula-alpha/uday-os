@@ -4,6 +4,7 @@ import { DynamicIsland } from './DynamicIsland';
 import { StatusBar } from './StatusBar';
 import { IosHomeScreen } from './IosHomeScreen';
 import { ControlCenter } from './ControlCenter';
+import { AboutApp } from '../apps/AboutApp';
 import { IosSettingsApp } from '../apps/IosSettingsApp';
 import { IosExperienceApp } from '../apps/IosExperienceApp';
 import { IosProjectsApp } from '../apps/IosProjectsApp';
@@ -41,6 +42,7 @@ import { MapsApp } from '../apps/MapsApp';
 import { AppleIntelligenceGlow } from './AppleIntelligenceGlow';
 import { RecruiterCallModal } from './RecruiterCallModal';
 import { AppSwitcher } from './AppSwitcher';
+import { AssistiveTouch } from './AssistiveTouch';
 import { LockScreen } from './LockScreen';
 import { SpotlightSearch } from './SpotlightSearch';
 import type { Project } from '../types';
@@ -87,6 +89,21 @@ export function IPhoneScreenContent({
   const [brightness, setBrightness] = useState(1.0);
   const [isLocked, setIsLocked] = useState(false);
   const [isStandByOpen, setIsStandByOpen] = useState(false);
+  const [isAssistiveTouchEnabled, setIsAssistiveTouchEnabled] = useState(() => {
+    try {
+      const saved = localStorage.getItem('ios_assistive_touch_enabled');
+      return saved !== null ? JSON.parse(saved) : true;
+    } catch {
+      return true;
+    }
+  });
+
+  const handleToggleAssistiveTouch = (enabled: boolean) => {
+    setIsAssistiveTouchEnabled(enabled);
+    try {
+      localStorage.setItem('ios_assistive_touch_enabled', JSON.stringify(enabled));
+    } catch {}
+  };
 
   const triggerMagSafe = () => {
     sound.playMagSafeSound();
@@ -133,7 +150,7 @@ export function IPhoneScreenContent({
     // Exclude buttons, links, form controls, and interactive elements from screen drag-scroll
     if (
       target?.closest(
-        'button, a, input, textarea, select, [role="button"], .ios-home-icon-btn, .widget-clickable, .camera-screen, .cc-slider-capsule, .brightness-slider-container, .volume-slider-container, .arcade-canvas-wrap, .arcade-app-page, .calc-grid, .camera-control-sensor-strip'
+        'button, a, input, textarea, select, [role="button"], .ios-home-icon-btn, .widget-clickable, .camera-screen, .cc-slider-capsule, .brightness-slider-container, .volume-slider-container, .arcade-canvas-wrap, .arcade-app-page, .calc-grid, .camera-control-sensor-strip, .assistive-touch-float, .assistive-touch-menu, .assistive-touch-backdrop'
       )
     ) {
       return;
@@ -312,7 +329,36 @@ export function IPhoneScreenContent({
                 color={color}
                 setColor={setColor}
                 onOpenApp={(app) => onNavigate(app)}
+                assistiveTouchEnabled={isAssistiveTouchEnabled}
+                onToggleAssistiveTouch={handleToggleAssistiveTouch}
               />
+            </motion.div>
+          ) : currentRoute === 'about' ? (
+            <motion.div
+              key="about-view"
+              className="page-screen-anim"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+            >
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', background: '#000000', color: '#fff' }}>
+                <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                  <button
+                    type="button"
+                    className="mail-nav-back-pill"
+                    onClick={() => onNavigate('settings')}
+                    aria-label="Back to Settings"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 999, padding: '4px 10px', color: '#38bdf8', fontSize: 13, cursor: 'pointer' }}
+                  >
+                    <span>‹ Settings</span>
+                  </button>
+                  <span style={{ fontSize: 15, fontWeight: 700 }}>About Uday</span>
+                  <div style={{ width: 44 }} />
+                </header>
+                <div style={{ flex: 1, overflowY: 'auto', padding: 14 }}>
+                  <AboutApp onOpenApp={(app) => onNavigate(app)} />
+                </div>
+              </div>
             </motion.div>
           ) : currentRoute === 'experience' ? (
             <motion.div
@@ -812,6 +858,24 @@ export function IPhoneScreenContent({
         }}
         aria-label="Return to iOS Home Screen or Open App Switcher"
       />
+
+      {/* iOS 18 AssistiveTouch Floating Controller & Overlay */}
+      {isAssistiveTouchEnabled && !isLocked && !isStandByOpen && (
+        <AssistiveTouch
+          onNavigate={(route) => {
+            setActiveProject(null);
+            setIsDemoOpen(false);
+            onNavigate(route);
+          }}
+          onOpenAppSwitcher={() => {
+            sound.playTapSound();
+            setIsAppSwitcherOpen(true);
+          }}
+          currentRoute={currentRoute}
+          isEnabled={isAssistiveTouchEnabled}
+          onToggleEnabled={handleToggleAssistiveTouch}
+        />
+      )}
 
       {/* Apple Intelligence Glowing Multicolor Edge Bezel Ribbon */}
       <AppleIntelligenceGlow

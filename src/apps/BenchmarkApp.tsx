@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ChevronLeft,
   Cpu,
@@ -38,12 +38,21 @@ export function BenchmarkApp({ onBack }: BenchmarkAppProps) {
     matrixOps: '48.2 GFLOPS',
   });
   const [hasRun, setHasRun] = useState(false);
+  const intervalRef = useRef<any>(null);
+
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
 
   const runBenchmark = () => {
     sound.playActionClickSound();
     setIsRunning(true);
     setProgress(0);
     setHasRun(false);
+
+    if (intervalRef.current) clearInterval(intervalRef.current);
 
     // Phase 1: Single Core Matrix Math
     setCurrentPhase('Phase 1/4: Single-Core Matrix & Crypto Computation...');
@@ -83,6 +92,7 @@ export function BenchmarkApp({ onBack }: BenchmarkAppProps) {
         });
       }
     }, 90);
+    intervalRef.current = interval;
   };
 
   return (
