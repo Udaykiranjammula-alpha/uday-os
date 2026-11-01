@@ -6,12 +6,13 @@ import {
   RefreshCw,
   Sliders,
   Image as ImageIcon,
-  Sparkles,
-  Circle,
   Square,
   Sun,
-  Flame,
-  Check,
+  Eye,
+  Camera,
+  Compass,
+  Film,
+  Sparkles,
 } from 'lucide-react';
 import { sound } from '../services/sound';
 
@@ -20,14 +21,34 @@ interface CameraAppProps {
   onOpenPhotos: () => void;
 }
 
-type CameraMode = 'CINEMATIC' | 'VIDEO' | 'PHOTO' | 'PORTRAIT' | 'PANO';
-type FilterType = 'standard' | 'vivid' | 'warm' | 'cool' | 'noir' | 'dramatic';
-type ZoomLevel = '0.5x' | '1x' | '2x' | '5x';
+export type CameraMode = 'PHOTO' | 'VIDEO' | 'PORTRAIT' | 'CINEMATIC' | 'SPATIAL' | 'PANORAMA';
+export type FilterType = 'standard' | 'vivid' | 'warm' | 'cool' | 'noir' | 'dramatic';
+export type ZoomLevel = '0.5x' | '1x' | '2x' | '5x';
+
+const CAMERA_MODES: CameraMode[] = [
+  'PHOTO',
+  'VIDEO',
+  'PORTRAIT',
+  'CINEMATIC',
+  'SPATIAL',
+  'PANORAMA',
+];
+
+const FILTERS: { id: FilterType; label: string; desc: string }[] = [
+  { id: 'standard', label: 'Standard', desc: 'True to life tone & balance' },
+  { id: 'vivid', label: 'Vivid', desc: 'Vibrant punchy contrast' },
+  { id: 'warm', label: 'Warm', desc: 'Golden hour undertones' },
+  { id: 'cool', label: 'Cool', desc: 'Crisp cinematic blues' },
+  { id: 'noir', label: 'Noir', desc: 'High contrast monochrome' },
+  { id: 'dramatic', label: 'Dramatic', desc: 'Deep shadows and highlights' },
+];
 
 export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const modeStripRef = useRef<HTMLDivElement>(null);
+  const modeButtonsRef = useRef<{ [key in CameraMode]?: HTMLButtonElement | null }>({});
 
   // Core camera states
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -41,6 +62,7 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
   const [activeFilter, setActiveFilter] = useState<FilterType>('standard');
   const [showFiltersMenu, setShowFiltersMenu] = useState(false);
   const [isFrontCamera, setIsFrontCamera] = useState(true);
+  const [isFlipping, setIsFlipping] = useState(false);
   const [latestPhoto, setLatestPhoto] = useState<string | null>(null);
 
   // Video Recording States
@@ -50,14 +72,18 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
   // Tap-to-focus indicator
   const [focusPoint, setFocusPoint] = useState<{ x: number; y: number } | null>(null);
 
-  // Load latest photo from localStorage
+  // Portrait lighting preset
+  const [portraitLight, setPortraitLight] = useState<'NATURAL' | 'STUDIO' | 'CONTOUR'>('NATURAL');
+
+  // Load latest photo from localStorage (prefer ios_user_photos)
   useEffect(() => {
     try {
-      const stored = localStorage.getItem('uday-os-user-photos');
+      const stored = localStorage.getItem('ios_user_photos') || localStorage.getItem('uday-os-user-photos');
       if (stored) {
         const photos = JSON.parse(stored);
         if (Array.isArray(photos) && photos.length > 0) {
-          setLatestPhoto(photos[photos.length - 1].dataUrl);
+          const last = photos[photos.length - 1];
+          setLatestPhoto(last.dataUrl || last.url);
         }
       }
     } catch {
@@ -113,7 +139,7 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
           audio: false,
         });
       } catch {
-        // Fallback for laptop webcams without facingMode
+        // Fallback for laptop webcams without facingMode constraint
         mediaStream = await navigator.mediaDevices.getUserMedia({
           video: true,
           audio: false,
@@ -159,6 +185,18 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
     }
   }, [stream]);
 
+  // Smooth scroll mode selector when active mode changes
+  useEffect(() => {
+    const btn = modeButtonsRef.current[cameraMode];
+    const container = modeStripRef.current;
+    if (btn && container) {
+      const btnRect = btn.getBoundingClientRect();
+      const contRect = container.getBoundingClientRect();
+      const offset = btnRect.left - contRect.left - (contRect.width / 2) + (btnRect.width / 2);
+      container.scrollBy({ left: offset, behavior: 'smooth' });
+    }
+  }, [cameraMode]);
+
   // Tap-to-focus on viewfinder
   const handleViewfinderClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -174,16 +212,16 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
   // Filter CSS styles
   const filterStyles: Record<FilterType, string> = {
     standard: 'none',
-    vivid: 'saturate(1.45) contrast(1.1)',
-    warm: 'sepia(0.28) saturate(1.25) hue-rotate(-10deg)',
-    cool: 'saturate(1.1) hue-rotate(18deg) brightness(1.04)',
-    noir: 'grayscale(1) contrast(1.3) brightness(0.95)',
-    dramatic: 'contrast(1.4) brightness(0.92) saturate(1.2)',
+    vivid: 'saturate(1.45) contrast(1.12)',
+    warm: 'sepia(0.28) saturate(1.25) hue-rotate(-10deg) brightness(1.02)',
+    cool: 'saturate(1.1) hue-rotate(18deg) brightness(1.05)',
+    noir: 'grayscale(1) contrast(1.35) brightness(0.95)',
+    dramatic: 'contrast(1.4) brightness(0.92) saturate(1.25)',
   };
 
-  // Zoom scale multiplier with 5x telephoto support
+  // Realistic zoom scale transform
   const zoomScale =
-    zoomLevel === '0.5x' ? 1 : zoomLevel === '1x' ? 1.25 : zoomLevel === '2x' ? 1.95 : 3.1;
+    zoomLevel === '0.5x' ? 0.72 : zoomLevel === '1x' ? 1.0 : zoomLevel === '2x' ? 1.55 : 2.75;
 
   // Capacitive Camera Control Sensor drag & tap handler
   const handleSensorPointer = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -211,7 +249,7 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
     window.clearTimeout((window as unknown as { _camControlTimer?: number })._camControlTimer);
     (window as unknown as { _camControlTimer?: number })._camControlTimer = window.setTimeout(() => {
       setShowCameraControlHud(false);
-    }, 2000);
+    }, 2200);
   };
 
   // Shutter action (Photos & Video recording)
@@ -228,12 +266,11 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
       return;
     }
 
-    // Photo / Portrait / Pano mode
+    // Photo / Portrait / Spatial / Panorama modes
     sound.playShutterSound();
-    if (flashMode === 'on' || (flashMode === 'auto' && Math.random() > 0.5)) {
-      setFlashActive(true);
-      setTimeout(() => setFlashActive(false), 260);
-    }
+    setFlashActive(true);
+    setTimeout(() => setFlashActive(false), 240);
+
     saveSnapshot();
   };
 
@@ -274,42 +311,77 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
         ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
         ctx.restore();
       } else {
-        // Simulated iPhone shot
+        // High-aesthetic simulated iPhone 17 Pro Max portfolio capture
         const grad = ctx.createLinearGradient(0, 0, 720, 960);
         grad.addColorStop(0, '#0f172a');
-        grad.addColorStop(0.5, '#1e1b4b');
-        grad.addColorStop(1, '#090d16');
+        grad.addColorStop(0.3, '#1e1b4b');
+        grad.addColorStop(0.7, '#2e1065');
+        grad.addColorStop(1, '#020617');
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, 720, 960);
 
-        ctx.strokeStyle = '#38bdf8';
-        ctx.lineWidth = 3;
+        // Ambient lighting glow circles
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.25)';
         ctx.beginPath();
-        ctx.arc(360, 480, 80, 0, Math.PI * 2);
-        ctx.stroke();
+        ctx.arc(360, 420, 220, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = 'rgba(168, 85, 247, 0.25)';
+        ctx.beginPath();
+        ctx.arc(280, 520, 180, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Target reticle
+        ctx.strokeStyle = '#fbbf24';
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(260, 360, 200, 200);
+
+        // Corner ticks
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 4;
+        const s = 25;
+        // Top Left
+        ctx.beginPath(); ctx.moveTo(250, 350 + s); ctx.lineTo(250, 350); ctx.lineTo(250 + s, 350); ctx.stroke();
+        // Top Right
+        ctx.beginPath(); ctx.moveTo(470 - s, 350); ctx.lineTo(470, 350); ctx.lineTo(470, 350 + s); ctx.stroke();
+        // Bottom Left
+        ctx.beginPath(); ctx.moveTo(250, 570 - s); ctx.lineTo(250, 570); ctx.lineTo(250 + s, 570); ctx.stroke();
+        // Bottom Right
+        ctx.beginPath(); ctx.moveTo(470 - s, 570); ctx.lineTo(470, 570); ctx.lineTo(470, 570 - s); ctx.stroke();
 
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.font = 'bold 30px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('UDAY OS · Shot on iPhone 17 Pro', 360, 470);
+        ctx.fillText('UDAY OS · iPhone 17 Pro Max', 360, 440);
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = '600 20px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif';
+        ctx.fillText(`${cameraMode} · ${zoomLevel} · ${activeFilter.toUpperCase()} STYLE`, 360, 480);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '500 15px monospace';
+        ctx.fillText(`48MP FUSION · f/1.78 · ISO 64 · 24mm`, 360, 515);
       }
 
-      const photoData = canvas.toDataURL('image/jpeg', 0.85);
+      const photoData = canvas.toDataURL('image/jpeg', 0.88);
       setLatestPhoto(photoData);
 
       try {
-        const stored = localStorage.getItem('uday-os-user-photos');
+        const stored = localStorage.getItem('ios_user_photos') || localStorage.getItem('uday-os-user-photos');
         const existing = stored ? JSON.parse(stored) : [];
         const newPhoto = {
           id: `photo-${Date.now()}`,
           dataUrl: photoData,
           mode: cameraMode,
           filter: activeFilter,
-          label: customLabel,
+          label: customLabel || `${cameraMode} Capture`,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+          isFavorite: false,
         };
         const updated = [...existing, newPhoto];
+        // Save to both keys so any consumer finds it immediately
+        localStorage.setItem('ios_user_photos', JSON.stringify(updated));
         localStorage.setItem('uday-os-user-photos', JSON.stringify(updated));
       } catch {
         // Ignore quota
@@ -332,8 +404,12 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
   };
 
   const handleFlipCamera = () => {
-    sound.playTapSound();
-    setIsFrontCamera((prev) => !prev);
+    sound.playActionClickSound();
+    setIsFlipping(true);
+    setTimeout(() => {
+      setIsFrontCamera((prev) => !prev);
+      setIsFlipping(false);
+    }, 180);
   };
 
   return (
@@ -341,7 +417,7 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
       {/* Hidden processing canvas */}
       <canvas ref={canvasRef} style={{ display: 'none' }} width={720} height={960} />
 
-      {/* Screen Flash Overlay */}
+      {/* Screen Shutter Flash Overlay */}
       {flashActive && <div className="camera-flash-curtain" />}
 
       {/* Top Controls Header */}
@@ -352,6 +428,7 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
           className="camera-ctrl-btn"
           onClick={onBack}
           aria-label="Back to Home"
+          title="Back to Home"
         >
           <ChevronLeft size={20} />
         </button>
@@ -379,7 +456,7 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
                 {flashMode === 'off' ? (
                   <ZapOff size={14} />
                 ) : (
-                  <Zap size={14} className={flashMode === 'on' ? 'text-amber' : ''} />
+                  <Zap size={14} className={flashMode === 'on' ? 'text-amber-400' : ''} />
                 )}
                 <span className="pill-sub">{flashMode === 'auto' ? 'A' : ''}</span>
               </button>
@@ -393,9 +470,13 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
                   setHdrEnabled(!hdrEnabled);
                 }}
                 aria-label="Toggle HDR"
+                title="Smart HDR 5"
               >
                 HDR
               </button>
+
+              {/* Mode indicator pill */}
+              <span className="camera-mode-pill-tag">{cameraMode}</span>
             </>
           )}
         </div>
@@ -408,8 +489,8 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
             sound.playTapSound();
             setShowFiltersMenu(!showFiltersMenu);
           }}
-          aria-label="Photographic Filters"
-          title="Styles & Filters"
+          aria-label="Photographic Styles"
+          title="Photographic Styles"
         >
           <Sliders size={17} />
         </button>
@@ -418,17 +499,18 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
       {/* Expandable Live Filters Strip */}
       {showFiltersMenu && (
         <div className="camera-filters-strip">
-          {(['standard', 'vivid', 'warm', 'cool', 'noir', 'dramatic'] as FilterType[]).map((f) => (
+          {FILTERS.map((f) => (
             <button
-              key={f}
+              key={f.id}
               type="button"
-              className={`filter-chip ${activeFilter === f ? 'active' : ''}`}
+              className={`filter-chip ${activeFilter === f.id ? 'active' : ''}`}
               onClick={() => {
                 sound.playTapSound();
-                setActiveFilter(f);
+                setActiveFilter(f.id);
               }}
+              title={f.desc}
             >
-              <span>{f.toUpperCase()}</span>
+              <span>{f.label.toUpperCase()}</span>
             </button>
           ))}
         </div>
@@ -436,7 +518,9 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
 
       {/* Live Viewfinder Body with Tap-to-Focus */}
       <div
-        className={`camera-viewfinder-screen ${cameraMode === 'CINEMATIC' ? 'letterbox-cinematic' : ''}`}
+        className={`camera-viewfinder-screen ${cameraMode === 'CINEMATIC' ? 'letterbox-cinematic' : ''} ${
+          isFlipping ? 'camera-flipping' : ''
+        }`}
         onClick={handleViewfinderClick}
       >
         {/* Live Webcam Element */}
@@ -454,13 +538,20 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
             display: streamReady ? 'block' : 'none',
             transform: `scale(${zoomScale}) ${isFrontCamera ? 'scaleX(-1)' : 'scaleX(1)'}`,
             filter: filterStyles[activeFilter],
-            transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease',
+            transition: 'transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), filter 0.2s ease',
           }}
         />
 
         {/* Viewfinder Telemetry Placeholder (visible if webcam disconnected) */}
         {!streamReady && (
-          <div className="camera-simulated-view">
+          <div
+            className="camera-simulated-view"
+            style={{
+              transform: `scale(${zoomScale})`,
+              filter: filterStyles[activeFilter],
+              transition: 'transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), filter 0.2s ease',
+            }}
+          >
             <div className="camera-sim-grid">
               <div className="sim-focus-box">
                 <span className="corner c-tl" />
@@ -475,6 +566,7 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
               <span>f/1.78</span>
               <span>1/120s</span>
               <span>ISO 64</span>
+              <span>{isFrontCamera ? 'TRUE-DEPTH 12MP' : 'PRO CAMERA SYS'}</span>
             </div>
           </div>
         )}
@@ -490,37 +582,74 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
           </div>
         )}
 
-        {/* Portrait Mode: Natural Light Bokeh Hexagon */}
+        {/* Mode-Specific Overlays */}
+
+        {/* 1. PORTRAIT: Natural Light Bokeh Hexagon & Lighting Switcher */}
         {cameraMode === 'PORTRAIT' && (
-          <div className="portrait-bokeh-badge">
+          <div className="portrait-bokeh-badge" onClick={(e) => e.stopPropagation()}>
             <div className="bokeh-hexagon">
-              <Sun size={14} className="text-amber" />
+              <Sun size={14} className="text-amber-400" />
             </div>
-            <span>NATURAL LIGHT</span>
+            <button
+              type="button"
+              className="portrait-light-toggle"
+              onClick={() => {
+                sound.playTapSound();
+                setPortraitLight((prev) =>
+                  prev === 'NATURAL' ? 'STUDIO' : prev === 'STUDIO' ? 'CONTOUR' : 'NATURAL'
+                );
+              }}
+            >
+              <span>{portraitLight} LIGHT</span>
+            </button>
+            <span className="portrait-aperture-f">f/1.4</span>
           </div>
         )}
 
-        {/* Pano Mode: Panorama Tracking Guide */}
-        {cameraMode === 'PANO' && (
+        {/* 2. SPATIAL: Vision Pro 3D Stereoscopic Capture HUD */}
+        {cameraMode === 'SPATIAL' && (
+          <div className="camera-spatial-badge">
+            <div className="spatial-vision-icon">
+              <Eye size={13} />
+            </div>
+            <span>SPATIAL VIDEO · VISION PRO</span>
+            <div className="spatial-stereo-brackets">
+              <span className="stereo-left">[L]</span>
+              <span className="stereo-right">[R]</span>
+            </div>
+          </div>
+        )}
+
+        {/* 3. PANORAMA: Wide Panoramic Guideline */}
+        {cameraMode === 'PANORAMA' && (
           <div className="camera-pano-guideline">
             <div className="pano-arrow-track">
+              <Compass size={14} className="text-amber-400" />
               <span className="pano-arrow">➔</span>
               <span className="pano-text">Move iPhone continuously</span>
             </div>
           </div>
         )}
 
-        {/* Cinematic 24fps Badge */}
+        {/* 4. CINEMATIC: 4K 24fps Letterbox Badge & Subject Tracking */}
         {cameraMode === 'CINEMATIC' && (
           <div className="camera-cinematic-badge">
-            <span>4K · 24 FPS</span>
+            <Film size={12} />
+            <span>4K · 24 FPS · RACK FOCUS</span>
+          </div>
+        )}
+
+        {/* 5. VIDEO: 4K 60fps Badge */}
+        {cameraMode === 'VIDEO' && (
+          <div className="camera-video-spec-badge">
+            <span>4K · 60 FPS</span>
           </div>
         )}
 
         {/* 3x3 Composition Grid */}
         <div className="camera-rule-of-thirds-grid" />
 
-        {/* Interactive Zoom Selector Capsule */}
+        {/* Interactive Zoom Selector Capsule (0.5x, 1x, 2x, 5x) */}
         <div className="camera-zoom-capsule">
           {(['0.5x', '1x', '2x', '5x'] as const).map((z) => (
             <button
@@ -573,11 +702,14 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
         )}
       </div>
 
-      {/* Interactive Mode Picker Strip (CINEMATIC | VIDEO | PHOTO | PORTRAIT | PANO) */}
-      <div className="camera-mode-strip" role="tablist">
-        {(['CINEMATIC', 'VIDEO', 'PHOTO', 'PORTRAIT', 'PANO'] as CameraMode[]).map((mode) => (
+      {/* Interactive Mode Picker Strip: PHOTO, VIDEO, PORTRAIT, CINEMATIC, SPATIAL, PANORAMA */}
+      <div className="camera-mode-strip" ref={modeStripRef} role="tablist">
+        {CAMERA_MODES.map((mode) => (
           <button
             key={mode}
+            ref={(el) => {
+              modeButtonsRef.current[mode] = el;
+            }}
             type="button"
             role="tab"
             aria-selected={cameraMode === mode}
@@ -626,13 +758,13 @@ export function CameraApp({ onBack, onOpenPhotos }: CameraAppProps) {
           </div>
         </button>
 
-        {/* Flip Lens / Selfie Camera Button */}
+        {/* Flip Lens / Selfie Camera Button with mirror handling */}
         <button
           type="button"
-          className="camera-flip-btn"
+          className={`camera-flip-btn ${isFlipping ? 'spinning' : ''}`}
           onClick={handleFlipCamera}
-          title="Flip camera (Front / Rear)"
-          aria-label="Toggle camera"
+          title={isFrontCamera ? 'Switch to Rear Ultra-Wide Camera' : 'Switch to Front TrueDepth Camera'}
+          aria-label="Flip camera"
         >
           <RefreshCw size={20} />
         </button>

@@ -19,9 +19,10 @@ interface ArcadeAppProps {
 interface Collectible {
   x: number;
   y: number;
-  type: 'python' | 'ts' | 'cpp';
+  type: 'python' | 'react' | 'cpp' | 'three';
   points: number;
   icon: string;
+  name: string;
   color: string;
   collected: boolean;
 }
@@ -32,6 +33,7 @@ interface Obstacle {
   width: number;
   height: number;
   label: string;
+  isStackOverflow?: boolean;
 }
 
 interface Particle {
@@ -61,6 +63,7 @@ export function ArcadeApp({ onBack, onNavigate }: ArcadeAppProps) {
   const [highScore, setHighScore] = useState(() => {
     return parseInt(localStorage.getItem('dev_dash_high_score') || '0', 10);
   });
+  const [isNewHighScore, setIsNewHighScore] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [unlockedOffer, setUnlockedOffer] = useState(false);
   const [shake, setShake] = useState(false);
@@ -81,37 +84,47 @@ export function ArcadeApp({ onBack, onNavigate }: ArcadeAppProps) {
     return audioCtxRef.current;
   }, []);
 
-  const playBeep = useCallback((freq: number, type: OscillatorType, duration: number, gainVal = 0.12) => {
-    if (!soundEnabled) return;
-    try {
-      const ctx = getAudioCtx();
-      if (!ctx) return;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, ctx.currentTime);
-      gain.gain.setValueAtTime(gainVal, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + duration);
-    } catch {}
-  }, [getAudioCtx, soundEnabled]);
+  const playBeep = useCallback(
+    (freq: number, type: OscillatorType, duration: number, gainVal = 0.12) => {
+      if (!soundEnabled) return;
+      try {
+        const ctx = getAudioCtx();
+        if (!ctx) return;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(gainVal, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch {}
+    },
+    [getAudioCtx, soundEnabled]
+  );
 
   const playJumpSound = useCallback(() => playBeep(440, 'sine', 0.12), [playBeep]);
   const playDoubleJumpSound = useCallback(() => {
     playBeep(660, 'triangle', 0.08);
     setTimeout(() => playBeep(880, 'sine', 0.12), 40);
   }, [playBeep]);
-  const playCoinSound = useCallback(() => {
-    playBeep(987, 'square', 0.08, 0.08);
-    setTimeout(() => playBeep(1318, 'square', 0.14, 0.1), 60);
-  }, [playBeep]);
+
+  const playCoinSound = useCallback(
+    (type: Collectible['type']) => {
+      const freq = type === 'three' ? 1480 : type === 'cpp' ? 1280 : type === 'react' ? 1100 : 987;
+      playBeep(freq, 'square', 0.08, 0.08);
+      setTimeout(() => playBeep(freq * 1.33, 'square', 0.14, 0.1), 50);
+    },
+    [playBeep]
+  );
+
   const playGameOverSound = useCallback(() => {
     playBeep(260, 'sawtooth', 0.18, 0.15);
     setTimeout(() => playBeep(140, 'sawtooth', 0.35, 0.15), 150);
   }, [playBeep]);
+
   const playMilestoneSound = useCallback(() => {
     const notes = [523, 659, 783, 1046];
     notes.forEach((n, i) => setTimeout(() => playBeep(n, 'triangle', 0.15), i * 70));
@@ -174,7 +187,6 @@ export function ArcadeApp({ onBack, onNavigate }: ArcadeAppProps) {
 
   // Start / restart game
   const startGame = useCallback(() => {
-    // Generate initial buildings for parallax cyber city skyline
     const buildings: Array<{ x: number; w: number; h: number; windows: Array<{ x: number; y: number }> }> = [];
     let bX = 0;
     while (bX < 450) {
@@ -190,7 +202,6 @@ export function ArcadeApp({ onBack, onNavigate }: ArcadeAppProps) {
       bX += w + Math.floor(Math.random() * 12) + 4;
     }
 
-    // Stars
     const stars: Array<{ x: number; y: number; s: number; alpha: number }> = [];
     for (let i = 0; i < 35; i++) {
       stars.push({
@@ -209,13 +220,14 @@ export function ArcadeApp({ onBack, onNavigate }: ArcadeAppProps) {
       jumpsLeft: 2,
       groundY: 255,
       obstacles: [
-        { x: 380, y: 228, width: 22, height: 27, label: 'Bug' },
-        { x: 620, y: 220, width: 26, height: 35, label: 'Loop' },
+        { x: 380, y: 228, width: 24, height: 27, label: '🐛 Bug' },
+        { x: 620, y: 220, width: 42, height: 35, label: 'Stack Overflow', isStackOverflow: true },
       ],
       collectibles: [
-        { x: 280, y: 190, type: 'python', points: 15, icon: '🐍', color: '#38bdf8', collected: false },
-        { x: 500, y: 175, type: 'ts', points: 25, icon: '🔷', color: '#60a5fa', collected: false },
-        { x: 740, y: 180, type: 'cpp', points: 50, icon: '⚡', color: '#f43f5e', collected: false },
+        { x: 280, y: 190, type: 'python', name: 'Python', points: 15, icon: '🐍', color: '#38bdf8', collected: false },
+        { x: 500, y: 175, type: 'react', name: 'React', points: 25, icon: '⚛️', color: '#00d8ff', collected: false },
+        { x: 740, y: 180, type: 'cpp', name: 'C++', points: 35, icon: '⚡', color: '#f43f5e', collected: false },
+        { x: 960, y: 170, type: 'three', name: 'Three.js', points: 50, icon: '🌐', color: '#f59e0b', collected: false },
       ],
       particles: [],
       floatingTexts: [],
@@ -231,6 +243,7 @@ export function ArcadeApp({ onBack, onNavigate }: ArcadeAppProps) {
     setScore(0);
     setIsGameOver(false);
     setIsPlaying(true);
+    setIsNewHighScore(false);
     setUnlockedOffer(false);
   }, []);
 
@@ -281,7 +294,7 @@ export function ArcadeApp({ onBack, onNavigate }: ArcadeAppProps) {
         }
       }
 
-      // 2. Parallax Cyber City Skyline (0.4x speed)
+      // 2. Parallax Cyber City Skyline (0.35x speed)
       for (const b of state.buildings) {
         ctx.fillStyle = '#0f172a';
         ctx.fillRect(b.x, state.groundY - b.h, b.w, b.h);
@@ -350,35 +363,49 @@ export function ArcadeApp({ onBack, onNavigate }: ArcadeAppProps) {
         if (state.playerY >= state.groundY - 25) {
           state.playerY = state.groundY - 25;
           state.velocity = 0;
-          state.jumpsLeft = 2; // Reset jumps upon touching the ground
+          state.jumpsLeft = 2; // Reset double jumps upon touching ground
         }
 
-        // Spawn obstacles
+        // Spawn obstacles: Bugs and Stack Overflows
         if (state.frameCount % 105 === 0) {
-          const heights = [22, 28, 32];
-          const chosenH = heights[Math.floor(Math.random() * heights.length)];
-          const labels = ['Bug', 'Loop', 'Crash', 'Leak'];
+          const obstacleOptions = [
+            { width: 24, height: 26, label: '🐛 Bug', isStackOverflow: false },
+            { width: 26, height: 28, label: '404 Bug', isStackOverflow: false },
+            { width: 44, height: 36, label: 'Stack Overflow', isStackOverflow: true },
+            { width: 34, height: 30, label: 'SegFault', isStackOverflow: true },
+            { width: 36, height: 32, label: 'OOM Crash', isStackOverflow: true },
+          ];
+          const chosen = obstacleOptions[Math.floor(Math.random() * obstacleOptions.length)];
           state.obstacles.push({
             x: canvas.width + 30,
-            y: state.groundY - chosenH,
-            width: 22,
-            height: chosenH,
-            label: labels[Math.floor(Math.random() * labels.length)],
+            y: state.groundY - chosen.height,
+            width: chosen.width,
+            height: chosen.height,
+            label: chosen.label,
+            isStackOverflow: chosen.isStackOverflow,
           });
         }
 
-        // Spawn collectibles
-        if (state.frameCount % 85 === 0) {
-          const types: Array<{ type: 'python' | 'ts' | 'cpp'; points: number; icon: string; color: string }> = [
-            { type: 'python', points: 15, icon: '🐍', color: '#38bdf8' },
-            { type: 'ts', points: 25, icon: '🔷', color: '#60a5fa' },
-            { type: 'cpp', points: 50, icon: '⚡', color: '#f43f5e' },
+        // Spawn tech tokens: Python, React, C++, Three.js
+        if (state.frameCount % 80 === 0) {
+          const techTokens: Array<{
+            type: Collectible['type'];
+            name: string;
+            points: number;
+            icon: string;
+            color: string;
+          }> = [
+            { type: 'python', name: 'Python', points: 15, icon: '🐍', color: '#38bdf8' },
+            { type: 'react', name: 'React', points: 25, icon: '⚛️', color: '#00d8ff' },
+            { type: 'cpp', name: 'C++', points: 35, icon: '⚡', color: '#f43f5e' },
+            { type: 'three', name: 'Three.js', points: 50, icon: '🌐', color: '#f59e0b' },
           ];
-          const t = types[Math.floor(Math.random() * types.length)];
+          const t = techTokens[Math.floor(Math.random() * techTokens.length)];
           state.collectibles.push({
             x: canvas.width + 20,
             y: state.groundY - 45 - Math.random() * 55,
             type: t.type,
+            name: t.name,
             points: t.points,
             icon: t.icon,
             color: t.color,
@@ -413,7 +440,7 @@ export function ArcadeApp({ onBack, onNavigate }: ArcadeAppProps) {
             break;
           }
 
-          if (obs.x < -35) {
+          if (obs.x < -45) {
             state.obstacles.splice(i, 1);
             state.score += 5;
             setScore(state.score);
@@ -430,21 +457,21 @@ export function ArcadeApp({ onBack, onNavigate }: ArcadeAppProps) {
 
           if (
             !col.collected &&
-            Math.abs(col.x - playerCenterX) < 20 &&
-            Math.abs(col.y - playerCenterY) < 24
+            Math.abs(col.x - playerCenterX) < 22 &&
+            Math.abs(col.y - playerCenterY) < 26
           ) {
             col.collected = true;
             state.score += col.points;
             setScore(state.score);
-            playCoinSound();
+            playCoinSound(col.type);
 
-            // Spawn celebration particles
-            for (let p = 0; p < 10; p++) {
+            // Spawn celebration particle explosion
+            for (let p = 0; p < 12; p++) {
               state.particles.push({
                 x: col.x,
                 y: col.y,
-                vx: (Math.random() - 0.5) * 5,
-                vy: (Math.random() - 0.5) * 5,
+                vx: (Math.random() - 0.5) * 6,
+                vy: (Math.random() - 0.5) * 6,
                 color: col.color,
                 size: Math.random() * 3 + 2,
                 alpha: 1,
@@ -473,39 +500,67 @@ export function ArcadeApp({ onBack, onNavigate }: ArcadeAppProps) {
           }
         }
 
-        // Update High Score
+        // Update High Score in state & localStorage
         if (state.score > highScore) {
           setHighScore(state.score);
-          localStorage.setItem('dev_dash_high_score', state.score.toString());
+          setIsNewHighScore(true);
+          try {
+            localStorage.setItem('dev_dash_high_score', state.score.toString());
+          } catch {}
         }
 
         // Speed ramp
-        if (state.frameCount % 350 === 0 && state.speed < 6.8) {
+        if (state.frameCount % 320 === 0 && state.speed < 6.8) {
           state.speed += 0.25;
         }
       }
 
-      // 4. Draw Collectibles with subtle levitation bob
+      // 4. Draw Collectibles with subtle levitation bob & glowing ring
       for (const col of state.collectibles) {
         if (!col.collected) {
           const bob = Math.sin(state.frameCount * 0.08) * 3;
-          ctx.font = '16px sans-serif';
-          ctx.fillText(col.icon, col.x - 8, col.y + bob + 6);
+          // Token glow halo
+          ctx.fillStyle = `${col.color}33`;
+          ctx.beginPath();
+          ctx.arc(col.x, col.y + bob, 11, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.font = '15px sans-serif';
+          ctx.fillText(col.icon, col.x - 7, col.y + bob + 5);
         }
       }
 
-      // 5. Draw Obstacles (Red Neon Glitch Blocks)
+      // 5. Draw Obstacles (Bugs & Stack Overflows)
       for (const obs of state.obstacles) {
-        ctx.fillStyle = '#ef4444';
-        ctx.shadowColor = '#ef4444';
-        ctx.shadowBlur = 8;
-        ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
-        ctx.shadowBlur = 0;
+        if (obs.isStackOverflow) {
+          // Stack Overflow warning block
+          ctx.fillStyle = '#dc2626';
+          ctx.shadowColor = '#ef4444';
+          ctx.shadowBlur = 10;
+          ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+          ctx.shadowBlur = 0;
 
-        // Label
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '8px monospace';
-        ctx.fillText(obs.label, obs.x + 2, obs.y + 11);
+          // Warning hazard lines
+          ctx.strokeStyle = '#fee2e2';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(obs.x + 1, obs.y + 1, obs.width - 2, obs.height - 2);
+
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 8px -apple-system, monospace';
+          ctx.fillText('STACK', obs.x + 4, obs.y + 12);
+          ctx.fillText('OVERFLOW', obs.x + 2, obs.y + 24);
+        } else {
+          // Glitch bug
+          ctx.fillStyle = '#ea580c';
+          ctx.shadowColor = '#f97316';
+          ctx.shadowBlur = 8;
+          ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+          ctx.shadowBlur = 0;
+
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '8px monospace';
+          ctx.fillText(obs.label, obs.x + 2, obs.y + 13);
+        }
       }
 
       // 6. Draw Player (Cyberpunk Runner)
@@ -627,7 +682,7 @@ export function ArcadeApp({ onBack, onNavigate }: ArcadeAppProps) {
       <div className="arcade-hero-ribbon">
         <div className="game-meta-group">
           <h1 className="game-title">Dev Dash: Byte Runner</h1>
-          <p className="game-sub">Dodge bugs · Double jump · Collect Python &amp; TypeScript</p>
+          <p className="game-sub">Dodge bugs &amp; stack overflows · Collect tech tokens</p>
         </div>
 
         <div className="arcade-score-row">
@@ -695,14 +750,19 @@ export function ArcadeApp({ onBack, onNavigate }: ArcadeAppProps) {
               <Play size={18} fill="currentColor" />
               <span>TAP TO START</span>
             </button>
-            <span className="arcade-tap-hint">Tap screen or press SPACE to Jump (Supports Double Jump!)</span>
+            <span className="arcade-tap-hint">Tap screen, Space, or Up Arrow to Jump &amp; Double-Jump!</span>
           </div>
         )}
 
         {isGameOver && (
           <div className="arcade-gameover-overlay">
             <h3>GAME OVER</h3>
-            <p>Caught in a syntax error!</p>
+            <p>Fatal Exception: Dodged {score} instructions!</p>
+            {isNewHighScore && (
+              <div style={{ color: '#fbbf24', fontSize: 11, fontWeight: 700, margin: '2px 0 6px', display: 'flex', alignItems: 'center', gap: 4 }}>
+                <Sparkles size={13} /> NEW HIGH SCORE!
+              </div>
+            )}
             <div className="final-score-badge">Final Score: {score}</div>
             <button
               type="button"
@@ -715,19 +775,22 @@ export function ArcadeApp({ onBack, onNavigate }: ArcadeAppProps) {
               <RotateCw size={16} />
               <span>PLAY AGAIN</span>
             </button>
-            <span className="arcade-tap-hint">Press SPACE or ENTER to retry</span>
+            <span className="arcade-tap-hint">Press SPACE, UP, or TAP to retry</span>
           </div>
         )}
       </div>
 
-      {/* Controls & Quick Hint Bar */}
+      {/* Controls & Quick Token Legend */}
       <div className="arcade-footer-card">
         <div className="arcade-spec-line">
-          <span>🎮 Jump: <strong>Tap / Space</strong></span>
-          <span>🚀 Double Jump: <strong>Tap in Air</strong></span>
-          <span>🐍 +15</span>
-          <span>🔷 +25</span>
-          <span>⚡ +50</span>
+          <span>🎮 <strong>Tap / Space / ↑</strong></span>
+          <span>🚀 <strong>Double Jump in Air</strong></span>
+        </div>
+        <div className="arcade-spec-line" style={{ marginTop: 4, opacity: 0.9 }}>
+          <span>🐍 Python +15</span>
+          <span>⚛️ React +25</span>
+          <span>⚡ C++ +35</span>
+          <span>🌐 Three.js +50</span>
         </div>
 
         {score >= 250 && (

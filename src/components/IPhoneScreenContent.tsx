@@ -676,7 +676,7 @@ export function IPhoneScreenContent({
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <MessagesApp onBack={() => onNavigate('home')} />
+              <MessagesApp onBack={() => onNavigate('home')} onNavigate={onNavigate} />
             </motion.div>
           ) : currentRoute === 'instagram' ? (
             <motion.div

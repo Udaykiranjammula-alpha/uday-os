@@ -10,9 +10,11 @@ class SoundService {
   public enabled = true;
 
   public tracks = [
-    { id: 'lofi', title: 'Lo-Fi Systems Stream', artist: 'Uday OS Ambient', bpm: '78 BPM' },
-    { id: 'cyber', title: 'Cyberpunk Algorithmic Rush', artist: 'Uday OS Electronic', bpm: '124 BPM' },
-    { id: 'focus', title: 'Deep Focus Pythonic Space', artist: 'Uday OS Minimal', bpm: '60 BPM' },
+    { id: 'lofi', title: 'Lo-Fi Systems Stream', artist: 'Uday OS Ambient', bpm: '78 BPM', duration: 220, category: 'Lofi Chill' },
+    { id: 'cyber', title: 'Cyberpunk Algorithmic Rush', artist: 'Uday OS Electronic', bpm: '124 BPM', duration: 195, category: 'Synthwave' },
+    { id: 'focus', title: 'Deep Focus Pythonic Space', artist: 'Uday OS Minimal', bpm: '60 BPM', duration: 240, category: 'Deep Work' },
+    { id: 'neural', title: 'Neural Architecture Ambient', artist: 'Uday OS Flow', bpm: '86 BPM', duration: 215, category: 'Flow State' },
+    { id: 'night', title: 'Silicon Valley Midnight Walk', artist: 'Uday OS Chillhop', bpm: '72 BPM', duration: 205, category: 'Midnight Code' },
   ];
 
   private initCtx() {
@@ -92,6 +94,105 @@ class SoundService {
 
       osc.start(now);
       osc.stop(now + 0.03);
+    } catch {}
+  }
+
+  // Authentic iOS iMessage Sent Sound (Ascending Whoosh / Swoosh)
+  public playMessageSentSound() {
+    if (!this.enabled) return;
+    try {
+      this.initCtx();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+
+      // Ascending swoosh tone
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(420, now);
+      osc.frequency.exponentialRampToValueAtTime(1480, now + 0.14);
+
+      gain.gain.setValueAtTime(0.01, now);
+      gain.gain.linearRampToValueAtTime(0.22, now + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.18);
+
+      // Subtle bubble air puff at top
+      const popOsc = this.ctx.createOscillator();
+      const popGain = this.ctx.createGain();
+      popOsc.type = 'triangle';
+      popOsc.frequency.setValueAtTime(1200, now + 0.08);
+      popOsc.frequency.exponentialRampToValueAtTime(600, now + 0.14);
+      popGain.gain.setValueAtTime(0.12, now + 0.08);
+      popGain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+
+      popOsc.connect(popGain);
+      popGain.connect(this.ctx.destination);
+      popOsc.start(now + 0.08);
+      popOsc.stop(now + 0.14);
+    } catch {}
+  }
+
+  // Authentic iOS iMessage Received Sound ("Note" / Sweet Bell Chime)
+  public playMessageReceivedSound() {
+    if (!this.enabled) return;
+    try {
+      this.initCtx();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+
+      // Classic iOS "Note" bell tone (C6 -> G6 harmonic)
+      const tone1 = this.ctx.createOscillator();
+      const gain1 = this.ctx.createGain();
+      tone1.type = 'sine';
+      tone1.frequency.setValueAtTime(1046.5, now); // C6
+      gain1.gain.setValueAtTime(0.2, now);
+      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+      tone1.connect(gain1);
+      gain1.connect(this.ctx.destination);
+      tone1.start(now);
+      tone1.stop(now + 0.35);
+
+      const tone2 = this.ctx.createOscillator();
+      const gain2 = this.ctx.createGain();
+      tone2.type = 'sine';
+      tone2.frequency.setValueAtTime(1567.98, now + 0.09); // G6
+      gain2.gain.setValueAtTime(0.24, now + 0.09);
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+
+      tone2.connect(gain2);
+      gain2.connect(this.ctx.destination);
+      tone2.start(now + 0.09);
+      tone2.stop(now + 0.55);
+    } catch {}
+  }
+
+  // iOS Tapback reaction pop sound
+  public playTapbackSound() {
+    if (!this.enabled) return;
+    try {
+      this.initCtx();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(950, now);
+      osc.frequency.exponentialRampToValueAtTime(1600, now + 0.04);
+
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.05);
     } catch {}
   }
 
@@ -297,6 +398,30 @@ class SoundService {
     } catch {}
   }
 
+  // Authentic iOS Timer Chime Alert (Crisp high radar bell alerts)
+  public playTimerAlert() {
+    if (!this.enabled) return;
+    try {
+      this.initCtx();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+      [0, 0.2, 0.4, 0.6].forEach((delay) => {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1760, now + delay); // A6
+        osc.frequency.exponentialRampToValueAtTime(880, now + delay + 0.18);
+        gain.gain.setValueAtTime(0.26, now + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.2);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now + delay);
+        osc.stop(now + delay + 0.2);
+      });
+    } catch {}
+  }
+
   // Incoming Recruiter Phone Call Ringtone (Classic iOS Marimba motif)
   public playCallChime() {
     if (!this.enabled) return;
@@ -317,6 +442,127 @@ class SoundService {
         gain.connect(this.ctx.destination);
         osc.start(now + idx * 0.12);
         osc.stop(now + idx * 0.12 + 0.35);
+      });
+    } catch {}
+  }
+
+  // Soft call termination tone
+  public playCallEndSound() {
+    if (!this.enabled) return;
+    try {
+      this.initCtx();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+      const notes = [493.88, 369.99]; // B4 -> F#4 descending
+      notes.forEach((freq, idx) => {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.14);
+        gain.gain.setValueAtTime(0.18, now + idx * 0.14);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.14 + 0.28);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now + idx * 0.14);
+        osc.stop(now + idx * 0.14 + 0.28);
+      });
+    } catch {}
+  }
+
+  // Thumbs-up firework sparkling reaction sound
+  public playFireworkSound() {
+    if (!this.enabled) return;
+    try {
+      this.initCtx();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+      // Rising spark
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(400, now);
+      osc.frequency.exponentialRampToValueAtTime(1400, now + 0.18);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.18);
+
+      // Shimmering burst
+      [0.18, 0.22, 0.26, 0.3].forEach((delay, i) => {
+        if (!this.ctx) return;
+        const spark = this.ctx.createOscillator();
+        const sparkGain = this.ctx.createGain();
+        spark.type = 'triangle';
+        spark.frequency.setValueAtTime(1200 + i * 250, now + delay);
+        sparkGain.gain.setValueAtTime(0.1, now + delay);
+        sparkGain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.12);
+        spark.connect(sparkGain);
+        sparkGain.connect(this.ctx.destination);
+        spark.start(now + delay);
+        spark.stop(now + delay + 0.12);
+      });
+    } catch {}
+  }
+
+  // Celebratory confetti pop sound
+  public playConfettiPopSound() {
+    if (!this.enabled) return;
+    try {
+      this.initCtx();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+      // Pop transient
+      const popOsc = this.ctx.createOscillator();
+      const popGain = this.ctx.createGain();
+      popOsc.type = 'triangle';
+      popOsc.frequency.setValueAtTime(220, now);
+      popOsc.frequency.exponentialRampToValueAtTime(880, now + 0.04);
+      popGain.gain.setValueAtTime(0.25, now);
+      popGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+      popOsc.connect(popGain);
+      popGain.connect(this.ctx.destination);
+      popOsc.start(now);
+      popOsc.stop(now + 0.06);
+
+      // Shimmering chime (Major chord flourish)
+      [659.25, 830.61, 987.77, 1318.51].forEach((freq, idx) => {
+        if (!this.ctx) return;
+        const chime = this.ctx.createOscillator();
+        const chimeGain = this.ctx.createGain();
+        chime.type = 'sine';
+        chime.frequency.setValueAtTime(freq, now + 0.06 + idx * 0.04);
+        chimeGain.gain.setValueAtTime(0.12, now + 0.06 + idx * 0.04);
+        chimeGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06 + idx * 0.04 + 0.4);
+        chime.connect(chimeGain);
+        chimeGain.connect(this.ctx.destination);
+        chime.start(now + 0.06 + idx * 0.04);
+        chime.stop(now + 0.06 + idx * 0.04 + 0.4);
+      });
+    } catch {}
+  }
+
+  // Warm Heart Reaction Bell
+  public playHeartReactionSound() {
+    if (!this.enabled) return;
+    try {
+      this.initCtx();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+      [880, 1108.73, 1318.51, 1661.22].forEach((freq, i) => {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + i * 0.05);
+        gain.gain.setValueAtTime(0.12, now + i * 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.05 + 0.35);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now + i * 0.05);
+        osc.stop(now + i * 0.05 + 0.35);
       });
     } catch {}
   }
@@ -428,6 +674,20 @@ class SoundService {
           [130.81, 164.81, 196.0, 261.63],
           [146.83, 174.61, 220.0, 293.66],
         ],
+        // Track 3: Neural Architecture Ambient (Abmaj7 -> Ebmaj7 -> Fm9 -> Dbmaj7)
+        [
+          [207.65, 261.63, 311.13, 392.0],
+          [155.56, 196.0, 233.08, 311.13],
+          [174.61, 220.0, 261.63, 349.23],
+          [138.59, 174.61, 207.65, 261.63],
+        ],
+        // Track 4: Silicon Valley Midnight Walk (Bbm9 -> Gbmaj7 -> Ebm7 -> F7#9)
+        [
+          [233.08, 277.18, 349.23, 415.3],
+          [185.0, 233.08, 277.18, 369.99],
+          [155.56, 185.0, 233.08, 277.18],
+          [174.61, 220.0, 261.63, 329.63],
+        ],
       ];
 
       const chords = chordSets[this.currentTrackIndex] || chordSets[0];
@@ -444,7 +704,7 @@ class SoundService {
           const osc = this.ctx.createOscillator();
           const noteGain = this.ctx.createGain();
 
-          osc.type = this.currentTrackIndex === 1 ? 'sawtooth' : 'sine';
+          osc.type = this.currentTrackIndex === 1 ? 'sawtooth' : this.currentTrackIndex === 3 ? 'triangle' : 'sine';
           osc.frequency.setValueAtTime(freq, now);
 
           // Soft attack and slow release for ambient warmth

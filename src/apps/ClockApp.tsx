@@ -2,12 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   ChevronLeft,
   Globe,
-  Timer,
+  Timer as StopwatchIcon,
+  Bell,
   Play,
   Pause,
   RotateCcw,
   Flag,
+  Hourglass,
 } from 'lucide-react';
+import { sound } from '../services/sound';
 
 interface ClockAppProps {
   onBack: () => void;
@@ -22,21 +25,35 @@ interface WorldCity {
 }
 
 const CITIES: WorldCity[] = [
-  { city: 'Vijayawada', country: 'India (Uday)', timeZone: 'Asia/Kolkata', offsetHours: 5.5 },
-  { city: 'Cupertino', country: 'Apple HQ (PST)', timeZone: 'America/Los_Angeles', offsetHours: -7 },
-  { city: 'London', country: 'United Kingdom (GMT)', timeZone: 'Europe/London', offsetHours: 1 },
-  { city: 'New York', country: 'United States (EST)', timeZone: 'America/New_York', offsetHours: -4 },
+  { city: 'Vijayawada', country: 'India (Uday / KL University)', timeZone: 'Asia/Kolkata', offsetHours: 5.5 },
+  { city: 'Cupertino', country: 'United States (Apple Park)', timeZone: 'America/Los_Angeles', offsetHours: -7 },
+  { city: 'London', country: 'United Kingdom (Westminster)', timeZone: 'Europe/London', offsetHours: 1 },
+  { city: 'Tokyo', country: 'Japan (Shibuya)', timeZone: 'Asia/Tokyo', offsetHours: 9 },
+];
+
+const TIMER_PRESETS = [
+  { label: '1m', seconds: 60 },
+  { label: '5m', seconds: 300 },
+  { label: '15m', seconds: 900 },
+  { label: '30m', seconds: 1800 },
 ];
 
 export function ClockApp({ onBack }: ClockAppProps) {
-  const [activeTab, setActiveTab] = useState<'world' | 'stopwatch'>('world');
+  const [activeTab, setActiveTab] = useState<'world' | 'stopwatch' | 'timer'>('world');
   const [now, setNow] = useState(new Date());
 
-  // Stopwatch State
+  // ================= Stopwatch State =================
   const [stopwatchRunning, setStopwatchRunning] = useState(false);
   const [stopwatchTime, setStopwatchTime] = useState(0); // in milliseconds
   const [laps, setLaps] = useState<number[]>([]);
   const stopwatchIntervalRef = useRef<number | null>(null);
+
+  // ================= Timer State =================
+  const [timerDuration, setTimerDuration] = useState(300); // 5 min default
+  const [timerRemaining, setTimerRemaining] = useState(300);
+  const [timerRunning, setTimerRunning] = useState(false);
+  const [timerCompleted, setTimerCompleted] = useState(false);
+  const timerIntervalRef = useRef<number | null>(null);
 
   // Live Clock Ticker
   useEffect(() => {
@@ -46,7 +63,7 @@ export function ClockApp({ onBack }: ClockAppProps) {
     return () => clearInterval(timer);
   }, []);
 
-  // Stopwatch Interval
+  // Stopwatch Interval Loop
   useEffect(() => {
     if (stopwatchRunning) {
       const startTime = Date.now() - stopwatchTime;
@@ -61,16 +78,16 @@ export function ClockApp({ onBack }: ClockAppProps) {
     };
   }, [stopwatchRunning]);
 
-  const handleStartStop = () => {
+  const handleStartStopStopwatch = () => {
+    sound.playTapSound();
     setStopwatchRunning(!stopwatchRunning);
   };
 
-  const handleLapReset = () => {
+  const handleLapResetStopwatch = () => {
+    sound.playTapSound();
     if (stopwatchRunning) {
-      // Record Lap
       setLaps((prev) => [stopwatchTime, ...prev]);
     } else {
-      // Reset
       setStopwatchTime(0);
       setLaps([]);
     }
@@ -86,6 +103,60 @@ export function ClockApp({ onBack }: ClockAppProps) {
     };
   };
 
+  // ================= Timer Logic =================
+  useEffect(() => {
+    if (timerRunning) {
+      timerIntervalRef.current = window.setInterval(() => {
+        setTimerRemaining((prev) => {
+          if (prev <= 1) {
+            clearInterval(timerIntervalRef.current!);
+            setTimerRunning(false);
+            setTimerCompleted(true);
+            sound.playTimerAlert();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else if (timerIntervalRef.current) {
+      clearInterval(timerIntervalRef.current);
+    }
+    return () => {
+      if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+    };
+  }, [timerRunning]);
+
+  const handleSelectPreset = (seconds: number) => {
+    sound.playTapSound();
+    setTimerDuration(seconds);
+    setTimerRemaining(seconds);
+    setTimerRunning(false);
+    setTimerCompleted(false);
+  };
+
+  const handleStartPauseTimer = () => {
+    sound.playTapSound();
+    if (timerCompleted) {
+      setTimerRemaining(timerDuration);
+      setTimerCompleted(false);
+    }
+    setTimerRunning(!timerRunning);
+  };
+
+  const handleResetTimer = () => {
+    sound.playTapSound();
+    setTimerRunning(false);
+    setTimerCompleted(false);
+    setTimerRemaining(timerDuration);
+  };
+
+  const formatTimerDigits = (secs: number) => {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
+
+  // Helper for timezone times
   const getCityTime = (timeZone: string) => {
     try {
       const formatter = new Intl.DateTimeFormat('en-US', {
@@ -108,30 +179,62 @@ export function ClockApp({ onBack }: ClockAppProps) {
 
   const { main: swMain, sub: swSub } = formatStopwatchTime(stopwatchTime);
 
+  // Calculate fastest and slowest laps
+  let fastestLapIdx = -1;
+  let slowestLapIdx = -1;
+  if (laps.length >= 2) {
+    const splits = laps.map((lap, i) => lap - (laps[i + 1] || 0));
+    let minSplit = Infinity;
+    let maxSplit = -Infinity;
+    splits.forEach((split, idx) => {
+      if (split < minSplit) {
+        minSplit = split;
+        fastestLapIdx = idx;
+      }
+      if (split > maxSplit) {
+        maxSplit = split;
+        slowestLapIdx = idx;
+      }
+    });
+  }
+
+  // Timer SVG ring computation
+  const ringRadius = 92;
+  const ringCircumference = 2 * Math.PI * ringRadius;
+  const progressRatio = timerDuration > 0 ? timerRemaining / timerDuration : 0;
+  const strokeDashoffset = ringCircumference * (1 - progressRatio);
+
   return (
     <div className="ios-clock-page">
       {/* Clock Top Header */}
       <header className="clock-header">
         <button
           type="button"
-          className="mail-nav-back-pill"
-          onClick={onBack}
-          aria-label="Back to Home"
+          className="calc-nav-btn"
+          onClick={() => {
+            sound.playTapSound();
+            onBack();
+          }}
+          aria-label="Back to Home Screen"
         >
           <ChevronLeft size={18} />
           <span>Home</span>
         </button>
 
         <h1 className="clock-page-title">
-          {activeTab === 'world' ? 'World Clock' : 'Stopwatch'}
+          {activeTab === 'world'
+            ? 'World Clock'
+            : activeTab === 'stopwatch'
+            ? 'Stopwatch'
+            : 'Timer'}
         </h1>
 
         <div style={{ width: 44 }} />
       </header>
 
-      {/* Main Content Area */}
+      {/* Main Content Body */}
       <div className="clock-body-content">
-        {activeTab === 'world' ? (
+        {activeTab === 'world' && (
           <div className="world-clock-list">
             {CITIES.map((city) => {
               const { hour, minute, second, dayPeriod, timeStr } = getCityTime(city.timeZone);
@@ -139,8 +242,8 @@ export function ClockApp({ onBack }: ClockAppProps) {
               const numM = parseInt(minute, 10);
               const numS = parseInt(second, 10);
 
-              const hourDeg = (numH % 12) * 30 + numM * 0.5;
-              const minDeg = numM * 6;
+              const hourDeg = (numH % 12) * 30 + numM * 0.5 + numS * (0.5 / 60);
+              const minDeg = numM * 6 + numS * 0.1;
               const secDeg = numS * 6;
 
               return (
@@ -170,7 +273,7 @@ export function ClockApp({ onBack }: ClockAppProps) {
                       <div className="clock-center-dot" />
                     </div>
 
-                    {/* Digital readout */}
+                    {/* Digital Readout */}
                     <div className="city-digital-time">
                       <span className="time-numbers">{timeStr}</span>
                       <small className="time-period">{dayPeriod}</small>
@@ -180,7 +283,9 @@ export function ClockApp({ onBack }: ClockAppProps) {
               );
             })}
           </div>
-        ) : (
+        )}
+
+        {activeTab === 'stopwatch' && (
           <div className="stopwatch-container">
             {/* Big Stopwatch Display */}
             <div className="stopwatch-display-hero">
@@ -193,8 +298,9 @@ export function ClockApp({ onBack }: ClockAppProps) {
               <button
                 type="button"
                 className="sw-circle-btn reset"
-                onClick={handleLapReset}
-                disabled={stopwatchTime === 0}
+                onClick={handleLapResetStopwatch}
+                disabled={stopwatchTime === 0 && !stopwatchRunning}
+                style={{ opacity: stopwatchTime === 0 && !stopwatchRunning ? 0.45 : 1 }}
               >
                 {stopwatchRunning ? 'Lap' : 'Reset'}
               </button>
@@ -202,7 +308,7 @@ export function ClockApp({ onBack }: ClockAppProps) {
               <button
                 type="button"
                 className={`sw-circle-btn start-stop ${stopwatchRunning ? 'stop' : 'start'}`}
-                onClick={handleStartStop}
+                onClick={handleStartStopStopwatch}
               >
                 {stopwatchRunning ? 'Stop' : 'Start'}
               </button>
@@ -217,14 +323,109 @@ export function ClockApp({ onBack }: ClockAppProps) {
                 const { main: lMain, sub: lSub } = formatStopwatchTime(delta);
                 const { main: totalMain, sub: totalSub } = formatStopwatchTime(lapMs);
 
+                const isFastest = idx === fastestLapIdx;
+                const isSlowest = idx === slowestLapIdx;
+
                 return (
-                  <div key={lapMs} className="stopwatch-lap-row">
+                  <div
+                    key={lapMs}
+                    className={`stopwatch-lap-row ${isFastest ? 'fastest' : ''} ${
+                      isSlowest ? 'slowest' : ''
+                    }`}
+                  >
                     <span className="lap-label">Lap {lapNum}</span>
-                    <span className="lap-split">{lMain}.{lSub}</span>
-                    <span className="lap-total">{totalMain}.{totalSub}</span>
+                    <span className="lap-split">
+                      {lMain}.{lSub}
+                    </span>
+                    <span className="lap-total">
+                      {totalMain}.{totalSub}
+                    </span>
                   </div>
                 );
               })}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'timer' && (
+          <div className="timer-container">
+            {/* Completion Banner */}
+            {timerCompleted && (
+              <div className="timer-alert-banner">
+                🔔 Timer Done! Alert chime ringing.
+              </div>
+            )}
+
+            {/* SVG Progress Ring */}
+            <div className="timer-ring-wrapper">
+              <svg className="timer-svg" width="220" height="220" viewBox="0 0 220 220">
+                <circle
+                  className="timer-circle-bg"
+                  cx="110"
+                  cy="110"
+                  r={ringRadius}
+                  strokeWidth="8"
+                  fill="none"
+                />
+                <circle
+                  className="timer-circle-fg"
+                  cx="110"
+                  cy="110"
+                  r={ringRadius}
+                  strokeWidth="8"
+                  strokeDasharray={ringCircumference}
+                  strokeDashoffset={strokeDashoffset}
+                  strokeLinecap="round"
+                  fill="none"
+                />
+              </svg>
+
+              <div className="timer-center-content">
+                <div className="timer-digits-hero">
+                  {formatTimerDigits(timerRemaining)}
+                </div>
+                <div className="timer-label-sub">
+                  {timerCompleted ? 'COMPLETED' : timerRunning ? 'REMAINING' : 'READY'}
+                </div>
+              </div>
+            </div>
+
+            {/* Preset Intervals: 1m, 5m, 15m, 30m */}
+            <div className="timer-presets-strip">
+              {TIMER_PRESETS.map((p) => (
+                <button
+                  key={p.seconds}
+                  type="button"
+                  className={`timer-preset-chip ${timerDuration === p.seconds ? 'active' : ''}`}
+                  onClick={() => handleSelectPreset(p.seconds)}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Timer Buttons Row */}
+            <div className="stopwatch-buttons-row">
+              <button
+                type="button"
+                className="sw-circle-btn reset"
+                onClick={handleResetTimer}
+                disabled={timerRemaining === timerDuration && !timerRunning && !timerCompleted}
+                style={{
+                  opacity:
+                    timerRemaining === timerDuration && !timerRunning && !timerCompleted ? 0.45 : 1,
+                }}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className={`sw-circle-btn start-stop ${timerRunning ? 'stop' : 'start'}`}
+                onClick={handleStartPauseTimer}
+              >
+                {timerRunning ? 'Pause' : timerRemaining < timerDuration && !timerCompleted ? 'Resume' : 'Start'}
+              </button>
             </div>
           </div>
         )}
@@ -235,7 +436,10 @@ export function ClockApp({ onBack }: ClockAppProps) {
         <button
           type="button"
           className={`clock-tab-btn ${activeTab === 'world' ? 'active' : ''}`}
-          onClick={() => setActiveTab('world')}
+          onClick={() => {
+            sound.playTapSound();
+            setActiveTab('world');
+          }}
         >
           <Globe size={22} />
           <span>World Clock</span>
@@ -244,10 +448,25 @@ export function ClockApp({ onBack }: ClockAppProps) {
         <button
           type="button"
           className={`clock-tab-btn ${activeTab === 'stopwatch' ? 'active' : ''}`}
-          onClick={() => setActiveTab('stopwatch')}
+          onClick={() => {
+            sound.playTapSound();
+            setActiveTab('stopwatch');
+          }}
         >
-          <Timer size={22} />
+          <StopwatchIcon size={22} />
           <span>Stopwatch</span>
+        </button>
+
+        <button
+          type="button"
+          className={`clock-tab-btn ${activeTab === 'timer' ? 'active' : ''}`}
+          onClick={() => {
+            sound.playTapSound();
+            setActiveTab('timer');
+          }}
+        >
+          <Hourglass size={22} />
+          <span>Timer</span>
         </button>
       </nav>
     </div>
