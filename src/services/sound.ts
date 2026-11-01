@@ -9,6 +9,20 @@ class SoundService {
   private currentTrackIndex = 0;
   public enabled = true;
 
+  constructor() {
+    if (typeof window !== 'undefined') {
+      const unlockAudio = () => {
+        try {
+          this.initCtx();
+        } catch {}
+        window.removeEventListener('pointerdown', unlockAudio);
+        window.removeEventListener('keydown', unlockAudio);
+      };
+      window.addEventListener('pointerdown', unlockAudio, { once: true, passive: true });
+      window.addEventListener('keydown', unlockAudio, { once: true, passive: true });
+    }
+  }
+
   public tracks = [
     { id: 'lofi', title: 'Lo-Fi Systems Stream', artist: 'Uday OS Ambient', bpm: '78 BPM', duration: 220, category: 'Lofi Chill' },
     { id: 'cyber', title: 'Cyberpunk Algorithmic Rush', artist: 'Uday OS Electronic', bpm: '124 BPM', duration: 195, category: 'Synthwave' },
@@ -18,16 +32,20 @@ class SoundService {
   ];
 
   private initCtx() {
-    if (!this.ctx) {
-      const AudioCtx =
-        window.AudioContext ||
-        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      if (AudioCtx) {
-        this.ctx = new AudioCtx();
+    try {
+      if (!this.ctx) {
+        const AudioCtx =
+          window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        if (AudioCtx) {
+          this.ctx = new AudioCtx();
+        }
       }
-    }
-    if (this.ctx && this.ctx.state === 'suspended') {
-      void this.ctx.resume();
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume().catch(() => {});
+      }
+    } catch {
+      // Audio context policy safe fallback
     }
   }
 

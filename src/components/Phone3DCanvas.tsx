@@ -201,6 +201,13 @@ export function Phone3DCanvas({
       webglRenderer.domElement.setAttribute('aria-hidden', 'true');
       container.appendChild(webglRenderer.domElement);
 
+      // WebGL Context Loss & Restoration Guard for Mobile Resilience
+      webglRenderer.domElement.addEventListener('webglcontextlost', (e) => {
+        e.preventDefault();
+        console.warn('WebGL context lost, switching immediately to fallback CSS 3D chassis.');
+        setFallbackMode(true);
+      });
+
       // Setup PMREM Environment safely
       pmrem = new THREE.PMREMGenerator(webglRenderer);
       const room = new RoomEnvironment();
@@ -293,13 +300,13 @@ export function Phone3DCanvas({
     // Load GLTF Model with MeshoptDecoder & automatic fallback
     let active = true;
 
-    // Timeout safety: if 3D model takes > 6s on slow mobile, gracefully switch to fallback
+    // Timeout safety: if 3D model takes > 2.8s on slow mobile, gracefully switch to fallback
     const loadTimeout = setTimeout(() => {
       if (active && !modelRef.current) {
-        console.warn('3D model load timeout, falling back to CSS 3D representation.');
+        console.warn('3D model load timeout (2.8s), falling back to CSS 3D representation.');
         setFallbackMode(true);
       }
-    }, 6000);
+    }, 2800);
 
     let flareTexture: THREE.CanvasTexture | null = null;
     let flareMat: THREE.SpriteMaterial | null = null;

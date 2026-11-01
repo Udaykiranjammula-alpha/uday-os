@@ -40,6 +40,13 @@ import { profile } from './data/profile';
 import { sound } from './services/sound';
 import { toggleHardwareTorch } from './services/torch';
 
+const normalizeRoute = (rawHash: string): string => {
+  if (!rawHash) return 'home';
+  // Strip leading # and / safely, handling '#/route', '#route', and query params
+  const clean = rawHash.replace(/^[#/]+/, '').split('?')[0].split('&')[0].trim().toLowerCase();
+  return clean || 'home';
+};
+
 export default function App() {
   const [color, setColor] = useState<'plum' | 'desert' | 'natural' | 'black'>('plum');
   const [studioLighting, setStudioLighting] = useState<'keynote' | 'cyberpunk' | 'golden'>('keynote');
@@ -61,8 +68,7 @@ export default function App() {
   const [copiedUrl, setCopiedUrl] = useState(false);
 
   const [currentRoute, setCurrentRoute] = useState<string>(() => {
-    const hash = window.location.hash.replace('#', '');
-    return hash || 'home';
+    return normalizeRoute(window.location.hash);
   });
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [isDemoOpen, setIsDemoOpen] = useState(false);
@@ -90,8 +96,8 @@ export default function App() {
   // Sync route with window.location.hash
   useEffect(() => {
     const handleHashChange = () => {
-      const hash = window.location.hash.replace('#', '');
-      setCurrentRoute(hash || 'home');
+      const route = normalizeRoute(window.location.hash);
+      setCurrentRoute(route);
       setActiveProject(null);
       setIsDemoOpen(false);
     };
@@ -101,8 +107,9 @@ export default function App() {
   }, []);
 
   const navigateTo = (route: string) => {
-    window.location.hash = `#${route}`;
-    setCurrentRoute(route);
+    const clean = normalizeRoute(route);
+    window.location.hash = `#${clean}`;
+    setCurrentRoute(clean);
     setActiveProject(null);
     setIsDemoOpen(false);
     if (isFlipped) setIsFlipped(false);

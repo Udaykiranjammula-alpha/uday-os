@@ -45,6 +45,7 @@ import { AppSwitcher } from './AppSwitcher';
 import { AssistiveTouch } from './AssistiveTouch';
 import { LockScreen } from './LockScreen';
 import { SpotlightSearch } from './SpotlightSearch';
+import { IosErrorBoundary } from './IosErrorBoundary';
 import type { Project } from '../types';
 import { projects } from '../data/projects';
 import { sound } from '../services/sound';
@@ -302,7 +303,8 @@ export function IPhoneScreenContent({
 
       {/* Screen Router Viewport */}
       <div className="iphone-screen-viewport">
-        <AnimatePresence mode="wait">
+        <IosErrorBoundary onResetRoute={() => onNavigate('home')}>
+          <AnimatePresence mode="wait">
           {isDemoOpen && activeProject ? (
             <motion.div
               key="demo-view"
@@ -780,6 +782,7 @@ export function IPhoneScreenContent({
             </motion.div>
           )}
         </AnimatePresence>
+        </IosErrorBoundary>
       </div>
 
       {/* iOS 18 Control Center Overlay */}
