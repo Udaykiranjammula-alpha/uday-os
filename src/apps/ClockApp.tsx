@@ -11,6 +11,7 @@ import {
   Hourglass,
 } from 'lucide-react';
 import { sound } from '../services/sound';
+import { liveActivity } from '../services/liveActivity';
 
 interface ClockAppProps {
   onBack: () => void;
@@ -39,21 +40,32 @@ const TIMER_PRESETS = [
 ];
 
 export function ClockApp({ onBack }: ClockAppProps) {
+  const initialClock = liveActivity.getClock();
   const [activeTab, setActiveTab] = useState<'world' | 'stopwatch' | 'timer'>('world');
   const [now, setNow] = useState(new Date());
 
   // ================= Stopwatch State =================
-  const [stopwatchRunning, setStopwatchRunning] = useState(false);
-  const [stopwatchTime, setStopwatchTime] = useState(0); // in milliseconds
-  const [laps, setLaps] = useState<number[]>([]);
-  const stopwatchIntervalRef = useRef<number | null>(null);
+  const [stopwatchRunning, setStopwatchRunning] = useState(
+    initialClock.type === 'stopwatch' && initialClock.isActive && !initialClock.isPaused
+  );
+  const [stopwatchTime, setStopwatchTime] = useState(
+    initialClock.type === 'stopwatch' ? initialClock.remainingMs : 0
+  );
+  const [laps, setLaps] = useState<number[]>(initialClock.laps || []);
 
   // ================= Timer State =================
-  const [timerDuration, setTimerDuration] = useState(300); // 5 min default
-  const [timerRemaining, setTimerRemaining] = useState(300);
-  const [timerRunning, setTimerRunning] = useState(false);
+  const [timerDuration, setTimerDuration] = useState(
+    initialClock.totalDurationSeconds || 300
+  );
+  const [timerRemaining, setTimerRemaining] = useState(
+    initialClock.type === 'timer' && initialClock.isActive
+      ? initialClock.remainingSeconds
+      : initialClock.totalDurationSeconds || 300
+  );
+  const [timerRunning, setTimerRunning] = useState(
+    initialClock.type === 'timer' && initialClock.isActive && !initialClock.isPaused
+  );
   const [timerCompleted, setTimerCompleted] = useState(false);
-  const timerIntervalRef = useRef<number | null>(null);
 
   // Live Clock Ticker
   useEffect(() => {
@@ -63,33 +75,44 @@ export function ClockApp({ onBack }: ClockAppProps) {
     return () => clearInterval(timer);
   }, []);
 
-  // Stopwatch Interval Loop
+  // Sync with liveActivity coordinator
   useEffect(() => {
-    if (stopwatchRunning) {
-      const startTime = Date.now() - stopwatchTime;
-      stopwatchIntervalRef.current = window.setInterval(() => {
-        setStopwatchTime(Date.now() - startTime);
-      }, 30);
-    } else if (stopwatchIntervalRef.current) {
-      clearInterval(stopwatchIntervalRef.current);
-    }
-    return () => {
-      if (stopwatchIntervalRef.current) clearInterval(stopwatchIntervalRef.current);
-    };
-  }, [stopwatchRunning]);
+    const unsubscribe = liveActivity.subscribe((state) => {
+      if (state.clock.type === 'timer') {
+        if (state.clock.isActive) {
+          setTimerRemaining(state.clock.remainingSeconds);
+          setTimerDuration(state.clock.totalDurationSeconds || 300);
+          setTimerRunning(!state.clock.isPaused);
+          setTimerCompleted(false);
+        } else {
+          setTimerRunning(false);
+        }
+      } else if (state.clock.type === 'stopwatch') {
+        if (state.clock.isActive) {
+          setStopwatchTime(state.clock.remainingMs);
+          setStopwatchRunning(!state.clock.isPaused);
+          setLaps(state.clock.laps || []);
+        } else {
+          setStopwatchRunning(false);
+          setStopwatchTime(0);
+          setLaps([]);
+        }
+      }
+    });
+    return unsubscribe;
+  }, []);
 
   const handleStartStopStopwatch = () => {
     sound.playTapSound();
-    setStopwatchRunning(!stopwatchRunning);
+    liveActivity.toggleStopwatchRunning();
   };
 
   const handleLapResetStopwatch = () => {
     sound.playTapSound();
     if (stopwatchRunning) {
-      setLaps((prev) => [stopwatchTime, ...prev]);
+      liveActivity.recordLap();
     } else {
-      setStopwatchTime(0);
-      setLaps([]);
+      liveActivity.resetStopwatch();
     }
   };
 
@@ -104,47 +127,29 @@ export function ClockApp({ onBack }: ClockAppProps) {
   };
 
   // ================= Timer Logic =================
-  useEffect(() => {
-    if (timerRunning) {
-      timerIntervalRef.current = window.setInterval(() => {
-        setTimerRemaining((prev) => {
-          if (prev <= 1) {
-            clearInterval(timerIntervalRef.current!);
-            setTimerRunning(false);
-            setTimerCompleted(true);
-            sound.playTimerAlert();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    } else if (timerIntervalRef.current) {
-      clearInterval(timerIntervalRef.current);
-    }
-    return () => {
-      if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
-    };
-  }, [timerRunning]);
-
   const handleSelectPreset = (seconds: number) => {
     sound.playTapSound();
     setTimerDuration(seconds);
     setTimerRemaining(seconds);
-    setTimerRunning(false);
     setTimerCompleted(false);
+    liveActivity.startTimer(seconds);
   };
 
   const handleStartPauseTimer = () => {
     sound.playTapSound();
-    if (timerCompleted) {
-      setTimerRemaining(timerDuration);
+    if (timerCompleted || (!timerRunning && timerRemaining <= 0)) {
       setTimerCompleted(false);
+      liveActivity.startTimer(timerDuration);
+    } else if (!timerRunning && timerRemaining === timerDuration) {
+      liveActivity.startTimer(timerDuration);
+    } else {
+      liveActivity.toggleTimerRunning();
     }
-    setTimerRunning(!timerRunning);
   };
 
   const handleResetTimer = () => {
     sound.playTapSound();
+    liveActivity.resetTimer();
     setTimerRunning(false);
     setTimerCompleted(false);
     setTimerRemaining(timerDuration);

@@ -424,10 +424,7 @@ export function MusicApp({ onBack }: MusicAppProps) {
                 className={`track-pill-item ${trackIndex === idx ? 'active' : ''}`}
                 onClick={() => {
                   sound.playTapSound();
-                  setTrackIndex(idx);
-                  sound.setTrack(idx);
-                  setProgress(0);
-                  setElapsedSeconds(0);
+                  liveActivity.setTrack(idx);
                 }}
               >
                 <div className="track-pill-num">
