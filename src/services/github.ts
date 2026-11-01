@@ -51,11 +51,37 @@ export const fallbackRepos: GitHubRepo[] = [
   },
 ];
 
+function safeGetStorage(key: string): string | null {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      return window.localStorage.getItem(key);
+    }
+    if (typeof localStorage !== 'undefined' && localStorage && typeof localStorage.getItem === 'function') {
+      return localStorage.getItem(key);
+    }
+  } catch {
+    // Ignore storage errors
+  }
+  return null;
+}
+
+function safeSetStorage(key: string, value: string): void {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem(key, value);
+    } else if (typeof localStorage !== 'undefined' && localStorage && typeof localStorage.setItem === 'function') {
+      localStorage.setItem(key, value);
+    }
+  } catch {
+    // Ignore quota or permission error
+  }
+}
+
 export async function fetchUserRepos(username: string = 'Udaykiranjammula-alpha', forceRefresh: boolean = false): Promise<GitHubFetchResult> {
   if (!forceRefresh) {
     try {
-      const cached = localStorage.getItem(CACHE_KEY);
-      const cachedTime = localStorage.getItem(CACHE_TIME_KEY);
+      const cached = safeGetStorage(CACHE_KEY);
+      const cachedTime = safeGetStorage(CACHE_TIME_KEY);
       if (cached && cachedTime) {
         const age = Date.now() - parseInt(cachedTime, 10);
         if (age < CACHE_TTL_MS) {
@@ -66,7 +92,7 @@ export async function fetchUserRepos(username: string = 'Udaykiranjammula-alpha'
         }
       }
     } catch {
-      // Local storage read error; fall through to network
+      // Storage read error; fall through to network
     }
   }
 
@@ -86,7 +112,7 @@ export async function fetchUserRepos(username: string = 'Udaykiranjammula-alpha'
 
     if (response.status === 403 || response.status === 429) {
       // Rate limited
-      const cached = localStorage.getItem(CACHE_KEY);
+      const cached = safeGetStorage(CACHE_KEY);
       const parsed = cached ? (JSON.parse(cached) as GitHubRepo[]) : fallbackRepos;
       return {
         repos: parsed,
@@ -111,16 +137,12 @@ export async function fetchUserRepos(username: string = 'Udaykiranjammula-alpha'
       updated_at: r.updated_at,
     }));
 
-    try {
-      localStorage.setItem(CACHE_KEY, JSON.stringify(sanitized));
-      localStorage.setItem(CACHE_TIME_KEY, String(Date.now()));
-    } catch {
-      // Ignore quota error
-    }
+    safeSetStorage(CACHE_KEY, JSON.stringify(sanitized));
+    safeSetStorage(CACHE_TIME_KEY, String(Date.now()));
 
     return { repos: sanitized, source: 'network' };
   } catch (err) {
-    const cached = localStorage.getItem(CACHE_KEY);
+    const cached = safeGetStorage(CACHE_KEY);
     const parsed = cached ? (JSON.parse(cached) as GitHubRepo[]) : fallbackRepos;
     return {
       repos: parsed,

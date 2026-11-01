@@ -9299,6 +9299,12 @@ a {
 .appstore-home-box {
   background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
 }
+.facetime-home-box {
+  background: linear-gradient(135deg, #30d158 0%, #24a144 100%) !important;
+}
+.apps-single-row.row-four {
+  margin-top: 10px;
+}
 .music-home-box {
   background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%) !important;
 }

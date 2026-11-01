@@ -199,17 +199,18 @@ export function IosHomeScreen({ onNavigate, onOpenSearch, onOpenStandBy }: IosHo
           <span className="ios-icon-title">Fitness</span>
         </button>
 
-        {/* Settings */}
+        {/* Apple FaceTime */}
         <button
           type="button"
           className="ios-home-icon-btn"
-          onClick={() => handleNav('settings')}
-          aria-label="Settings application"
+          onClick={() => handleNav('facetime')}
+          aria-label="FaceTime application"
         >
-          <div className="ios-icon-box">
-            <img src="/ios/settings.png" alt="Settings" width={52} height={52} />
+          <div className="ios-icon-box facetime-home-box">
+            <span style={{ fontSize: 26 }}>📹</span>
+            <span className="app-red-badge">LIVE</span>
           </div>
-          <span className="ios-icon-title">Settings</span>
+          <span className="ios-icon-title">FaceTime</span>
         </button>
       </section>
 
@@ -262,10 +263,66 @@ export function IosHomeScreen({ onNavigate, onOpenSearch, onOpenStandBy }: IosHo
           onClick={() => handleNav('notes')}
           aria-label="Notes application"
         >
-          <div className="ios-icon-box notes-home-box">
-            <span style={{ fontSize: 28 }}>📝</span>
+          <div className="ios-icon-box">
+            <img src="/ios/notes.svg" alt="Notes" width={52} height={52} />
           </div>
           <span className="ios-icon-title">Notes</span>
+        </button>
+      </section>
+
+      {/* Essential Apps Grid - Row 4 (Photos, Resume, Contact, Settings) */}
+      <section className="apps-single-row row-four">
+        {/* Photos */}
+        <button
+          type="button"
+          className="ios-home-icon-btn"
+          onClick={() => handleNav('photos')}
+          aria-label="Photos application"
+        >
+          <div className="ios-icon-box">
+            <img src="/ios/photos.png" alt="Photos" width={52} height={52} />
+          </div>
+          <span className="ios-icon-title">Photos</span>
+        </button>
+
+        {/* Resume */}
+        <button
+          type="button"
+          className="ios-home-icon-btn"
+          onClick={() => handleNav('resume')}
+          aria-label="Resume application"
+        >
+          <div className="ios-icon-box">
+            <img src="/ios/resume.png" alt="Resume" width={52} height={52} />
+          </div>
+          <span className="ios-icon-title">Resume</span>
+        </button>
+
+        {/* Contact */}
+        <button
+          type="button"
+          className="ios-home-icon-btn"
+          onClick={() => handleNav('contact')}
+          aria-label="Contact application"
+        >
+          <div className="ios-icon-box">
+            <img src="/ios/contact.png" alt="Contact" width={52} height={52} />
+            <span className="app-red-badge">1</span>
+          </div>
+          <span className="ios-icon-title">Contact</span>
+        </button>
+
+        {/* Settings */}
+        <button
+          type="button"
+          className="ios-home-icon-btn"
+          onClick={() => handleNav('settings')}
+          aria-label="Settings application"
+        >
+          <div className="ios-icon-box">
+            <img src="/ios/settings.png" alt="Settings" width={52} height={52} />
+          </div>
+          <span className="ios-icon-title">Settings</span>
         </button>
       </section>
 
