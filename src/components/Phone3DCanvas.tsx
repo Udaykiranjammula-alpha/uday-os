@@ -71,17 +71,18 @@ const NORMAL_EXCLUSIONS = new Set(['Anodized aluminum', 'Frosted glass', 'Plasti
 
 function createTorchTexture(): THREE.CanvasTexture {
   const canvas = document.createElement('canvas');
-  canvas.width = 128;
-  canvas.height = 128;
+  canvas.width = 256;
+  canvas.height = 256;
   const ctx = canvas.getContext('2d');
   if (ctx) {
-    const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+    const grad = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
     grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
-    grad.addColorStop(0.25, 'rgba(255, 248, 190, 0.95)');
-    grad.addColorStop(0.55, 'rgba(255, 215, 110, 0.4)');
-    grad.addColorStop(1, 'rgba(255, 180, 50, 0)');
+    grad.addColorStop(0.15, 'rgba(255, 250, 210, 0.95)');
+    grad.addColorStop(0.38, 'rgba(255, 220, 130, 0.45)');
+    grad.addColorStop(0.7, 'rgba(255, 190, 70, 0.12)');
+    grad.addColorStop(1, 'rgba(255, 170, 40, 0)');
     ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 128, 128);
+    ctx.fillRect(0, 0, 256, 256);
   }
   const texture = new THREE.CanvasTexture(canvas);
   return texture;
@@ -322,10 +323,21 @@ export function Phone3DCanvas({
         const loader = new GLTFLoader();
         loader.setMeshoptDecoder(MeshoptDecoder);
 
-        // Real 3D Flashlight Components on the Camera Module
-        const torchPointLight = new THREE.PointLight(0xfff5cc, 0, 18, 1.8);
-        const torchSpotLight = new THREE.SpotLight(0xfffae6, 0, 45, Math.PI / 4, 0.85, 1.5);
+        // Real 3D Flashlight Components anchored precisely on True Tone Flash LED
+        const FLASH_POS = new THREE.Vector3(-1.2233, 3.4622, -0.345);
+        const torchGroup = new THREE.Group();
+        torchGroup.position.copy(FLASH_POS);
+        modelGroup.add(torchGroup);
+
+        const torchPointLight = new THREE.PointLight(0xfff6d0, 0, 24, 1.6);
+        torchPointLight.position.set(0, 0, -0.05);
+
+        const torchSpotLight = new THREE.SpotLight(0xfffae6, 0, 45, Math.PI / 4.2, 0.75, 1.5);
+        torchSpotLight.position.set(0, 0, -0.04);
         const torchTarget = new THREE.Object3D();
+        torchTarget.position.set(0, 0, -25); // Points outward into space behind phone!
+        torchGroup.add(torchTarget);
+        torchSpotLight.target = torchTarget;
 
         flareTexture = createTorchTexture();
         flareMat = new THREE.SpriteMaterial({
@@ -336,14 +348,17 @@ export function Phone3DCanvas({
           depthWrite: false,
         });
         const torchFlare = new THREE.Sprite(flareMat);
-        torchFlare.scale.set(1.4, 1.4, 1.4);
+        torchFlare.position.set(0, 0, -0.02);
+        torchFlare.scale.set(1.65, 1.65, 1.65);
         torchFlare.visible = false;
 
-        beamGeo = new THREE.ConeGeometry(3.0, 12, 24, 1, true);
-        beamGeo.translate(0, -6, 0);
-        beamGeo.rotateX(-Math.PI / 2);
+        const beamHeight = 16;
+        const beamRadius = 3.2;
+        beamGeo = new THREE.ConeGeometry(beamRadius, beamHeight, 32, 1, true);
+        beamGeo.translate(0, -beamHeight / 2, 0); // Apex at (0, 0, 0)
+        beamGeo.rotateX(Math.PI / 2); // Points straight out along -Z into space away from back glass!
         beamMat = new THREE.MeshBasicMaterial({
-          color: 0xfff8d6,
+          color: 0xfff5cc,
           transparent: true,
           opacity: 0,
           blending: THREE.AdditiveBlending,
@@ -351,6 +366,12 @@ export function Phone3DCanvas({
           depthWrite: false,
         });
         const torchBeam = new THREE.Mesh(beamGeo, beamMat);
+        torchBeam.position.set(0, 0, -0.03);
+
+        torchGroup.add(torchPointLight);
+        torchGroup.add(torchSpotLight);
+        torchGroup.add(torchFlare);
+        torchGroup.add(torchBeam);
 
         const tryLoad = (primaryUrl: string, secondaryUrl: string) => {
           loader.load(
@@ -362,7 +383,6 @@ export function Phone3DCanvas({
               root.rotation.y = Math.PI;
               root.scale.set(V_SCALE, W_SCALE, V_SCALE);
 
-              let ledFound = false;
               root.traverse((child: THREE.Object3D) => {
                 if (child instanceof THREE.Mesh) {
                   child.castShadow = true;
@@ -373,27 +393,6 @@ export function Phone3DCanvas({
                       if (NORMAL_EXCLUSIONS.has(mat.name) && mat.normalMap) {
                         mat.normalMap = null;
                         mat.needsUpdate = true;
-                      }
-                      if ((mat.name === 'LED' || mat.name === 'Plastic LED') && !ledFound) {
-                        ledFound = true;
-                        child.geometry.computeBoundingBox();
-                        const center = new THREE.Vector3();
-                        if (child.geometry.boundingBox) {
-                          child.geometry.boundingBox.getCenter(center);
-                        }
-                        torchPointLight.position.copy(center);
-                        torchSpotLight.position.copy(center);
-                        torchTarget.position.set(center.x, center.y, center.z - 25);
-                        child.add(torchTarget);
-                        torchSpotLight.target = torchTarget;
-
-                        torchFlare.position.copy(center);
-                        torchBeam.position.copy(center);
-
-                        child.add(torchPointLight);
-                        child.add(torchSpotLight);
-                        child.add(torchFlare);
-                        child.add(torchBeam);
                       }
                     }
                   }
@@ -411,14 +410,9 @@ export function Phone3DCanvas({
                       const mats = Array.isArray(child.material) ? child.material : [child.material];
                       for (const mat of mats) {
                         if (mat instanceof THREE.MeshStandardMaterial) {
-                          if (mat.name === 'LED') {
-                            mat.emissive.set(on ? 0xfff099 : 0x000000);
-                            mat.emissiveIntensity = on ? 16.0 : 0.0;
-                            mat.toneMapped = !on;
-                            mat.needsUpdate = true;
-                          } else if (mat.name === 'Plastic LED') {
-                            mat.emissive.set(on ? 0xfffae6 : 0x000000);
-                            mat.emissiveIntensity = on ? 8.0 : 0.0;
+                          if (mat.name === 'LED' || mat.name === 'Plastic LED') {
+                            mat.emissive.set(on ? 0xfff6d0 : 0x000000);
+                            mat.emissiveIntensity = on ? 24.0 : 0.0;
                             mat.toneMapped = !on;
                             mat.needsUpdate = true;
                           }
@@ -428,10 +422,10 @@ export function Phone3DCanvas({
                   });
                 }
 
-                torchPointLight.intensity = on ? 5.5 : 0;
-                torchSpotLight.intensity = on ? 10.0 : 0;
+                torchPointLight.intensity = on ? 7.5 : 0;
+                torchSpotLight.intensity = on ? 12.0 : 0;
                 torchFlare.visible = on;
-                if (beamMat) beamMat.opacity = on ? 0.3 : 0;
+                if (beamMat) beamMat.opacity = on ? 0.16 : 0;
                 needsCssRenderRef.current = true;
               };
               updateFlashlightRef.current = applyFlashlight;
