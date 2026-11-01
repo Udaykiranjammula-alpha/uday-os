@@ -1653,10 +1653,47 @@ a {
 /* ================= iOS HOME SCREEN LAYOUT ================= */
 .ios-homescreen-view {
   flex: 1;
-  padding: 0 16px 20px;
+  padding: 0 0 10px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow: hidden;
+  position: relative;
+}
+
+.ios-homescreen-viewport {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  touch-action: pan-x;
+}
+
+.ios-homescreen-slider {
+  display: flex;
+  width: 200%;
+  height: 100%;
+}
+
+.ios-homescreen-page {
+  width: 50%;
+  height: 100%;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.ios-home-page-arrow:hover {
+  background: rgba(255, 255, 255, 0.28) !important;
+  transform: translateY(-50%) scale(1.08) !important;
+}
+
+.ios-home-page-arrow:active {
+  transform: translateY(-50%) scale(0.94) !important;
 }
 
 /* 1. Top Wide GitHub Heatmap Widget (153px height matching prsd.dev) */
