@@ -197,9 +197,13 @@ a {
 
 /* Studio Flip Dock */
 .studio-flip-dock {
-  margin-top: 32px;
+  margin-top: 24px;
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
+  gap: 8px;
+  max-width: 280px;
+  margin-left: auto;
 }
 .studio-flip-pill {
   display: inline-flex;
@@ -209,11 +213,13 @@ a {
   border-radius: 999px;
   font-size: 11px;
   font-weight: 600;
+  white-space: nowrap;
   color: var(--studio-muted);
   background: rgba(125, 125, 135, 0.08);
   border: 1px solid var(--studio-line);
   cursor: pointer;
   transition: all 0.2s ease;
+  user-select: none;
 }
 .studio-flip-pill:hover {
   color: var(--studio-ink);
@@ -223,6 +229,18 @@ a {
 .studio-flip-pill.flipped {
   color: #0284c7;
   border-color: #0284c7;
+}
+.keynote-hub-trigger-btn {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.18) 0%, rgba(168, 85, 247, 0.18) 100%) !important;
+  border-color: rgba(56, 189, 248, 0.45) !important;
+  color: #38bdf8 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.18) !important;
+}
+.keynote-hub-trigger-btn:hover {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.3) 0%, rgba(168, 85, 247, 0.3) 100%) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
 }
 
 /* Phone World & Stage */
@@ -15808,5 +15826,202 @@ a {
   display: inline-flex;
   align-items: center;
 }
+
+/* ==========================================================================
+   KEYNOTE STUDIO MASTER HUB MODAL
+   ========================================================================== */
+.keynote-hub-modal {
+  width: min(92vw, 680px);
+  max-height: 86vh;
+  background: rgba(15, 17, 24, 0.94);
+  backdrop-filter: blur(36px);
+  -webkit-backdrop-filter: blur(36px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 28px;
+  padding: 24px;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.88), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  overflow: hidden;
+}
+.keynote-hub-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 16px;
+}
+.keynote-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #38bdf8;
+  margin-bottom: 4px;
+}
+.keynote-hub-title-box h3 {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  margin: 0 0 4px 0;
+  color: #ffffff;
+}
+.keynote-hub-title-box p {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 0;
+  line-height: 1.4;
+}
+.keynote-hub-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+.keynote-hub-close-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+.keynote-hub-body {
+  overflow-y: auto;
+  padding-right: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+.keynote-hub-body::-webkit-scrollbar {
+  width: 5px;
+}
+.keynote-hub-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+.hub-category-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.hub-section-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #64748b;
+  margin: 0 0 2px 2px;
+}
+.hub-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 8px;
+}
+.hub-feature-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: inherit;
+}
+.hub-feature-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+.hub-card-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.hub-card-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.hub-card-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #f1f5f9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hub-card-sub {
+  font-size: 10px;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+.hub-card-arrow {
+  color: #64748b;
+  flex-shrink: 0;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+.hub-feature-card:hover .hub-card-arrow {
+  color: #ffffff;
+  transform: translateX(2px);
+}
+
+/* ==========================================================================
+   RESPONSIVE LAYOUT FIX (PREVENTS ANY BUTTON OVERLAY OVER PHONE)
+   ========================================================================== */
+@media (max-width: 1100px) {
+  .studio-nav {
+    position: fixed !important;
+    top: 16px !important;
+    right: 16px !important;
+    transform: none !important;
+    z-index: 90 !important;
+    max-width: 220px !important;
+    text-align: right !important;
+    pointer-events: auto !important;
+  }
+  .studio-nav-name {
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    white-space: nowrap !important;
+  }
+  .studio-nav ul {
+    display: none !important; /* Hides editorial links on split-screen to leave the phone 100% visible */
+  }
+  .studio-flip-dock {
+    margin-top: 6px !important;
+    gap: 5px !important;
+    max-width: 220px !important;
+  }
+  .studio-flip-pill {
+    padding: 5px 10px !important;
+    font-size: 10px !important;
+  }
+}
+
 
 

@@ -12,6 +12,7 @@ import { WritingToolsHUD } from './components/WritingToolsHUD';
 import { LiveActivitiesModal } from './components/LiveActivitiesModal';
 import { CameraControlHUD } from './components/CameraControlHUD';
 import { ApplePayRecruiterSheet } from './components/ApplePayRecruiterSheet';
+import { KeynoteStudioHub } from './components/KeynoteStudioHub';
 import {
   Rotate3d,
   Share2,
@@ -55,6 +56,7 @@ export default function App() {
   const [isLiveActivitiesOpen, setIsLiveActivitiesOpen] = useState(false);
   const [isCameraControlOpen, setIsCameraControlOpen] = useState(false);
   const [isApplePayOpen, setIsApplePayOpen] = useState(false);
+  const [isKeynoteHubOpen, setIsKeynoteHubOpen] = useState(false);
   const [visionOSEnv, setVisionOSEnv] = useState<VisionOSEnvironment>('steve-jobs');
   const [copiedUrl, setCopiedUrl] = useState(false);
 
@@ -130,6 +132,7 @@ export default function App() {
         else if (isLiveActivitiesOpen) setIsLiveActivitiesOpen(false);
         else if (isCameraControlOpen) setIsCameraControlOpen(false);
         else if (isApplePayOpen) setIsApplePayOpen(false);
+        else if (isKeynoteHubOpen) setIsKeynoteHubOpen(false);
         else if (isShareOpen) setIsShareOpen(false);
         else if (currentRoute === 'search') navigateTo('home');
       }
@@ -149,6 +152,7 @@ export default function App() {
     isLiveActivitiesOpen,
     isCameraControlOpen,
     isApplePayOpen,
+    isKeynoteHubOpen,
     isShareOpen,
   ]);
 
@@ -360,8 +364,9 @@ export default function App() {
           </li>
         </ul>
 
-        {/* Studio Dock: Hardware & Keynote Actions */}
+        {/* Studio Dock: Clean Apple Hardware & Keynote Actions */}
         <div className="studio-flip-dock">
+          {/* 3D Hardware Flip Button */}
           <button
             type="button"
             className={`studio-flip-pill ${isFlipped ? 'flipped' : ''}`}
@@ -376,201 +381,22 @@ export default function App() {
             <span>{isFlipped ? 'View Screen' : 'View Back (360°)'}</span>
           </button>
 
-          {/* Action Button Pill */}
+          {/* Keynote Studio Hub Trigger */}
           <button
             type="button"
-            className="studio-flip-pill action-pill"
+            className="studio-flip-pill keynote-hub-trigger-btn"
             onClick={() => {
               sound.playActionClickSound();
-              setIsActionCarouselOpen(true);
+              setIsKeynoteHubOpen(true);
             }}
-            title="Physical Action Button Carousel (HotKey: A)"
-            aria-label="Action Button"
+            title="Open Apple Keynote Studio Showcase (Silicon, VisionOS, Radar, Audio)"
+            aria-label="Keynote Studio Hub"
           >
-            <Sliders size={13} />
-            <span>Action Button</span>
+            <Sparkles size={13} className="text-cyan animate-pulse" />
+            <span> Keynote Studio (13)</span>
           </button>
 
-          {/* 3D A18 Pro Teardown X-Ray Pill */}
-          <button
-            type="button"
-            className="studio-flip-pill teardown-pill"
-            onClick={() => {
-              sound.playActionClickSound();
-              setIsTeardownOpen(true);
-            }}
-            title="Apple Keynote A18 Pro Exploded 3D Teardown"
-            aria-label="A18 Pro Teardown"
-          >
-            <Cpu size={13} />
-            <span>A18 Pro X-Ray</span>
-          </button>
-
-          {/* VisionOS Spatial Mode Pill */}
-          <button
-            type="button"
-            className="studio-flip-pill spatial-pill"
-            onClick={() => {
-              sound.playActionClickSound();
-              setIsSpatialOpen(true);
-            }}
-            title="VisionOS Spatial Computing Breakout"
-            aria-label="VisionOS Spatial Mode"
-          >
-            <Eye size={13} />
-            <span>VisionOS 3D</span>
-          </button>
-
-          {/* NameDrop / AirDrop Pill */}
-          <button
-            type="button"
-            className="studio-flip-pill namedrop-pill"
-            onClick={() => {
-              sound.playActionClickSound();
-              setIsNameDropOpen(true);
-            }}
-            title="Apple AirDrop & NameDrop Ethereal Wave"
-            aria-label="AirDrop"
-          >
-            <Radio size={13} />
-            <span>AirDrop</span>
-          </button>
-
-          {/* AirPods Pro Spatial Audio Pill */}
-          <button
-            type="button"
-            className="studio-flip-pill airpods-pill"
-            onClick={() => {
-              sound.playActionClickSound();
-              setIsAirPodsOpen(true);
-            }}
-            title="AirPods Pro Spatial Audio & Head Tracking"
-            aria-label="AirPods Spatial"
-          >
-            <Headphones size={13} />
-            <span>AirPods Spatial</span>
-          </button>
-
-          {/* Emergency SOS via Satellite Pill */}
-          <button
-            type="button"
-            className="studio-flip-pill satellite-pill"
-            onClick={() => {
-              sound.playActionClickSound();
-              setIsSatelliteOpen(true);
-            }}
-            title="Apple Emergency SOS via Satellite Orbital Radar"
-            aria-label="Satellite SOS"
-          >
-            <Satellite size={13} />
-            <span>Satellite SOS</span>
-          </button>
-
-          {/* Split View Multitasking Pill */}
-          <button
-            type="button"
-            className="studio-flip-pill splitview-pill"
-            onClick={() => {
-              sound.playActionClickSound();
-              navigateTo(currentRoute === 'splitview' ? 'home' : 'splitview');
-            }}
-            title="iOS Stage Manager Dual Split View"
-            aria-label="Split View"
-          >
-            <Columns size={13} />
-            <span>Split View</span>
-          </button>
-
-          {/* Apple Watch Companion Pill */}
-          <button
-            type="button"
-            className="studio-flip-pill watch-pill"
-            onClick={() => {
-              sound.playActionClickSound();
-              setIsWatchOpen((prev) => !prev);
-            }}
-            title="Apple Watch Ultra 2 Titanium Companion"
-            aria-label="Watch Ultra"
-          >
-            <Watch size={13} />
-            <span>Watch Ultra</span>
-          </button>
-
-          {/* Apple Intelligence Writing Tools Pill */}
-          <button
-            type="button"
-            className="studio-flip-pill writingtools-pill"
-            onClick={() => {
-              sound.playActionClickSound();
-              setIsWritingToolsOpen(true);
-            }}
-            title="Apple Intelligence Writing Tools & Code Refactor"
-            aria-label="Writing Tools"
-          >
-            <Wand2 size={13} />
-            <span>Writing Tools</span>
-          </button>
-
-          {/* Live Activities Dynamic Island Pill */}
-          <button
-            type="button"
-            className="studio-flip-pill liveactivities-pill"
-            onClick={() => {
-              sound.playActionClickSound();
-              setIsLiveActivitiesOpen(true);
-            }}
-            title="Dynamic Island Live Activities Tracker"
-            aria-label="Live Activities"
-          >
-            <Zap size={13} />
-            <span>Live Activities</span>
-          </button>
-
-          {/* Apple Maps 3D Flyover Pill */}
-          <button
-            type="button"
-            className="studio-flip-pill maps-pill"
-            onClick={() => {
-              sound.playActionClickSound();
-              navigateTo(currentRoute === 'maps' ? 'home' : 'maps');
-            }}
-            title="Apple Maps 3D Flyover & Tech Campus Explorer"
-            aria-label="Apple Maps"
-          >
-            <MapPin size={13} />
-            <span>Apple Maps</span>
-          </button>
-
-          {/* iPhone 16 Pro Camera Control Pill */}
-          <button
-            type="button"
-            className="studio-flip-pill cameracontrol-pill"
-            onClick={() => {
-              sound.playActionClickSound();
-              setIsCameraControlOpen((prev) => !prev);
-            }}
-            title="iPhone 16 Pro Capacitive Camera Control & Lens Dial"
-            aria-label="Camera Control"
-          >
-            <Camera size={13} />
-            <span>Camera Control</span>
-          </button>
-
-          {/* Apple Pay Recruiter Checkout Pill */}
-          <button
-            type="button"
-            className="studio-flip-pill applepay-pill"
-            onClick={() => {
-              sound.playActionClickSound();
-              setIsApplePayOpen(true);
-            }}
-            title="Apple Pay · Express Recruiter One-Tap Hire Sheet"
-            aria-label="Apple Pay Hire"
-          >
-            <CreditCard size={13} />
-            <span>Apple Pay Hire</span>
-          </button>
-
+          {/* Share & QR Code Pill */}
           <button
             type="button"
             className="studio-flip-pill share-btn"
@@ -744,6 +570,27 @@ export default function App() {
         isOpen={isApplePayOpen}
         onClose={() => setIsApplePayOpen(false)}
         onNavigate={navigateTo}
+      />
+
+      {/* Apple Keynote Studio Showcase Master Hub */}
+      <KeynoteStudioHub
+        isOpen={isKeynoteHubOpen}
+        onClose={() => setIsKeynoteHubOpen(false)}
+        onOpenTeardown={() => setIsTeardownOpen(true)}
+        onOpenSpatial={() => setIsSpatialOpen(true)}
+        onOpenNameDrop={() => setIsNameDropOpen(true)}
+        onOpenAirPods={() => setIsAirPodsOpen(true)}
+        onOpenSatellite={() => setIsSatelliteOpen(true)}
+        onToggleSplitView={() => navigateTo(currentRoute === 'splitview' ? 'home' : 'splitview')}
+        onToggleWatch={() => setIsWatchOpen((prev) => !prev)}
+        onOpenWritingTools={() => setIsWritingToolsOpen(true)}
+        onOpenLiveActivities={() => setIsLiveActivitiesOpen(true)}
+        onOpenMaps={() => navigateTo(currentRoute === 'maps' ? 'home' : 'maps')}
+        onOpenCameraControl={() => setIsCameraControlOpen(true)}
+        onOpenApplePay={() => setIsApplePayOpen(true)}
+        onOpenActionCarousel={() => setIsActionCarouselOpen(true)}
+        onToggleFlip={() => setIsFlipped(!isFlipped)}
+        isFlipped={isFlipped}
       />
     </main>
   );
