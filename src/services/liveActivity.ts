@@ -226,9 +226,12 @@ class LiveActivityService {
   public setPiP(partial: Partial<PiPState>) {
     const updated = { ...this.state.pip, ...partial };
     if (partial.position) {
+      const bounds = updated.bezelBounds;
+      const rawX = Number.isFinite(partial.position.x) ? partial.position.x : bounds.minX;
+      const rawY = Number.isFinite(partial.position.y) ? partial.position.y : bounds.minY;
       updated.position = {
-        x: Math.min(Math.max(partial.position.x, this.state.pip.bezelBounds.minX), this.state.pip.bezelBounds.maxX),
-        y: Math.min(Math.max(partial.position.y, this.state.pip.bezelBounds.minY), this.state.pip.bezelBounds.maxY),
+        x: Math.min(Math.max(rawX, bounds.minX), bounds.maxX),
+        y: Math.min(Math.max(rawY, bounds.minY), bounds.maxY),
       };
     }
     this.state.pip = updated;
@@ -697,8 +700,11 @@ class LiveActivityService {
   }
 
   public updatePiPPosition(x: number, y: number) {
-    const clampedX = Math.min(Math.max(x, this.state.pip.bezelBounds.minX), this.state.pip.bezelBounds.maxX);
-    const clampedY = Math.min(Math.max(y, this.state.pip.bezelBounds.minY), this.state.pip.bezelBounds.maxY);
+    const bounds = this.state.pip.bezelBounds;
+    const rawX = Number.isFinite(x) ? x : bounds.minX;
+    const rawY = Number.isFinite(y) ? y : bounds.minY;
+    const clampedX = Math.min(Math.max(rawX, bounds.minX), bounds.maxX);
+    const clampedY = Math.min(Math.max(rawY, bounds.minY), bounds.maxY);
     this.state.pip.position = { x: clampedX, y: clampedY };
     this.notify();
   }

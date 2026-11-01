@@ -73,7 +73,7 @@ export class LiveActivityCoordinatorDriver {
     title: '',
     isPlaying: false,
     position: { x: 20, y: 120 },
-    bezelBounds: { minX: 12, maxX: 260, minY: 60, maxY: 680 },
+    bezelBounds: { minX: 8, maxX: 220, minY: 60, maxY: 680 },
   };
 
   private listeners: Array<() => void> = [];
@@ -142,7 +142,7 @@ export class LiveActivityCoordinatorDriver {
       title: '',
       isPlaying: false,
       position: { x: 20, y: 120 },
-      bezelBounds: { minX: 12, maxX: 260, minY: 60, maxY: 680 },
+      bezelBounds: { minX: 8, maxX: 220, minY: 60, maxY: 680 },
     };
     this.notify();
   }

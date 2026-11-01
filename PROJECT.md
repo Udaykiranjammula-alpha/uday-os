@@ -68,7 +68,7 @@ Every feature identified during the Survey phase is mapped to an authoritative m
 
 | # | Name | Scope | Dependencies | Status |
 |---|------|-------|-------------|--------|
-| M1 | Dynamic Island Live Activities & PiP Multitasking | `liveActivity.ts`, `DynamicIsland.tsx`, `PiPOverlay.tsx`, `styles.css`, integration with Music & Clock | None | PLANNED |
+| M1 | Dynamic Island Live Activities & PiP Multitasking | `liveActivity.ts`, `DynamicIsland.tsx`, `PiPOverlay.tsx`, `styles.css`, integration with Music & Clock | None | **DONE** |
 | M2 | Xcode Cloud In-Phone Compiler & LeetCode Playground | `CodeEditor.tsx`, `codeRunner.ts`, `XcodeApp.tsx`, `LeetCodeApp.tsx`, routes & icon integration | None | PLANNED |
 | M3 | Apple HealthKit 3D Activity Rings, Gyroscope & Hardware Haptics | `haptics.ts`, `FitnessApp.tsx` (3D rings, gyro/mouse kinetic gauge, 360° medals), `SpatialParallax.tsx` | None | PLANNED |
 | M4 | Spotlight Search 2.0 with Math, Conversions & Shortcuts | `spotlightIndex.ts`, `mathEvaluator.ts`, `SpotlightSearch.tsx`, action shortcuts | M1, M2 | PLANNED |
