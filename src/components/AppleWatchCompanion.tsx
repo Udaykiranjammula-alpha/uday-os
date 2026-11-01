@@ -8,21 +8,48 @@ import {
   RotateCw,
   X,
   Volume2,
+  Sparkles,
+  Satellite,
+  Radio,
 } from 'lucide-react';
 import { sound } from '../services/sound';
 
-interface AppleWatchCompanionProps {
+export type VisionOSEnvironment = 'steve-jobs' | 'mount-hood' | 'deep-space' | 'cyberpunk';
+
+export interface AppleWatchCompanionProps {
   isOpen: boolean;
   onClose: () => void;
   onPingPhone: () => void;
   onScrollPhone?: (delta: number) => void;
+  currentEnv?: VisionOSEnvironment;
+  onSelectEnv?: (env: VisionOSEnvironment) => void;
+  onNavigatePhone?: (route: string) => void;
+  onTriggerSOS?: () => void;
 }
+
+const ENVIRONMENTS: VisionOSEnvironment[] = [
+  'steve-jobs',
+  'mount-hood',
+  'deep-space',
+  'cyberpunk',
+];
+
+const ENV_TITLES: Record<VisionOSEnvironment, string> = {
+  'steve-jobs': 'STEVE JOBS THEATER',
+  'mount-hood': 'MOUNT HOOD OREGON',
+  'deep-space': 'DEEP SPACE ORBIT',
+  'cyberpunk': 'CYBERPUNK NEON',
+};
 
 export function AppleWatchCompanion({
   isOpen,
   onClose,
   onPingPhone,
   onScrollPhone,
+  currentEnv = 'steve-jobs',
+  onSelectEnv,
+  onNavigatePhone,
+  onTriggerSOS,
 }: AppleWatchCompanionProps) {
   const [crownAngle, setCrownAngle] = useState(0);
   const [timeStr, setTimeStr] = useState('10:09');
@@ -44,6 +71,16 @@ export function AppleWatchCompanion({
     setCrownAngle((prev) => prev + delta);
     sound.playTapSound();
     if (onScrollPhone) onScrollPhone(delta * 4);
+
+    // Cycle VisionOS environment when Digital Crown is spun
+    if (onSelectEnv) {
+      const currentIndex = ENVIRONMENTS.indexOf(currentEnv);
+      const nextIndex =
+        delta > 0
+          ? (currentIndex + 1) % ENVIRONMENTS.length
+          : (currentIndex - 1 + ENVIRONMENTS.length) % ENVIRONMENTS.length;
+      onSelectEnv(ENVIRONMENTS[nextIndex]);
+    }
   };
 
   const handlePing = () => {
@@ -51,6 +88,15 @@ export function AppleWatchCompanion({
     setIsPinging(true);
     onPingPhone();
     setTimeout(() => setIsPinging(false), 2400);
+  };
+
+  const handleCycleEnvDirect = () => {
+    sound.playTapSound();
+    if (onSelectEnv) {
+      const currentIndex = ENVIRONMENTS.indexOf(currentEnv);
+      const nextIndex = (currentIndex + 1) % ENVIRONMENTS.length;
+      onSelectEnv(ENVIRONMENTS[nextIndex]);
+    }
   };
 
   if (!isOpen) return null;
@@ -90,9 +136,13 @@ export function AppleWatchCompanion({
             {/* Sapphire OLED Screen */}
             <div className="watch-screen">
               {/* Modular Ultra Face Header */}
-              <div className="watch-face-header">
-                <span className="watch-location">VIJAYAWADA</span>
-                <span className="watch-elevation">22M</span>
+              <div
+                className="watch-face-header clickable-env-header"
+                onClick={handleCycleEnvDirect}
+                title="Click to cycle VisionOS Environment"
+              >
+                <span className="watch-location">{ENV_TITLES[currentEnv]}</span>
+                <span className="watch-elevation">3K NIT</span>
               </div>
 
               {/* Big Digital Clock Time */}
@@ -101,39 +151,81 @@ export function AppleWatchCompanion({
                 <span className="watch-seconds-dot" />
               </div>
 
-              {/* Modular Complications Grid */}
+              {/* Modular Complications Grid - Fully Interactive with iPhone */}
               <div className="watch-complications-grid">
                 {/* Complication 1: LeetCode Streak */}
-                <div className="watch-complication-card">
+                <button
+                  type="button"
+                  className="watch-complication-card interactive"
+                  onClick={() => {
+                    sound.playTapSound();
+                    onNavigatePhone?.('leetcode');
+                  }}
+                  title="Open LeetCode App on iPhone"
+                >
                   <Flame size={12} className="text-amber-400" />
                   <span className="comp-value">184</span>
                   <span className="comp-label">SOLVED</span>
-                </div>
+                </button>
 
                 {/* Complication 2: Systems Heart Rate */}
-                <div className="watch-complication-card">
+                <button
+                  type="button"
+                  className="watch-complication-card interactive"
+                  onClick={() => {
+                    sound.playTapSound();
+                    onNavigatePhone?.('fitness');
+                  }}
+                  title="Open Activity Rings & Health on iPhone"
+                >
                   <Heart size={12} className="text-rose-500 animate-pulse" />
                   <span className="comp-value">72</span>
                   <span className="comp-label">BPM</span>
-                </div>
+                </button>
 
-                {/* Complication 3: Compass Compass Heading */}
-                <div className="watch-complication-card">
+                {/* Complication 3: Compass Heading */}
+                <button
+                  type="button"
+                  className="watch-complication-card interactive"
+                  onClick={() => {
+                    sound.playTapSound();
+                    onNavigatePhone?.('maps');
+                  }}
+                  title="Open Apple Maps 3D on iPhone"
+                >
                   <Compass size={12} className="text-cyan" />
                   <span className="comp-value">315°</span>
                   <span className="comp-label">NW</span>
-                </div>
+                </button>
               </div>
 
-              {/* Find My Ping Phone Button */}
-              <button
-                type="button"
-                className={`watch-ping-button ${isPinging ? 'pinging' : ''}`}
-                onClick={handlePing}
-              >
-                <BellRing size={12} />
-                <span>{isPinging ? 'Pinging iPhone...' : 'Find My · Ping iPhone'}</span>
-              </button>
+              {/* Interactive Control Row */}
+              <div className="watch-control-buttons-row">
+                <button
+                  type="button"
+                  className={`watch-ping-button ${isPinging ? 'pinging' : ''}`}
+                  onClick={handlePing}
+                  title="Find My · Play Ping Tone on iPhone"
+                >
+                  <BellRing size={11} />
+                  <span>{isPinging ? 'Pinging...' : 'Find My'}</span>
+                </button>
+
+                {onTriggerSOS && (
+                  <button
+                    type="button"
+                    className="watch-sos-mini-btn"
+                    onClick={() => {
+                      sound.playTapSound();
+                      onTriggerSOS();
+                    }}
+                    title="Emergency Satellite Beacon"
+                  >
+                    <Satellite size={11} />
+                    <span>SOS</span>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -144,17 +236,21 @@ export function AppleWatchCompanion({
             type="button"
             className="watch-digital-crown"
             style={{ transform: `rotate(${crownAngle}deg)` }}
-            onClick={() => handleRotateCrown(25)}
+            onClick={() => handleRotateCrown(35)}
             onWheel={(e) => {
               e.preventDefault();
-              handleRotateCrown(e.deltaY > 0 ? 15 : -15);
+              handleRotateCrown(e.deltaY > 0 ? 25 : -25);
             }}
-            title="Click or scroll Digital Crown"
+            title="Rotate Crown to cycle VisionOS Environments"
             aria-label="Rotate Digital Crown"
           >
             <div className="crown-fluting" />
           </button>
-          <div className="watch-side-button" onClick={() => handleRotateCrown(-25)} />
+          <div
+            className="watch-side-button"
+            onClick={() => handleRotateCrown(-35)}
+            title="Side Button"
+          />
         </div>
       </div>
     </aside>

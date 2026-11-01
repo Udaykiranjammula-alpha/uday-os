@@ -7,9 +7,11 @@ import { SpatialBreakoutView } from './components/SpatialBreakoutView';
 import { NameDropModal } from './components/NameDropModal';
 import { AirPodsSpatialModal } from './components/AirPodsSpatialModal';
 import { SatelliteRadarModal } from './components/SatelliteRadarModal';
-import { AppleWatchCompanion } from './components/AppleWatchCompanion';
+import { AppleWatchCompanion, type VisionOSEnvironment } from './components/AppleWatchCompanion';
 import { WritingToolsHUD } from './components/WritingToolsHUD';
 import { LiveActivitiesModal } from './components/LiveActivitiesModal';
+import { CameraControlHUD } from './components/CameraControlHUD';
+import { ApplePayRecruiterSheet } from './components/ApplePayRecruiterSheet';
 import {
   Rotate3d,
   Share2,
@@ -29,6 +31,8 @@ import {
   Wand2,
   Zap,
   MapPin,
+  Camera,
+  CreditCard,
 } from 'lucide-react';
 import type { Project } from './types';
 import { profile } from './data/profile';
@@ -49,6 +53,9 @@ export default function App() {
   const [isWatchOpen, setIsWatchOpen] = useState(true);
   const [isWritingToolsOpen, setIsWritingToolsOpen] = useState(false);
   const [isLiveActivitiesOpen, setIsLiveActivitiesOpen] = useState(false);
+  const [isCameraControlOpen, setIsCameraControlOpen] = useState(false);
+  const [isApplePayOpen, setIsApplePayOpen] = useState(false);
+  const [visionOSEnv, setVisionOSEnv] = useState<VisionOSEnvironment>('steve-jobs');
   const [copiedUrl, setCopiedUrl] = useState(false);
 
   const [currentRoute, setCurrentRoute] = useState<string>(() => {
@@ -121,6 +128,8 @@ export default function App() {
         else if (isSatelliteOpen) setIsSatelliteOpen(false);
         else if (isWritingToolsOpen) setIsWritingToolsOpen(false);
         else if (isLiveActivitiesOpen) setIsLiveActivitiesOpen(false);
+        else if (isCameraControlOpen) setIsCameraControlOpen(false);
+        else if (isApplePayOpen) setIsApplePayOpen(false);
         else if (isShareOpen) setIsShareOpen(false);
         else if (currentRoute === 'search') navigateTo('home');
       }
@@ -138,6 +147,8 @@ export default function App() {
     isSatelliteOpen,
     isWritingToolsOpen,
     isLiveActivitiesOpen,
+    isCameraControlOpen,
+    isApplePayOpen,
     isShareOpen,
   ]);
 
@@ -161,7 +172,7 @@ export default function App() {
   };
 
   return (
-    <main className={`pocket-studio studio-light lighting-${studioLighting}`}>
+    <main className={`pocket-studio studio-light lighting-${studioLighting} env-${visionOSEnv}`}>
       {/* Top Left: Finish Swatches & Lighting Presets */}
       <div className="finish-picker-group">
         <div className="finish-picker" role="radiogroup" aria-label="Titanium Finishes">
@@ -255,6 +266,54 @@ export default function App() {
             title="Sunset Golden Hour Lighting"
           >
             Golden
+          </button>
+        </div>
+
+        {/* VisionOS Immersive Environments Switcher */}
+        <div className="studio-env-strip" title="VisionOS Immersive Backdrop Environment">
+          <button
+            type="button"
+            className={`env-selector-pill ${visionOSEnv === 'steve-jobs' ? 'active' : ''}`}
+            onClick={() => {
+              sound.playTapSound();
+              setVisionOSEnv('steve-jobs');
+            }}
+            title="VisionOS: Steve Jobs Theater"
+          >
+             Theater
+          </button>
+          <button
+            type="button"
+            className={`env-selector-pill ${visionOSEnv === 'mount-hood' ? 'active' : ''}`}
+            onClick={() => {
+              sound.playTapSound();
+              setVisionOSEnv('mount-hood');
+            }}
+            title="VisionOS: Mount Hood Twilight"
+          >
+            Mt. Hood
+          </button>
+          <button
+            type="button"
+            className={`env-selector-pill ${visionOSEnv === 'deep-space' ? 'active' : ''}`}
+            onClick={() => {
+              sound.playTapSound();
+              setVisionOSEnv('deep-space');
+            }}
+            title="VisionOS: Deep Space Orbit"
+          >
+            Space
+          </button>
+          <button
+            type="button"
+            className={`env-selector-pill ${visionOSEnv === 'cyberpunk' ? 'active' : ''}`}
+            onClick={() => {
+              sound.playTapSound();
+              setVisionOSEnv('cyberpunk');
+            }}
+            title="VisionOS: Cyberpunk Neon"
+          >
+            Neon
           </button>
         </div>
       </div>
@@ -482,6 +541,36 @@ export default function App() {
             <span>Apple Maps</span>
           </button>
 
+          {/* iPhone 16 Pro Camera Control Pill */}
+          <button
+            type="button"
+            className="studio-flip-pill cameracontrol-pill"
+            onClick={() => {
+              sound.playActionClickSound();
+              setIsCameraControlOpen((prev) => !prev);
+            }}
+            title="iPhone 16 Pro Capacitive Camera Control & Lens Dial"
+            aria-label="Camera Control"
+          >
+            <Camera size={13} />
+            <span>Camera Control</span>
+          </button>
+
+          {/* Apple Pay Recruiter Checkout Pill */}
+          <button
+            type="button"
+            className="studio-flip-pill applepay-pill"
+            onClick={() => {
+              sound.playActionClickSound();
+              setIsApplePayOpen(true);
+            }}
+            title="Apple Pay · Express Recruiter One-Tap Hire Sheet"
+            aria-label="Apple Pay Hire"
+          >
+            <CreditCard size={13} />
+            <span>Apple Pay Hire</span>
+          </button>
+
           <button
             type="button"
             className="studio-flip-pill share-btn"
@@ -522,6 +611,7 @@ export default function App() {
             flashlightOn={flashlightOn}
             setFlashlightOn={handleToggleFlashlight}
             onFlipToBack={() => setIsFlipped(true)}
+            onOpenLiveActivities={() => setIsLiveActivitiesOpen(true)}
           />
         </Phone3DCanvas>
 
@@ -530,6 +620,10 @@ export default function App() {
           isOpen={isWatchOpen}
           onClose={() => setIsWatchOpen(false)}
           onPingPhone={handlePingPhoneFromWatch}
+          currentEnv={visionOSEnv}
+          onSelectEnv={(env) => setVisionOSEnv(env)}
+          onNavigatePhone={navigateTo}
+          onTriggerSOS={() => setIsSatelliteOpen(true)}
         />
       </div>
 
@@ -635,6 +729,20 @@ export default function App() {
       <LiveActivitiesModal
         isOpen={isLiveActivitiesOpen}
         onClose={() => setIsLiveActivitiesOpen(false)}
+        onNavigate={navigateTo}
+      />
+
+      {/* iPhone 16 Pro Capacitive Camera Control HUD */}
+      <CameraControlHUD
+        isOpen={isCameraControlOpen}
+        onClose={() => setIsCameraControlOpen(false)}
+        onOpenFullCamera={() => navigateTo('camera')}
+      />
+
+      {/* Apple Pay · Express Recruiter One-Tap Hire Face ID Sheet */}
+      <ApplePayRecruiterSheet
+        isOpen={isApplePayOpen}
+        onClose={() => setIsApplePayOpen(false)}
         onNavigate={navigateTo}
       />
     </main>

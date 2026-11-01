@@ -61,6 +61,7 @@ export interface IPhoneScreenContentProps {
   flashlightOn?: boolean;
   setFlashlightOn?: (on: boolean) => void;
   onFlipToBack?: () => void;
+  onOpenLiveActivities?: () => void;
 }
 
 export function IPhoneScreenContent({
@@ -77,6 +78,7 @@ export function IPhoneScreenContent({
   flashlightOn = false,
   setFlashlightOn = () => {},
   onFlipToBack,
+  onOpenLiveActivities,
 }: IPhoneScreenContentProps) {
   const [isControlCenterOpen, setIsControlCenterOpen] = useState(false);
   const [isAppSwitcherOpen, setIsAppSwitcherOpen] = useState(false);
@@ -258,6 +260,7 @@ export function IPhoneScreenContent({
         onToggleFlashlight={() => setFlashlightOn(!flashlightOn)}
         onFlipToBack={onFlipToBack}
         onNavigate={onNavigate}
+        onOpenLiveActivities={onOpenLiveActivities}
       />
 
       {/* Status Bar (Right side taps trigger iOS 18 Control Center, battery triggers MagSafe) */}

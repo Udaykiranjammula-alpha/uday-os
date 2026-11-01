@@ -15102,3 +15102,711 @@ a {
   font-size: 10px;
   color: #94a3b8;
 }
+
+/* Dynamic Island Live Activities Hub Launcher Button */
+.island-live-activity-hub-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 6px;
+  padding: 5px 8px;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 9999px;
+  color: #e2e8f0;
+  font-size: 9.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.island-live-activity-hub-btn:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: rgba(56, 189, 248, 0.5);
+  color: #ffffff;
+  transform: translateY(-0.5px);
+}
+.island-hub-glow-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  animation: pulse-beacon 1.5s infinite;
+  flex-shrink: 0;
+}
+.island-hub-text {
+  flex: 1;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.island-hub-ext {
+  color: #38bdf8;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   VISIONOS IMMERSIVE ENVIRONMENTS (STUDIO BACKDROPS)
+   ========================================================================== */
+.pocket-studio.env-steve-jobs {
+  background: radial-gradient(circle at 50% 18%, rgba(245, 158, 11, 0.12) 0%, rgba(18, 18, 22, 0.98) 55%, #050508 100%) !important;
+  transition: background 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pocket-studio.env-mount-hood {
+  background: radial-gradient(circle at 50% 15%, rgba(99, 102, 241, 0.15) 0%, rgba(15, 23, 42, 0.96) 52%, #030712 100%) !important;
+  transition: background 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pocket-studio.env-deep-space {
+  background: radial-gradient(circle at 65% 20%, rgba(14, 165, 233, 0.16) 0%, rgba(2, 6, 23, 0.97) 58%, #000003 100%) !important;
+  transition: background 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pocket-studio.env-cyberpunk {
+  background: radial-gradient(circle at 35% 20%, rgba(236, 72, 153, 0.16) 0%, rgba(15, 10, 30, 0.97) 52%, #040209 100%) !important;
+  transition: background 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.studio-env-strip {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  padding: 3px 5px;
+}
+.env-selector-pill {
+  padding: 3px 8px;
+  font-size: 10px;
+  font-weight: 500;
+  border-radius: 9999px;
+  color: #94a3b8;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.env-selector-pill:hover {
+  color: #e2e8f0;
+}
+.env-selector-pill.active {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.cameracontrol-pill {
+  border-color: rgba(245, 158, 11, 0.3) !important;
+  color: #fbbf24 !important;
+}
+.cameracontrol-pill:hover {
+  background: rgba(245, 158, 11, 0.15) !important;
+}
+
+.applepay-pill {
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+}
+.applepay-pill:hover {
+  background: rgba(255, 255, 255, 0.18) !important;
+}
+
+/* Apple Watch Companion interactive updates */
+.clickable-env-header {
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.15s ease;
+}
+.clickable-env-header:hover {
+  opacity: 0.8;
+}
+.watch-complication-card.interactive {
+  cursor: pointer;
+  border: none;
+  background: rgba(255, 255, 255, 0.05);
+  font-family: inherit;
+  transition: transform 0.15s, background 0.15s;
+}
+.watch-complication-card.interactive:hover {
+  background: rgba(255, 255, 255, 0.14);
+  transform: scale(1.05);
+}
+.watch-control-buttons-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+}
+.watch-control-buttons-row .watch-ping-button {
+  flex: 1;
+}
+.watch-sos-mini-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 5px 8px;
+  border-radius: 9999px;
+  background: rgba(239, 68, 68, 0.18);
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  color: #f87171;
+  font-size: 9px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.watch-sos-mini-btn:hover {
+  background: rgba(239, 68, 68, 0.35);
+  transform: translateY(-0.5px);
+}
+
+/* ==========================================================================
+   IPHONE 16 PRO CAPACITIVE CAMERA CONTROL HUD
+   ========================================================================== */
+.camera-control-hud-container {
+  position: fixed;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 900;
+  width: 290px;
+  pointer-events: auto;
+}
+@media (max-width: 1200px) {
+  .camera-control-hud-container {
+    right: 12px;
+    top: auto;
+    bottom: 20px;
+    transform: none;
+    width: min(92vw, 320px);
+  }
+}
+.camera-flash-burst-overlay {
+  position: fixed;
+  inset: 0;
+  background: #ffffff;
+  z-index: 99999;
+  animation: camera-flash-burst 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  pointer-events: none;
+}
+@keyframes camera-flash-burst {
+  0% { opacity: 0.95; }
+  100% { opacity: 0; }
+}
+.camera-control-arc-panel {
+  background: rgba(15, 17, 23, 0.88);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+  padding: 16px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.camera-control-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.control-brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+.control-header-btns {
+  display: flex;
+  gap: 6px;
+}
+.control-icon-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.control-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+.camera-control-mode-tabs {
+  display: flex;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 9999px;
+  padding: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.mode-tab {
+  flex: 1;
+  padding: 4px 0;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 9999px;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+.mode-tab.active {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+.camera-control-dial-area {
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 16px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.dial-indicator-caption {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+.zoom-chips-row, .style-chips-row, .aperture-chips-row {
+  display: flex;
+  gap: 6px;
+  justify-content: space-between;
+}
+.zoom-chip, .style-chip, .aperture-chip {
+  flex: 1;
+  padding: 6px 0;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.05);
+  color: #cbd5e1;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+.zoom-chip.selected, .style-chip.selected, .aperture-chip.selected {
+  background: #f59e0b;
+  border-color: #f59e0b;
+  color: #000000;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+}
+.lens-spec-label {
+  font-size: 10px;
+  color: #94a3b8;
+  margin-top: 8px;
+  text-align: center;
+}
+.style-preview-swatch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 10px;
+  color: #cbd5e1;
+}
+.swatch-circle {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.swatch-circle.style-standard { background: #38bdf8; }
+.swatch-circle.style-amber { background: #f59e0b; }
+.swatch-circle.style-vibrant { background: #ec4899; }
+.swatch-circle.style-noir { background: #94a3b8; }
+
+.capacitive-shutter-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.shutter-instructions {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: #64748b;
+}
+.shutter-buttons-row {
+  display: flex;
+  gap: 8px;
+}
+.light-press-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  background: rgba(56, 189, 248, 0.1);
+  color: #38bdf8;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.light-press-btn.focused {
+  background: rgba(16, 185, 129, 0.25);
+  border-color: #10b981;
+  color: #10b981;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+}
+.full-shutter-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+}
+.full-shutter-btn:hover {
+  transform: scale(1.06);
+}
+.full-shutter-btn:active {
+  transform: scale(0.92);
+}
+.inner-shutter-core {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+.captured-counter {
+  text-align: center;
+  font-size: 9px;
+  color: #64748b;
+}
+
+/* ==========================================================================
+   APPLE PAY · RECRUITER EXPRESS ONE-TAP HIRE SHEET
+   ========================================================================== */
+.apple-pay-sheet {
+  width: min(92vw, 420px);
+  background: rgba(18, 20, 29, 0.94);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 28px;
+  padding: 24px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.85);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.apple-pay-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.apple-pay-brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+.apple-glyph {
+  font-size: 18px;
+}
+.apple-pay-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.apple-card-container {
+  perspective: 800px;
+}
+.apple-card-titanium {
+  width: 100%;
+  height: 190px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 45%, #94a3b8 100%);
+  color: #0f172a;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.45);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+.apple-card-titanium::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, 0.4) 50%, transparent 60%);
+  pointer-events: none;
+}
+.apple-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.card-chip {
+  width: 32px;
+  height: 24px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+.card-logo {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+.apple-card-middle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: ui-monospace, monospace;
+}
+.card-chip-number {
+  font-size: 12px;
+  letter-spacing: 2px;
+  font-weight: 700;
+  color: #334155;
+}
+.card-tier-badge {
+  font-size: 8.5px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 9999px;
+  background: rgba(15, 23, 42, 0.12);
+  border: 1px solid rgba(15, 23, 42, 0.2);
+}
+.apple-card-bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.card-holder-info {
+  display: flex;
+  flex-direction: column;
+}
+.card-label {
+  font-size: 8px;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.5px;
+}
+.card-name {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+.card-reward {
+  text-align: right;
+}
+.reward-pct {
+  display: block;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+}
+.reward-sub {
+  font-size: 7.5px;
+  font-weight: 800;
+  color: #475569;
+}
+
+.pay-prompt-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+.pay-instructions {
+  font-size: 11.5px;
+  color: #94a3b8;
+  margin: 0;
+  line-height: 1.4;
+}
+.face-id-confirm-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #ffffff;
+  color: #000000;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.face-id-confirm-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.3);
+}
+
+.pay-scanning-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+}
+.face-id-scanner-rings {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.scanner-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px dashed #38bdf8;
+  animation: spin 3s linear infinite;
+}
+.scanner-ring.inner {
+  inset: 8px;
+  border-color: #a855f7;
+  animation: spin-reverse 2s linear infinite;
+}
+.face-id-smile-icon {
+  font-size: 20px;
+  font-weight: 700;
+  color: #38bdf8;
+}
+.scanning-text {
+  font-size: 12px;
+  color: #cbd5e1;
+  font-weight: 600;
+}
+
+.pay-success-box {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.verified-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.verified-badge-row h4 {
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0;
+  color: #ffffff;
+}
+.recruiter-receipt-card {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.receipt-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+}
+.receipt-line span {
+  color: #94a3b8;
+}
+.receipt-line strong {
+  color: #ffffff;
+}
+.receipt-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.receipt-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+.receipt-btn.primary {
+  background: #3b82f6;
+  border: 1px solid #60a5fa;
+  color: #ffffff;
+}
+.receipt-btn.primary:hover {
+  background: #2563eb;
+}
+.receipt-btn.secondary {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+.receipt-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+.receipt-btn.tertiary {
+  background: transparent;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  color: #94a3b8;
+}
+.receipt-btn.tertiary:hover {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.apple-pay-footer {
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 10px;
+}
+.secure-element-tag {
+  font-size: 9px;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+}
+
+

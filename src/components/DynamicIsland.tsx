@@ -22,6 +22,7 @@ interface DynamicIslandProps {
   onToggleFlashlight?: () => void;
   onFlipToBack?: () => void;
   onNavigate?: (route: string) => void;
+  onOpenLiveActivities?: () => void;
 }
 
 export function DynamicIsland({
@@ -31,6 +32,7 @@ export function DynamicIsland({
   onToggleFlashlight,
   onFlipToBack,
   onNavigate,
+  onOpenLiveActivities,
 }: DynamicIslandProps) {
   const [expanded, setExpanded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -121,6 +123,24 @@ export function DynamicIsland({
                   <Battery size={12} /> 98%
                 </span>
               </div>
+
+              {/* Direct Live Activities Hub Pill */}
+              {onOpenLiveActivities && (
+                <button
+                  type="button"
+                  className="island-live-activity-hub-btn"
+                  onClick={() => {
+                    sound.playTapSound();
+                    setExpanded(false);
+                    onOpenLiveActivities();
+                  }}
+                  title="Open Live Activities Hub"
+                >
+                  <span className="island-hub-glow-dot" />
+                  <span className="island-hub-text">Live Activities Hub · Flight, Sports, Delivery, SpaceX</span>
+                  <ExternalLink size={10} className="island-hub-ext" />
+                </button>
+              )}
 
               {/* Torch Tile if flashlight is active */}
               {flashlightOn && (
