@@ -130,10 +130,10 @@ export function IPhoneScreenContent({
     if (e.pointerType !== 'mouse' || e.button !== 0) return;
 
     const target = e.target as HTMLElement | null;
-    // Exclude form controls, camera, sliders, and arcade game controls from screen drag-scroll
+    // Exclude buttons, links, form controls, and interactive elements from screen drag-scroll
     if (
       target?.closest(
-        'input, textarea, select, .camera-screen, .cc-slider-capsule, .brightness-slider-container, .volume-slider-container, .arcade-canvas-wrap, .arcade-app-page, .calc-grid, .camera-control-sensor-strip'
+        'button, a, input, textarea, select, [role="button"], .ios-home-icon-btn, .widget-clickable, .camera-screen, .cc-slider-capsule, .brightness-slider-container, .volume-slider-container, .arcade-canvas-wrap, .arcade-app-page, .calc-grid, .camera-control-sensor-strip'
       )
     ) {
       return;
@@ -154,10 +154,6 @@ export function IPhoneScreenContent({
 
     if (!scrollEl) return;
 
-    try {
-      e.currentTarget.setPointerCapture(e.pointerId);
-    } catch {}
-
     dragScrollRef.current = {
       isDown: true,
       startY: e.clientY,
@@ -172,10 +168,13 @@ export function IPhoneScreenContent({
     if (!state.isDown || !state.scrollTarget) return;
 
     const dy = e.clientY - state.startY;
-    if (Math.abs(dy) > 4) {
-      state.hasMoved = true;
-    }
-    if (state.hasMoved) {
+    if (Math.abs(dy) > 5) {
+      if (!state.hasMoved) {
+        state.hasMoved = true;
+        try {
+          e.currentTarget.setPointerCapture(e.pointerId);
+        } catch {}
+      }
       state.scrollTarget.scrollTop = state.startScrollTop - dy;
     }
   };
