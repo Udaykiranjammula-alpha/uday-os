@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DynamicIsland } from './DynamicIsland';
+import { PiPOverlay } from './PiPOverlay';
 import { StatusBar } from './StatusBar';
 import { IosHomeScreen } from './IosHomeScreen';
 import { ControlCenter } from './ControlCenter';
@@ -784,6 +785,9 @@ export function IPhoneScreenContent({
         </AnimatePresence>
         </IosErrorBoundary>
       </div>
+
+      {/* Persistent Draggable Picture-in-Picture Floating Multitasking Window */}
+      <PiPOverlay onNavigate={onNavigate} />
 
       {/* iOS 18 Control Center Overlay */}
       <ControlCenter

@@ -18,6 +18,7 @@ import {
   Radio,
 } from 'lucide-react';
 import { sound } from '../services/sound';
+import { liveActivity } from '../services/liveActivity';
 
 interface MusicAppProps {
   onBack: () => void;
@@ -36,13 +37,14 @@ const LYRICS = [
 ];
 
 export function MusicApp({ onBack }: MusicAppProps) {
-  const [isPlaying, setIsPlaying] = useState(sound.getIsPlaying());
-  const [trackIndex, setTrackIndex] = useState(0);
-  const [progress, setProgress] = useState(25); // percentage 0 - 100
-  const [elapsedSeconds, setElapsedSeconds] = useState(55);
+  const initialAudio = liveActivity.getAudio();
+  const [isPlaying, setIsPlaying] = useState(initialAudio.isPlaying);
+  const [trackIndex, setTrackIndex] = useState(initialAudio.trackIndex);
+  const [progress, setProgress] = useState(initialAudio.progress); // percentage 0 - 100
+  const [elapsedSeconds, setElapsedSeconds] = useState(initialAudio.elapsedSeconds);
   const [isScrubbing, setIsScrubbing] = useState(false);
-  const [volume, setVolume] = useState(0.8);
-  const [isMuted, setIsMuted] = useState(false);
+  const [volume, setVolume] = useState(initialAudio.volume);
+  const [isMuted, setIsMuted] = useState(initialAudio.isMuted);
   const [isShuffle, setIsShuffle] = useState(false);
   const [isRepeat, setIsRepeat] = useState(false);
   const [activeLyricIndex, setActiveLyricIndex] = useState(0);
@@ -51,90 +53,62 @@ export function MusicApp({ onBack }: MusicAppProps) {
   const [spatialMode, setSpatialMode] = useState<'off' | 'anc' | 'transparency'>('anc');
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  // Subscribe to liveActivity coordinator
+  useEffect(() => {
+    const unsubscribe = liveActivity.subscribe((state) => {
+      setIsPlaying(state.audio.isPlaying);
+      setTrackIndex(state.audio.trackIndex);
+      if (!isScrubbing) {
+        setProgress(state.audio.progress);
+        setElapsedSeconds(state.audio.elapsedSeconds);
+      }
+      setVolume(state.audio.volume);
+      setIsMuted(state.audio.isMuted);
+    });
+    return unsubscribe;
+  }, [isScrubbing]);
+
   const tracks = sound.tracks;
   const currentTrack = tracks[trackIndex] || tracks[0];
   const trackDuration = currentTrack.duration || 220; // seconds
 
   const handleTogglePlay = () => {
-    const nextPlaying = sound.toggleAmbientMusic((p) => {
-      setIsPlaying(p);
-    });
-    setIsPlaying(nextPlaying);
+    sound.playTapSound();
+    liveActivity.toggleAudioPlay();
   };
 
   const handleNextTrack = () => {
     sound.playTapSound();
-    let next: number;
     if (isShuffle) {
-      next = Math.floor(Math.random() * tracks.length);
+      const next = Math.floor(Math.random() * tracks.length);
+      liveActivity.setTrack(next);
     } else {
-      next = (trackIndex + 1) % tracks.length;
+      liveActivity.nextTrack();
     }
-    setTrackIndex(next);
-    sound.setTrack(next);
-    setProgress(0);
-    setElapsedSeconds(0);
   };
 
   const handlePrevTrack = () => {
     sound.playTapSound();
-    if (elapsedSeconds > 3) {
-      // Restart current track
-      setProgress(0);
-      setElapsedSeconds(0);
-      return;
-    }
-    const prev = (trackIndex - 1 + tracks.length) % tracks.length;
-    setTrackIndex(prev);
-    sound.setTrack(prev);
-    setProgress(0);
-    setElapsedSeconds(0);
+    liveActivity.prevTrack();
   };
 
-  // Progress and playback clock ticker
+  // Lyrics animation ticker
   useEffect(() => {
-    if (!isPlaying || isScrubbing) return;
+    if (!isPlaying) return;
     const interval = setInterval(() => {
-      setElapsedSeconds((sec) => {
-        const nextSec = sec + 1;
-        if (nextSec >= trackDuration) {
-          if (isRepeat) {
-            setProgress(0);
-            return 0;
-          }
-          handleNextTrack();
-          return 0;
-        }
-        setProgress((nextSec / trackDuration) * 100);
-        return nextSec;
-      });
-
       setActiveLyricIndex((prev) => (prev + 1) % LYRICS.length);
-    }, 1000);
+    }, 3500);
     return () => clearInterval(interval);
-  }, [isPlaying, isScrubbing, trackDuration, isRepeat]);
+  }, [isPlaying]);
 
   // Volume change handler
   const handleVolumeChange = (newVol: number) => {
-    setVolume(newVol);
-    if (newVol === 0) {
-      setIsMuted(true);
-      sound.setVolume(0);
-    } else {
-      setIsMuted(false);
-      sound.setVolume(newVol);
-    }
+    liveActivity.setVolume(newVol);
   };
 
   const toggleMute = () => {
     sound.playTapSound();
-    if (isMuted) {
-      setIsMuted(false);
-      sound.setVolume(volume || 0.8);
-    } else {
-      setIsMuted(true);
-      sound.setVolume(0);
-    }
+    liveActivity.toggleMute();
   };
 
   // Spatial Audio & ANC handler
@@ -329,7 +303,12 @@ export function MusicApp({ onBack }: MusicAppProps) {
                 setElapsedSeconds(Math.floor((pct / 100) * trackDuration));
               }
             }}
-            onPointerUp={() => setIsScrubbing(false)}
+            onPointerUp={(e) => {
+              setIsScrubbing(false);
+              const rect = e.currentTarget.getBoundingClientRect();
+              const pct = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+              liveActivity.seekProgress(pct);
+            }}
           >
             <div className="music-progress-fill" style={{ width: `${progress}%` }}>
               <div className="music-scrub-knob" />

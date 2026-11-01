@@ -371,11 +371,9 @@ describe('Xcode Cloud Compiler & LeetCode Playground (Features 7 - 11)', () => {
       const pyTemplate = 'def two_sum(nums, target):\n    # Python solution';
       const jsTemplate = 'function twoSum(nums, target) {\n    // JS solution\n}';
 
-      let lang: 'python' | 'javascript' = 'javascript';
-      expect(lang === 'javascript' ? jsTemplate : pyTemplate).toContain('// JS solution');
-
-      lang = 'python';
-      expect(lang === 'javascript' ? jsTemplate : pyTemplate).toContain('# Python solution');
+      const getTemplate = (lang: 'python' | 'javascript') => (lang === 'javascript' ? jsTemplate : pyTemplate);
+      expect(getTemplate('javascript')).toContain('// JS solution');
+      expect(getTemplate('python')).toContain('# Python solution');
     });
 
     it('dispatches algorithm live activity with CPU gauge to Dynamic Island when Run clicked', () => {

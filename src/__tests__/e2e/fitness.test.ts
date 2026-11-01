@@ -271,9 +271,9 @@ describe('Apple HealthKit 3D Activity Rings & Gyroscope Telemetry (Features 12 -
 
     it('validates unlocking status against actual portfolio achievements data', () => {
       const isUnlocked = (medal: (typeof medals)[0]): boolean => {
-        if (medal.id === 'leetcode') return medal.criteriaSolved >= 100;
-        if (medal.id === 'kl-university') return medal.criteriaDegree === 'B.Tech CSE';
-        if (medal.id === 'esp32') return medal.criteriaTech === 'FreeRTOS';
+        if (medal.id === 'leetcode') return (medal.criteriaSolved ?? 0) >= 100;
+        if (medal.id === 'kl-university') return (medal.criteriaDegree ?? '') === 'B.Tech CSE';
+        if (medal.id === 'esp32') return (medal.criteriaTech ?? '') === 'FreeRTOS';
         return false;
       };
 

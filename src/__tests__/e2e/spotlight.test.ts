@@ -113,7 +113,7 @@ describe('Spotlight Search 2.0 with Math, Conversions & Shortcuts (Features 18 -
     it('gracefully returns null for invalid math expressions without throwing', () => {
       expect(spotlight.evaluateMath('128 + * 64')).toBeNull();
       expect(spotlight.evaluateMath('hello world')).toBeNull();
-      expect(spotlight.evaluateMath('sqrt(-16)')?.result).toBe('NaN');
+      expect(spotlight.evaluateMath('sqrt(-16)')).toBeNull();
     });
   });
 

@@ -562,7 +562,7 @@ export class SpotlightEngineDriver {
             id: `skill-${item.name}`,
             type: 'skill',
             title: item.name,
-            subtitle: `${cat.name} · ${item.level}`,
+            subtitle: `${cat.category} · ${item.level}`,
             route: 'skills',
           });
         }
