@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Check,
+  Sparkles,
 } from 'lucide-react';
 import { sound } from '../services/sound';
 
@@ -119,6 +120,28 @@ export function ActionButtonCarousel({
       color: '#30d158',
       action: () => {
         onNavigate('arcade');
+        onClose();
+      },
+    },
+    {
+      id: 'genmoji',
+      name: 'Genmoji Studio',
+      subtitle: 'Apple Intelligence Image Playground',
+      icon: <Sparkles size={28} />,
+      color: '#a855f7',
+      action: () => {
+        onNavigate('genmoji');
+        onClose();
+      },
+    },
+    {
+      id: 'benchmark',
+      name: 'Geekbench A18 Pro',
+      subtitle: 'Run 3nm Silicon Benchmark Suite',
+      icon: <Cpu size={28} />,
+      color: '#ffd60a',
+      action: () => {
+        onNavigate('benchmark');
         onClose();
       },
     },

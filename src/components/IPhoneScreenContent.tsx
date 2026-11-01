@@ -32,6 +32,8 @@ import { WalletApp } from '../apps/WalletApp';
 import { FitnessApp } from '../apps/FitnessApp';
 import { StandByApp } from '../apps/StandByApp';
 import { FaceTimeApp } from '../apps/FaceTimeApp';
+import { GenmojiApp } from '../apps/GenmojiApp';
+import { BenchmarkApp } from '../apps/BenchmarkApp';
 import { AppleIntelligenceGlow } from './AppleIntelligenceGlow';
 import { RecruiterCallModal } from './RecruiterCallModal';
 import { AppSwitcher } from './AppSwitcher';
@@ -519,6 +521,32 @@ export function IPhoneScreenContent({
               exit={{ opacity: 0, scale: 0.96 }}
             >
               <FaceTimeApp
+                onBack={() => onNavigate('home')}
+                onNavigate={onNavigate}
+              />
+            </motion.div>
+          ) : currentRoute === 'genmoji' ? (
+            <motion.div
+              key="genmoji-view"
+              className="page-screen-anim"
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+            >
+              <GenmojiApp
+                onBack={() => onNavigate('home')}
+                onNavigate={onNavigate}
+              />
+            </motion.div>
+          ) : currentRoute === 'benchmark' ? (
+            <motion.div
+              key="benchmark-view"
+              className="page-screen-anim"
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+            >
+              <BenchmarkApp
                 onBack={() => onNavigate('home')}
                 onNavigate={onNavigate}
               />

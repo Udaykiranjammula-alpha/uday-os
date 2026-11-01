@@ -5,6 +5,7 @@ import { ActionButtonCarousel } from './components/ActionButtonCarousel';
 import { PhoneTeardownModal } from './components/PhoneTeardownModal';
 import { SpatialBreakoutView } from './components/SpatialBreakoutView';
 import { NameDropModal } from './components/NameDropModal';
+import { AirPodsSpatialModal } from './components/AirPodsSpatialModal';
 import {
   Rotate3d,
   Share2,
@@ -17,6 +18,7 @@ import {
   Eye,
   Radio,
   Sliders,
+  Headphones,
 } from 'lucide-react';
 import type { Project } from './types';
 import { profile } from './data/profile';
@@ -32,6 +34,7 @@ export default function App() {
   const [isTeardownOpen, setIsTeardownOpen] = useState(false);
   const [isSpatialOpen, setIsSpatialOpen] = useState(false);
   const [isNameDropOpen, setIsNameDropOpen] = useState(false);
+  const [isAirPodsOpen, setIsAirPodsOpen] = useState(false);
   const [copiedUrl, setCopiedUrl] = useState(false);
 
   const [currentRoute, setCurrentRoute] = useState<string>(() => {
@@ -90,6 +93,7 @@ export default function App() {
         else if (isTeardownOpen) setIsTeardownOpen(false);
         else if (isSpatialOpen) setIsSpatialOpen(false);
         else if (isNameDropOpen) setIsNameDropOpen(false);
+        else if (isAirPodsOpen) setIsAirPodsOpen(false);
         else if (isShareOpen) setIsShareOpen(false);
         else if (currentRoute === 'search') navigateTo('home');
       }
@@ -103,6 +107,7 @@ export default function App() {
     isTeardownOpen,
     isSpatialOpen,
     isNameDropOpen,
+    isAirPodsOpen,
     isShareOpen,
   ]);
 
@@ -342,6 +347,21 @@ export default function App() {
             <span>AirDrop</span>
           </button>
 
+          {/* AirPods Pro Spatial Audio Pill */}
+          <button
+            type="button"
+            className="studio-flip-pill airpods-pill"
+            onClick={() => {
+              sound.playActionClickSound();
+              setIsAirPodsOpen(true);
+            }}
+            title="AirPods Pro Spatial Audio & Head Tracking"
+            aria-label="AirPods Spatial"
+          >
+            <Headphones size={13} />
+            <span>AirPods Spatial</span>
+          </button>
+
           <button
             type="button"
             className="studio-flip-pill share-btn"
@@ -463,6 +483,12 @@ export default function App() {
         isOpen={isNameDropOpen}
         onClose={() => setIsNameDropOpen(false)}
         onNavigate={navigateTo}
+      />
+
+      {/* AirPods Pro Spatial Audio & Head Tracking Modal */}
+      <AirPodsSpatialModal
+        isOpen={isAirPodsOpen}
+        onClose={() => setIsAirPodsOpen(false)}
       />
     </main>
   );

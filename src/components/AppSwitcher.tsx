@@ -12,6 +12,8 @@ export interface AppCard {
 }
 
 export const DEFAULT_APP_DECK: AppCard[] = [
+  { id: 'genmoji', title: 'Genmoji', icon: '🎨', color: '#a855f7', subtitle: 'Apple Intelligence Studio' },
+  { id: 'benchmark', title: 'Geekbench', icon: '⚡', color: '#f59e0b', subtitle: 'A18 Pro Silicon Diagnostics' },
   { id: 'facetime', title: 'FaceTime', icon: '📹', color: '#30d158', subtitle: 'Spatial Video Interview' },
   { id: 'fitness', title: 'Activity', icon: '⭕', color: '#ff2d55', subtitle: 'Closed 3 Activity Rings' },
   { id: 'calculator', title: 'Calculator', icon: '🧮', color: '#ff9f0a', subtitle: 'Math & Tech Converter' },

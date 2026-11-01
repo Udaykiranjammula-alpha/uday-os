@@ -326,6 +326,63 @@ export function IosHomeScreen({ onNavigate, onOpenSearch, onOpenStandBy }: IosHo
         </button>
       </section>
 
+      {/* Essential Apps Grid - Row 5 (Apple Intelligence & Silicon Labs) */}
+      <section className="apps-single-row row-five">
+        {/* Apple Intelligence Genmoji Studio */}
+        <button
+          type="button"
+          className="ios-home-icon-btn"
+          onClick={() => handleNav('genmoji')}
+          aria-label="Apple Intelligence Genmoji and Image Playground"
+        >
+          <div className="ios-icon-box genmoji-home-box">
+            <span style={{ fontSize: 26 }}>🎨</span>
+            <span className="app-ai-glow-ring" />
+          </div>
+          <span className="ios-icon-title">Genmoji</span>
+        </button>
+
+        {/* Apple Silicon Geekbench Benchmark */}
+        <button
+          type="button"
+          className="ios-home-icon-btn"
+          onClick={() => handleNav('benchmark')}
+          aria-label="Apple Silicon A18 Pro Geekbench Benchmark"
+        >
+          <div className="ios-icon-box benchmark-home-box">
+            <span style={{ fontSize: 26 }}>⚡</span>
+            <span className="app-red-badge">3nm</span>
+          </div>
+          <span className="ios-icon-title">Geekbench</span>
+        </button>
+
+        {/* Education */}
+        <button
+          type="button"
+          className="ios-home-icon-btn"
+          onClick={() => handleNav('education')}
+          aria-label="Education and Academic Credentials"
+        >
+          <div className="ios-icon-box education-home-box">
+            <span style={{ fontSize: 26 }}>🎓</span>
+          </div>
+          <span className="ios-icon-title">Education</span>
+        </button>
+
+        {/* Terminal */}
+        <button
+          type="button"
+          className="ios-home-icon-btn"
+          onClick={() => handleNav('terminal')}
+          aria-label="Developer Shell and CLI"
+        >
+          <div className="ios-icon-box terminal-home-box">
+            <span style={{ fontSize: 24 }}>💻</span>
+          </div>
+          <span className="ios-icon-title">Terminal</span>
+        </button>
+      </section>
+
       {/* Search & iOS 18 Customize Bar */}
       <div className="ios-search-pill-container">
         <button

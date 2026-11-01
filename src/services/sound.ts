@@ -295,6 +295,38 @@ class SoundService {
     return this.isAmbientPlaying;
   }
 
+  private filterNode: BiquadFilterNode | null = null;
+  private pannerNode: StereoPannerNode | null = null;
+  public ancMode: 'anc' | 'off' | 'transparency' = 'off';
+
+  public setNoiseCancellationMode(mode: 'anc' | 'off' | 'transparency') {
+    this.ancMode = mode;
+    this.initCtx();
+    if (!this.ctx || !this.filterNode) return;
+    const now = this.ctx.currentTime;
+    try {
+      if (mode === 'anc') {
+        this.filterNode.type = 'lowpass';
+        this.filterNode.frequency.setTargetAtTime(900, now, 0.1);
+      } else if (mode === 'transparency') {
+        this.filterNode.type = 'highshelf';
+        this.filterNode.frequency.setTargetAtTime(2800, now, 0.1);
+        this.filterNode.gain.setTargetAtTime(3.5, now, 0.1);
+      } else {
+        this.filterNode.type = 'allpass';
+      }
+    } catch {}
+  }
+
+  public setSpatialHeadPan(panRatio: number) {
+    this.initCtx();
+    if (!this.ctx || !this.pannerNode) return;
+    try {
+      const clamped = Math.max(-1, Math.min(1, panRatio));
+      this.pannerNode.pan.setTargetAtTime(clamped, this.ctx.currentTime, 0.05);
+    } catch {}
+  }
+
   public startAmbientMusic() {
     try {
       this.initCtx();
@@ -305,12 +337,28 @@ class SoundService {
       this.ambientGain = this.ctx.createGain();
       this.ambientGain.gain.setValueAtTime(0.12, this.ctx.currentTime);
 
+      // Filter node for ANC & Transparency
+      this.filterNode = this.ctx.createBiquadFilter();
+      this.setNoiseCancellationMode(this.ancMode);
+
+      // Stereo Panner node for Head-Tracking Spatial Audio
+      if (typeof this.ctx.createStereoPanner === 'function') {
+        this.pannerNode = this.ctx.createStereoPanner();
+      }
+
       // Web Audio Analyser Node for Real Frequency Visualizer
       this.analyser = this.ctx.createAnalyser();
       this.analyser.fftSize = 64;
       this.analyser.smoothingTimeConstant = 0.8;
 
-      this.ambientGain.connect(this.analyser);
+      if (this.pannerNode) {
+        this.ambientGain.connect(this.filterNode);
+        this.filterNode.connect(this.pannerNode);
+        this.pannerNode.connect(this.analyser);
+      } else {
+        this.ambientGain.connect(this.filterNode);
+        this.filterNode.connect(this.analyser);
+      }
       this.analyser.connect(this.ctx.destination);
 
       // Chords based on selected track

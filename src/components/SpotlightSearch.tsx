@@ -17,6 +17,8 @@ interface SpotlightAppItem {
 }
 
 const APPS: SpotlightAppItem[] = [
+  { id: 'genmoji', label: 'Genmoji (Apple Intelligence)', icon: '🎨', route: 'genmoji' },
+  { id: 'benchmark', label: 'Geekbench A18 Pro', icon: '⚡', route: 'benchmark' },
   { id: 'facetime', label: 'FaceTime', icon: '📹', route: 'facetime' },
   { id: 'fitness', label: 'Activity Rings', icon: '⭕', route: 'fitness' },
   { id: 'calculator', label: 'Calculator', icon: '🧮', route: 'calculator' },
