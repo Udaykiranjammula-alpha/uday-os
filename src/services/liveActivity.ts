@@ -112,7 +112,7 @@ class LiveActivityService {
       videoSrc: '',
       isPlaying: false,
       position: { x: 216, y: 76 },
-      bezelBounds: { minX: 12, maxX: 260, minY: 60, maxY: 680 },
+      bezelBounds: { minX: 8, maxX: 220, minY: 60, maxY: 680 },
       isMinimized: false,
     },
   };
@@ -285,7 +285,7 @@ class LiveActivityService {
         videoSrc: '',
         isPlaying: false,
         position: { x: 20, y: 120 },
-        bezelBounds: { minX: 12, maxX: 260, minY: 60, maxY: 680 },
+        bezelBounds: { minX: 8, maxX: 220, minY: 60, maxY: 680 },
         isMinimized: false,
       },
     };
@@ -435,7 +435,8 @@ class LiveActivityService {
 
   // --- Clock & Timer Precision Engine (50ms Interval) ---
   public startTimer(durationSeconds: number) {
-    const totalMs = durationSeconds * 1000;
+    const safeDuration = Math.max(0, durationSeconds);
+    const totalMs = safeDuration * 1000;
     this.state.clock = {
       isActive: true,
       type: 'timer',
@@ -443,8 +444,8 @@ class LiveActivityService {
       isRunning: true,
       totalDurationMs: totalMs,
       remainingMs: totalMs,
-      totalDurationSeconds: durationSeconds,
-      remainingSeconds: durationSeconds,
+      totalDurationSeconds: safeDuration,
+      remainingSeconds: safeDuration,
       stopwatchMs: 0,
       formattedTime: this.formatMinutesSeconds(totalMs),
       laps: [],
@@ -470,7 +471,7 @@ class LiveActivityService {
   }
 
   public toggleTimerRunning() {
-    if (!this.state.clock.isActive) {
+    if (!this.state.clock.isActive || this.state.clock.type !== 'timer') {
       this.startTimer(300); // 5 min default
       return;
     }
@@ -507,18 +508,21 @@ class LiveActivityService {
   }
 
   public startStopwatch() {
+    const isStopwatch = this.state.clock.type === 'stopwatch';
+    const initialMs = isStopwatch ? this.state.clock.remainingMs : 0;
+    const initialLaps = isStopwatch ? (this.state.clock.laps || []) : [];
     this.state.clock = {
       isActive: true,
       type: 'stopwatch',
       isPaused: false,
       isRunning: true,
-      remainingMs: this.state.clock.type === 'stopwatch' ? this.state.clock.remainingMs : 0,
+      remainingMs: initialMs,
       totalDurationMs: 0,
       remainingSeconds: 0,
       totalDurationSeconds: 0,
-      stopwatchMs: this.state.clock.type === 'stopwatch' ? this.state.clock.remainingMs : 0,
-      formattedTime: this.formatStopwatchTime(this.state.clock.remainingMs),
-      laps: this.state.clock.laps || [],
+      stopwatchMs: initialMs,
+      formattedTime: this.formatStopwatchTime(initialMs),
+      laps: initialLaps,
     };
     this.startClockTicker();
     this.notify();
@@ -532,11 +536,23 @@ class LiveActivityService {
     this.notify();
   }
 
+  public resumeStopwatch() {
+    if (!this.state.clock.isActive || this.state.clock.type !== 'stopwatch') return;
+    this.state.clock.isPaused = false;
+    this.state.clock.isRunning = true;
+    this.startClockTicker();
+    this.notify();
+  }
+
   public toggleStopwatchRunning() {
-    if (this.state.clock.isActive && !this.state.clock.isPaused) {
-      this.pauseStopwatch();
-    } else {
+    if (!this.state.clock.isActive || this.state.clock.type !== 'stopwatch') {
       this.startStopwatch();
+      return;
+    }
+    if (this.state.clock.isPaused) {
+      this.resumeStopwatch();
+    } else {
+      this.pauseStopwatch();
     }
   }
 
@@ -597,16 +613,18 @@ class LiveActivityService {
   }
 
   public formatMinutesSeconds(ms: number): string {
-    const totalSecs = Math.ceil(ms / 1000);
+    const safeMs = Math.max(0, ms);
+    const totalSecs = Math.ceil(safeMs / 1000);
     const m = Math.floor(totalSecs / 60).toString().padStart(2, '0');
     const s = Math.floor(totalSecs % 60).toString().padStart(2, '0');
     return `${m}:${s}`;
   }
 
   public formatStopwatchTime(ms: number): string {
-    const m = Math.floor(ms / 60000).toString().padStart(2, '0');
-    const s = Math.floor((ms % 60000) / 1000).toString().padStart(2, '0');
-    const cs = Math.floor((ms % 1000) / 10).toString().padStart(2, '0');
+    const safeMs = Math.max(0, ms);
+    const m = Math.floor(safeMs / 60000).toString().padStart(2, '0');
+    const s = Math.floor((safeMs % 60000) / 1000).toString().padStart(2, '0');
+    const cs = Math.floor((safeMs % 1000) / 10).toString().padStart(2, '0');
     return `${m}:${s}.${cs}`;
   }
 
