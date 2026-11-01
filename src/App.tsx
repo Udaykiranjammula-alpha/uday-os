@@ -9,6 +9,7 @@ import { AirPodsSpatialModal } from './components/AirPodsSpatialModal';
 import { SatelliteRadarModal } from './components/SatelliteRadarModal';
 import { AppleWatchCompanion } from './components/AppleWatchCompanion';
 import { WritingToolsHUD } from './components/WritingToolsHUD';
+import { LiveActivitiesModal } from './components/LiveActivitiesModal';
 import {
   Rotate3d,
   Share2,
@@ -26,6 +27,8 @@ import {
   Columns,
   Watch,
   Wand2,
+  Zap,
+  MapPin,
 } from 'lucide-react';
 import type { Project } from './types';
 import { profile } from './data/profile';
@@ -45,6 +48,7 @@ export default function App() {
   const [isSatelliteOpen, setIsSatelliteOpen] = useState(false);
   const [isWatchOpen, setIsWatchOpen] = useState(true);
   const [isWritingToolsOpen, setIsWritingToolsOpen] = useState(false);
+  const [isLiveActivitiesOpen, setIsLiveActivitiesOpen] = useState(false);
   const [copiedUrl, setCopiedUrl] = useState(false);
 
   const [currentRoute, setCurrentRoute] = useState<string>(() => {
@@ -116,6 +120,7 @@ export default function App() {
         else if (isAirPodsOpen) setIsAirPodsOpen(false);
         else if (isSatelliteOpen) setIsSatelliteOpen(false);
         else if (isWritingToolsOpen) setIsWritingToolsOpen(false);
+        else if (isLiveActivitiesOpen) setIsLiveActivitiesOpen(false);
         else if (isShareOpen) setIsShareOpen(false);
         else if (currentRoute === 'search') navigateTo('home');
       }
@@ -132,6 +137,7 @@ export default function App() {
     isAirPodsOpen,
     isSatelliteOpen,
     isWritingToolsOpen,
+    isLiveActivitiesOpen,
     isShareOpen,
   ]);
 
@@ -446,6 +452,36 @@ export default function App() {
             <span>Writing Tools</span>
           </button>
 
+          {/* Live Activities Dynamic Island Pill */}
+          <button
+            type="button"
+            className="studio-flip-pill liveactivities-pill"
+            onClick={() => {
+              sound.playActionClickSound();
+              setIsLiveActivitiesOpen(true);
+            }}
+            title="Dynamic Island Live Activities Tracker"
+            aria-label="Live Activities"
+          >
+            <Zap size={13} />
+            <span>Live Activities</span>
+          </button>
+
+          {/* Apple Maps 3D Flyover Pill */}
+          <button
+            type="button"
+            className="studio-flip-pill maps-pill"
+            onClick={() => {
+              sound.playActionClickSound();
+              navigateTo(currentRoute === 'maps' ? 'home' : 'maps');
+            }}
+            title="Apple Maps 3D Flyover & Tech Campus Explorer"
+            aria-label="Apple Maps"
+          >
+            <MapPin size={13} />
+            <span>Apple Maps</span>
+          </button>
+
           <button
             type="button"
             className="studio-flip-pill share-btn"
@@ -593,6 +629,13 @@ export default function App() {
       <WritingToolsHUD
         isOpen={isWritingToolsOpen}
         onClose={() => setIsWritingToolsOpen(false)}
+      />
+
+      {/* Dynamic Island Live Activities Hub */}
+      <LiveActivitiesModal
+        isOpen={isLiveActivitiesOpen}
+        onClose={() => setIsLiveActivitiesOpen(false)}
+        onNavigate={navigateTo}
       />
     </main>
   );

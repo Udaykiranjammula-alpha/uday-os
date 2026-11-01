@@ -17,6 +17,8 @@ interface SpotlightAppItem {
 }
 
 const APPS: SpotlightAppItem[] = [
+  { id: 'maps', label: 'Apple Maps 3D Flyover', icon: '🗺️', route: 'maps' },
+  { id: 'poster', label: 'Contact Poster Studio', icon: '📇', route: 'poster' },
   { id: 'spatial-gallery', label: 'Spatial 3D Hologram Gallery', icon: '👓', route: 'spatial-gallery' },
   { id: 'splitview', label: 'Stage Manager Split View', icon: '📱', route: 'splitview' },
   { id: 'genmoji', label: 'Genmoji (Apple Intelligence)', icon: '🎨', route: 'genmoji' },

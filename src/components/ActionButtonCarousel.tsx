@@ -17,6 +17,8 @@ import {
   Satellite,
   Columns,
   Eye,
+  MapPin,
+  Sparkles as SparklesIcon,
 } from 'lucide-react';
 import { sound } from '../services/sound';
 
@@ -167,6 +169,28 @@ export function ActionButtonCarousel({
       color: '#6366f1',
       action: () => {
         onNavigate('splitview');
+        onClose();
+      },
+    },
+    {
+      id: 'maps',
+      name: 'Apple Maps 3D',
+      subtitle: 'Explore KL University & Apple Park Hubs',
+      icon: <MapPin size={28} />,
+      color: '#10b981',
+      action: () => {
+        onNavigate('maps');
+        onClose();
+      },
+    },
+    {
+      id: 'poster',
+      name: 'Contact Poster Studio',
+      subtitle: 'iOS 18 Full-Bleed Recruiter Nameplate',
+      icon: <Sparkles size={28} />,
+      color: '#f59e0b',
+      action: () => {
+        onNavigate('poster');
         onClose();
       },
     },

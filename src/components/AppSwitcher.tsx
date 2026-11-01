@@ -12,6 +12,8 @@ export interface AppCard {
 }
 
 export const DEFAULT_APP_DECK: AppCard[] = [
+  { id: 'maps', title: 'Maps', icon: '🗺️', color: '#10b981', subtitle: 'Apple Maps 3D Flyover' },
+  { id: 'poster', title: 'Poster', icon: '📇', color: '#f59e0b', subtitle: 'iOS 18 Contact Poster' },
   { id: 'spatial-gallery', title: 'Spatial 3D', icon: '👓', color: '#0ea5e9', subtitle: 'VisionOS Hologram Gallery' },
   { id: 'splitview', title: 'Split View', icon: '📱', color: '#6366f1', subtitle: 'Stage Manager Multitasking' },
   { id: 'genmoji', title: 'Genmoji', icon: '🎨', color: '#a855f7', subtitle: 'Apple Intelligence Studio' },

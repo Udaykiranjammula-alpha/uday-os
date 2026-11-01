@@ -36,6 +36,8 @@ import { GenmojiApp } from '../apps/GenmojiApp';
 import { BenchmarkApp } from '../apps/BenchmarkApp';
 import { SpatialGalleryApp } from '../apps/SpatialGalleryApp';
 import { SplitViewScreen } from './SplitViewScreen';
+import { ContactPosterApp } from '../apps/ContactPosterApp';
+import { MapsApp } from '../apps/MapsApp';
 import { AppleIntelligenceGlow } from './AppleIntelligenceGlow';
 import { RecruiterCallModal } from './RecruiterCallModal';
 import { AppSwitcher } from './AppSwitcher';
@@ -580,6 +582,32 @@ export function IPhoneScreenContent({
                 onNavigate={onNavigate}
                 activeProject={activeProject}
                 setActiveProject={setActiveProject}
+              />
+            </motion.div>
+          ) : currentRoute === 'poster' ? (
+            <motion.div
+              key="poster-view"
+              className="page-screen-anim"
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+            >
+              <ContactPosterApp
+                onBack={() => onNavigate('home')}
+                onNavigate={onNavigate}
+              />
+            </motion.div>
+          ) : currentRoute === 'maps' ? (
+            <motion.div
+              key="maps-view"
+              className="page-screen-anim"
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+            >
+              <MapsApp
+                onBack={() => onNavigate('home')}
+                onNavigate={onNavigate}
               />
             </motion.div>
           ) : currentRoute === 'leetcode' ? (

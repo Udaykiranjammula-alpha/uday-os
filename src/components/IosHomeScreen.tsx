@@ -270,7 +270,7 @@ export function IosHomeScreen({ onNavigate, onOpenSearch, onOpenStandBy }: IosHo
         </button>
       </section>
 
-      {/* Essential Apps Grid - Row 4 (Photos, Resume, Contact, Settings) */}
+      {/* Essential Apps Grid - Row 4 (Photos, Apple Maps, Contact Poster, Settings) */}
       <section className="apps-single-row row-four">
         {/* Photos */}
         <button
@@ -285,31 +285,32 @@ export function IosHomeScreen({ onNavigate, onOpenSearch, onOpenStandBy }: IosHo
           <span className="ios-icon-title">Photos</span>
         </button>
 
-        {/* Resume */}
+        {/* Apple Maps 3D Flyover */}
         <button
           type="button"
           className="ios-home-icon-btn"
-          onClick={() => handleNav('resume')}
-          aria-label="Resume application"
+          onClick={() => handleNav('maps')}
+          aria-label="Apple Maps 3D Flyover and Campus Explorer"
         >
-          <div className="ios-icon-box">
-            <img src="/ios/resume.png" alt="Resume" width={52} height={52} />
+          <div className="ios-icon-box maps-home-box">
+            <span style={{ fontSize: 26 }}>🗺️</span>
+            <span className="app-red-badge">3D</span>
           </div>
-          <span className="ios-icon-title">Resume</span>
+          <span className="ios-icon-title">Maps</span>
         </button>
 
-        {/* Contact */}
+        {/* Contact Poster Studio */}
         <button
           type="button"
           className="ios-home-icon-btn"
-          onClick={() => handleNav('contact')}
-          aria-label="Contact application"
+          onClick={() => handleNav('poster')}
+          aria-label="iOS 18 Contact Poster Studio"
         >
-          <div className="ios-icon-box">
-            <img src="/ios/contact.png" alt="Contact" width={52} height={52} />
-            <span className="app-red-badge">1</span>
+          <div className="ios-icon-box poster-home-box">
+            <span style={{ fontSize: 26 }}>📇</span>
+            <span className="app-red-badge">POSTER</span>
           </div>
-          <span className="ios-icon-title">Contact</span>
+          <span className="ios-icon-title">Poster</span>
         </button>
 
         {/* Settings */}
