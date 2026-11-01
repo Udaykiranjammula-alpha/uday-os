@@ -13,15 +13,17 @@ import {
   HardDrive,
   Cpu,
   Layers,
+  LineChart,
 } from 'lucide-react';
 import { sound } from '../services/sound';
+import { MathNotesGrapher } from '../components/MathNotesGrapher';
 
 interface CalculatorAppProps {
   onBack: () => void;
   onNavigate?: (route: string) => void;
 }
 
-type CalcMode = 'standard' | 'scientific' | 'converter' | 'history';
+type CalcMode = 'standard' | 'scientific' | 'grapher' | 'converter' | 'history';
 
 interface HistoryItem {
   id: string;
@@ -708,8 +710,8 @@ export function CalculatorApp({ onBack }: CalculatorAppProps) {
               color: mode === 'standard' ? '#ffffff' : 'rgba(255, 255, 255, 0.7)',
               border: 'none',
               borderRadius: '16px',
-              padding: '4px 10px',
-              fontSize: '12px',
+              padding: '4px 8px',
+              fontSize: '11px',
               fontWeight: 600,
               cursor: 'pointer',
               transition: 'all 0.15s ease',
@@ -730,18 +732,44 @@ export function CalculatorApp({ onBack }: CalculatorAppProps) {
               color: mode === 'scientific' ? '#ffffff' : 'rgba(255, 255, 255, 0.7)',
               border: 'none',
               borderRadius: '16px',
-              padding: '4px 10px',
-              fontSize: '12px',
+              padding: '4px 8px',
+              fontSize: '11px',
               fontWeight: 600,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '4px',
+              gap: '3px',
               transition: 'all 0.15s ease',
             }}
           >
-            <FlaskConical size={12} />
+            <FlaskConical size={11} />
             <span>Max Cal</span>
+          </button>
+          <button
+            type="button"
+            className={`calc-seg-pill ${mode === 'grapher' ? 'active' : ''}`}
+            onClick={() => {
+              sound.playTapSound();
+              setMode('grapher');
+            }}
+            title="iOS 18 Math Notes 2D Function Grapher"
+            style={{
+              background: mode === 'grapher' ? '#ff9f0a' : 'transparent',
+              color: mode === 'grapher' ? '#ffffff' : 'rgba(255, 255, 255, 0.7)',
+              border: 'none',
+              borderRadius: '16px',
+              padding: '4px 8px',
+              fontSize: '11px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '3px',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <LineChart size={11} />
+            <span>Graph</span>
           </button>
         </div>
 
@@ -797,103 +825,105 @@ export function CalculatorApp({ onBack }: CalculatorAppProps) {
         </div>
       </header>
 
-      {/* Main Display Area */}
-      <div
-        className="calc-display-container"
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'flex-end',
-          alignItems: 'flex-end',
-          padding: '4px 8px 12px',
-          minHeight: mode === 'scientific' ? '68px' : '96px',
-          position: 'relative',
-        }}
-      >
-        {/* Copy toast */}
-        {isCopied && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              background: 'rgba(255, 255, 255, 0.2)',
-              backdropFilter: 'blur(20px)',
-              padding: '3px 12px',
-              borderRadius: '12px',
-              fontSize: '11px',
-              fontWeight: 600,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              color: '#34d399',
-            }}
-          >
-            <Check size={12} />
-            <span>Copied to Clipboard</span>
-          </div>
-        )}
-
-        {/* Expression subtitle */}
+      {/* Main Display Area (Hidden in Grapher mode to give maximum viewport to canvas) */}
+      {mode !== 'grapher' && (
         <div
-          className="calc-formula-sub"
+          className="calc-display-container"
           style={{
-            fontSize: '13px',
-            color: 'rgba(255, 255, 255, 0.45)',
-            marginBottom: '2px',
-            fontWeight: 400,
             display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
+            flexDirection: 'column',
+            justifyContent: 'flex-end',
+            alignItems: 'flex-end',
+            padding: '4px 8px 12px',
+            minHeight: mode === 'scientific' ? '68px' : '96px',
+            position: 'relative',
           }}
         >
-          {memory !== 0 && (
-            <span
+          {/* Copy toast */}
+          {isCopied && (
+            <div
               style={{
-                fontSize: '10px',
-                background: 'rgba(255, 159, 10, 0.25)',
-                color: '#ff9f0a',
-                padding: '1px 5px',
-                borderRadius: '6px',
-                fontWeight: 700,
+                position: 'absolute',
+                top: 0,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                background: 'rgba(255, 255, 255, 0.2)',
+                backdropFilter: 'blur(20px)',
+                padding: '3px 12px',
+                borderRadius: '12px',
+                fontSize: '11px',
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                color: '#34d399',
               }}
             >
-              M: {memory}
-            </span>
+              <Check size={12} />
+              <span>Copied to Clipboard</span>
+            </div>
           )}
-          <span>{expression}</span>
-        </div>
 
-        {/* Main Big Digits */}
-        <div
-          className="calc-main-digits"
-          onClick={handleCopy}
-          title="Click to copy result"
-          style={{
-            fontWeight: 300,
-            color: '#ffffff',
-            letterSpacing: '-0.03em',
-            lineHeight: 1.05,
-            wordBreak: 'break-all',
-            textAlign: 'right',
-            cursor: 'pointer',
-            fontSize:
-              mode === 'scientific'
-                ? display.length > 9
-                  ? '32px'
-                  : '44px'
-                : display.length > 9
-                ? '38px'
-                : display.length > 6
-                ? '50px'
-                : '64px',
-            transition: 'font-size 0.15s ease',
-          }}
-        >
-          {formattedDisplay}
+          {/* Expression subtitle */}
+          <div
+            className="calc-formula-sub"
+            style={{
+              fontSize: '13px',
+              color: 'rgba(255, 255, 255, 0.45)',
+              marginBottom: '2px',
+              fontWeight: 400,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
+            {memory !== 0 && (
+              <span
+                style={{
+                  fontSize: '10px',
+                  background: 'rgba(255, 159, 10, 0.25)',
+                  color: '#ff9f0a',
+                  padding: '1px 5px',
+                  borderRadius: '6px',
+                  fontWeight: 700,
+                }}
+              >
+                M: {memory}
+              </span>
+            )}
+            <span>{expression}</span>
+          </div>
+
+          {/* Main Big Digits */}
+          <div
+            className="calc-main-digits"
+            onClick={handleCopy}
+            title="Click to copy result"
+            style={{
+              fontWeight: 300,
+              color: '#ffffff',
+              letterSpacing: '-0.03em',
+              lineHeight: 1.05,
+              wordBreak: 'break-all',
+              textAlign: 'right',
+              cursor: 'pointer',
+              fontSize:
+                mode === 'scientific'
+                  ? display.length > 9
+                    ? '32px'
+                    : '44px'
+                  : display.length > 9
+                  ? '38px'
+                  : display.length > 6
+                  ? '50px'
+                  : '64px',
+              transition: 'font-size 0.15s ease',
+            }}
+          >
+            {formattedDisplay}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* --- STANDARD CALCULATOR VIEW --- */}
       {mode === 'standard' && (
@@ -1677,6 +1707,13 @@ export function CalculatorApp({ onBack }: CalculatorAppProps) {
               </>
             )}
           </div>
+        </div>
+      )}
+
+      {/* --- IOS 18 MATH NOTES 2D FUNCTION GRAPHER VIEW --- */}
+      {mode === 'grapher' && (
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
+          <MathNotesGrapher onBack={() => setMode('standard')} />
         </div>
       )}
     </div>

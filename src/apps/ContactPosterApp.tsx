@@ -19,6 +19,7 @@ import { profile } from '../data/profile';
 interface ContactPosterAppProps {
   onBack: () => void;
   onNavigate?: (route: string) => void;
+  onOpenNameDrop?: () => void;
 }
 
 type TypographyStyle =
@@ -105,7 +106,7 @@ const FONT_STYLES_DATA: Record<
   },
 };
 
-export function ContactPosterApp({ onBack }: ContactPosterAppProps) {
+export function ContactPosterApp({ onBack, onNavigate, onOpenNameDrop }: ContactPosterAppProps) {
   const [typography, setTypography] = useState<TypographyStyle>('san-francisco');
   const [fontWeight, setFontWeight] = useState<number>(800);
   const [gradient, setGradient] = useState<ColorGradient>('titanium-natural');
@@ -411,6 +412,21 @@ export function ContactPosterApp({ onBack }: ContactPosterAppProps) {
           <Share2 size={14} />
           <span>Save &amp; Share Custom Contact Poster</span>
         </button>
+
+        {/* Apple iOS 18 NameDrop Contact Beam */}
+        {onOpenNameDrop && (
+          <button
+            type="button"
+            onClick={() => {
+              sound.playApplePayChime();
+              onOpenNameDrop();
+            }}
+            className="w-full py-3 px-4 bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/25 hover:opacity-95 active:scale-[0.98] transition-all border border-cyan-400/40"
+          >
+            <Sparkles size={14} className="text-cyan-200" />
+            <span> NameDrop Contact Beam (vCard &amp; Resume)</span>
+          </button>
+        )}
       </div>
     </div>
   );

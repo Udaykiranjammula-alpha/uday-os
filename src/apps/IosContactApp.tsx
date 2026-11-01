@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ArrowUp, Instagram, Github, Linkedin, ExternalLink } from 'lucide-react';
+import { ChevronLeft, ArrowUp, Instagram, Github, Linkedin, ExternalLink, Sparkles } from 'lucide-react';
 import { profile } from '../data/profile';
+import { sound } from '../services/sound';
 
 interface IosContactAppProps {
   onBack: () => void;
+  onOpenNameDrop?: () => void;
 }
 
-export function IosContactApp({ onBack }: IosContactAppProps) {
+export function IosContactApp({ onBack, onOpenNameDrop }: IosContactAppProps) {
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
 
@@ -88,6 +90,38 @@ export function IosContactApp({ onBack }: IosContactAppProps) {
         <p className="mail-footnote-text">
           Write a note, then tap send to continue in your email app.
         </p>
+
+        {/* Apple iOS 18 NameDrop Beam Button */}
+        {onOpenNameDrop && (
+          <button
+            type="button"
+            onClick={() => {
+              sound.playApplePayChime();
+              onOpenNameDrop();
+            }}
+            style={{
+              width: '100%',
+              margin: '12px 0 16px',
+              padding: '12px 14px',
+              background: 'linear-gradient(135deg, #0284c7, #2563eb, #7c3aed)',
+              color: '#ffffff',
+              borderRadius: '14px',
+              border: '1px solid rgba(255, 255, 255, 0.25)',
+              boxShadow: '0 4px 14px rgba(37, 99, 235, 0.35)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              transition: 'transform 0.15s ease',
+            }}
+          >
+            <Sparkles size={15} color="#67e8f9" />
+            <span> NameDrop Contact Beam (.vcf vCard)</span>
+          </button>
+        )}
 
         {/* Social Profiles Direct Links */}
         <div className="mail-socials-group">

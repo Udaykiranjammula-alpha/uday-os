@@ -24,6 +24,7 @@ interface AiAssistantAppProps {
   onNavigate?: (route: string) => void;
   onToggleFlashlight?: () => void;
   onToggleMusic?: () => void;
+  currentRoute?: string;
 }
 
 const KNOWLEDGE_RESPONSES: Record<string, string> = {
@@ -48,6 +49,28 @@ Key coursework: Data Structures, Algorithmic Analysis, C Systems Programming, an
 • Instagram: @udaykiran.jammula`,
 
   hire: `Uday is actively open to Software Engineering Internships and Full-Stack / Systems development roles. He brings strong algorithmic fundamentals, clean architecture skills, and proven experience building complete web & embedded solutions. Contact him at jammulaudaykiran12@gmail.com!`,
+
+  leetcode: `LeetCode Two Sum Optimal Solution (O(N) Time, O(N) Space):
+• Approach: Maintain a hash map recording each value's index as you iterate through nums.
+• For element x, check if (target - x) exists in the map.
+• If yes: return [map.get(target - x), current_index].
+• If no: map.set(x, current_index).
+• Result: Solved in a single O(N) pass, eliminating the naive O(N²) nested loops. Uday has solved 184+ LeetCode problems demonstrating algorithmic efficiency.`,
+
+  math: `Apple Math Notes & 2D Function Graphing:
+• Function Roots: A root is any x-value where f(x) = 0 (the x-intercepts).
+• For f(x) = x² - 4, factoring gives (x - 2)(x + 2) = 0, with roots at x = +2 and x = -2.
+• In Uday OS Max Cal, the 2D Cartesian Grapher plots curves dynamically at 60fps with real-time coordinate inspection and Apple Pencil ink solver.`,
+
+  hospital: `Hospital Management System (HMS) Architecture:
+• Frontend: Modern responsive triage dashboard with priority queuing and bed allocation telemetry.
+• Key Capabilities: Patient admission tracking, doctor specialty lookup, vital signs monitoring, and instant medical billing.
+• Deployed live on Vercel with zero latency.`,
+
+  campus: `KL University (KLEF) - Vijayawada, AP:
+• Campus Overview: 100-acre green campus accredited with NAAC A++ grade.
+• Uday's Program: B.Tech Computer Science & Engineering (2023 - 2027).
+• Focus: Advanced Data Structures, Operating Systems, Computer Networks, and Full-Stack Systems Design.`,
 };
 
 export function AiAssistantApp({
@@ -55,6 +78,7 @@ export function AiAssistantApp({
   onNavigate,
   onToggleFlashlight,
   onToggleMusic,
+  currentRoute,
 }: AiAssistantAppProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -127,10 +151,16 @@ export function AiAssistantApp({
       // Enrich knowledge responses
       if (q.includes('skill') || q.includes('stack') || q.includes('tech') || q.includes('python')) {
         reply = KNOWLEDGE_RESPONSES.skills;
-      } else if (q.includes('project') || q.includes('hospital') || q.includes('esp32') || q.includes('portfolio')) {
-        reply = KNOWLEDGE_RESPONSES.projects;
-      } else if (q.includes('college') || q.includes('education') || q.includes('university') || q.includes('kl') || q.includes('degree')) {
+      } else if (q.includes('two sum') || q.includes('leetcode') || q.includes('dsa') || q.includes('algorithm')) {
+        reply = KNOWLEDGE_RESPONSES.leetcode;
+      } else if (q.includes('math') || q.includes('graph') || q.includes('root') || q.includes('calculator') || q.includes('parabola')) {
+        reply = KNOWLEDGE_RESPONSES.math;
+      } else if (q.includes('hospital') || q.includes('clinical') || q.includes('triage') || q.includes('hms')) {
+        reply = KNOWLEDGE_RESPONSES.hospital;
+      } else if (q.includes('campus') || q.includes('college') || q.includes('university') || q.includes('kl') || q.includes('degree')) {
         reply = KNOWLEDGE_RESPONSES.education;
+      } else if (q.includes('project') || q.includes('esp32') || q.includes('portfolio')) {
+        reply = KNOWLEDGE_RESPONSES.projects;
       } else if (q.includes('contact') || q.includes('email') || q.includes('reach') || q.includes('phone') || q.includes('social')) {
         reply = KNOWLEDGE_RESPONSES.contact;
       } else if (q.includes('hire') || q.includes('job') || q.includes('intern') || q.includes('role') || q.includes('work with')) {
@@ -173,7 +203,39 @@ export function AiAssistantApp({
     handleExecuteIntent(intent);
   };
 
+  // Apple Intelligence On-Screen Awareness Chips
+  const contextualChips = React.useMemo(() => {
+    const list: { label: string; query: string }[] = [];
+    if (currentRoute === 'leetcode') {
+      list.push(
+        { label: '💡 Explain Two Sum (O(N) Hash Table)', query: 'Explain Two Sum optimal algorithm' },
+        { label: '📊 Review 184 LeetCode Progress', query: 'Tell me about LeetCode problem solving' }
+      );
+    } else if (currentRoute === 'calculator') {
+      list.push(
+        { label: '📈 Graph Roots of x² - 4', query: 'How do roots work in the Math Notes 2D grapher?' },
+        { label: '⚡ Convert 16 GB to Megabits', query: 'How does the Tech Unit Converter work?' }
+      );
+    } else if (currentRoute === 'maps') {
+      list.push(
+        { label: '📍 KL University Campus Tour', query: 'Tell me about KL University campus highlights' }
+      );
+    } else if (currentRoute === 'projects') {
+      list.push(
+        { label: '🏥 Hospital Management System', query: 'Explain Hospital Management System architecture' },
+        { label: '⚡ ESP32 Dual-Core ML Telemetry', query: 'Tell me about the ESP32 project' }
+      );
+    } else if (currentRoute === 'poster' || currentRoute === 'contact') {
+      list.push(
+        { label: '📇 Share Contact via NameDrop', query: 'How does NameDrop beam work?' },
+        { label: '🎨 Custom Poster Typography', query: 'What styles are in Contact Poster?' }
+      );
+    }
+    return list;
+  }, [currentRoute]);
+
   const presetChips = [
+    ...contextualChips,
     { label: 'Technical Skills', query: 'What are your core technical skills?' },
     { label: 'Featured Projects', query: 'Tell me about your key software projects' },
     { label: 'KL University Coursework', query: 'What is your education at KL University?' },
@@ -236,7 +298,25 @@ export function AiAssistantApp({
           <p className="ai-subtitle">Voice-enabled intelligence for navigation, projects, and queries</p>
         </div>
 
-        {/* Preset Chips */}
+        {/* On-Screen Awareness & Preset Chips */}
+        {contextualChips.length > 0 && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+              padding: '2px 12px',
+              fontSize: '10.5px',
+              fontWeight: 700,
+              color: '#38bdf8',
+              letterSpacing: '0.3px',
+              textTransform: 'uppercase',
+            }}
+          >
+            <Sparkles size={11} className="text-cyan-400" />
+            <span> On-Screen Intelligence Active</span>
+          </div>
+        )}
         <div className="ai-preset-chips-strip">
           {presetChips.map((chip) => (
             <button

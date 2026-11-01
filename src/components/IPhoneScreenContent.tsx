@@ -64,6 +64,10 @@ export interface IPhoneScreenContentProps {
   setFlashlightOn?: (on: boolean) => void;
   onFlipToBack?: () => void;
   onOpenLiveActivities?: () => void;
+  onOpenActionCarousel?: () => void;
+  onOpenCameraControl?: () => void;
+  onOpenNameDrop?: () => void;
+  onOpenSpatialBreakout?: () => void;
 }
 
 export function IPhoneScreenContent({
@@ -81,7 +85,17 @@ export function IPhoneScreenContent({
   setFlashlightOn = () => {},
   onFlipToBack,
   onOpenLiveActivities,
+  onOpenActionCarousel,
+  onOpenCameraControl,
+  onOpenNameDrop,
+  onOpenSpatialBreakout,
 }: IPhoneScreenContentProps) {
+  const previousRouteRef = useRef<string>('home');
+  useEffect(() => {
+    if (currentRoute !== 'ai' && currentRoute !== 'assistant') {
+      previousRouteRef.current = currentRoute;
+    }
+  }, [currentRoute]);
   const [isControlCenterOpen, setIsControlCenterOpen] = useState(false);
   const [isAppSwitcherOpen, setIsAppSwitcherOpen] = useState(false);
   const [isCallModalOpen, setIsCallModalOpen] = useState(false);
@@ -391,7 +405,10 @@ export function IPhoneScreenContent({
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <IosContactApp onBack={() => onNavigate('home')} />
+              <IosContactApp
+                onBack={() => onNavigate('home')}
+                onOpenNameDrop={onOpenNameDrop}
+              />
             </motion.div>
           ) : currentRoute === 'github' ? (
             <motion.div
@@ -458,6 +475,7 @@ export function IPhoneScreenContent({
                 onNavigate={onNavigate}
                 onToggleFlashlight={() => setFlashlightOn(!flashlightOn)}
                 onToggleMusic={() => sound.toggleAmbientMusic()}
+                currentRoute={previousRouteRef.current}
               />
             </motion.div>
           ) : currentRoute === 'arcade' ? (
@@ -643,6 +661,7 @@ export function IPhoneScreenContent({
               <ContactPosterApp
                 onBack={() => onNavigate('home')}
                 onNavigate={onNavigate}
+                onOpenNameDrop={onOpenNameDrop}
               />
             </motion.div>
           ) : currentRoute === 'maps' ? (
@@ -893,6 +912,100 @@ export function IPhoneScreenContent({
             onNavigate(route);
           }}
         />
+      )}
+
+      {/*  Left Rail: iPhone 16 Pro Action Button Bezel Sensor */}
+      {onOpenActionCarousel && !isLocked && !isStandByOpen && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            sound.playActionClickSound();
+            onOpenActionCarousel();
+          }}
+          className="ios-action-button-bezel"
+          title=" Action Button (Click to configure)"
+          aria-label="iPhone 16 Pro Action Button"
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: '115px',
+            width: '6px',
+            height: '42px',
+            borderRadius: '0 4px 4px 0',
+            background: 'linear-gradient(180deg, #ff9f0a, #d97706)',
+            boxShadow: '0 0 10px rgba(255, 159, 10, 0.75), inset 0 0 2px rgba(255, 255, 255, 0.5)',
+            border: 'none',
+            padding: 0,
+            cursor: 'pointer',
+            zIndex: 44,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'width 0.15s ease, transform 0.1s ease',
+          }}
+          onPointerEnter={(e) => {
+            (e.currentTarget as HTMLElement).style.width = '10px';
+          }}
+          onPointerLeave={(e) => {
+            (e.currentTarget as HTMLElement).style.width = '6px';
+          }}
+        >
+          <span
+            style={{
+              width: '2.5px',
+              height: '14px',
+              borderRadius: '2px',
+              backgroundColor: '#ffffff',
+              boxShadow: '0 0 4px #ffffff',
+            }}
+          />
+        </button>
+      )}
+
+      {/*  Right Rail: iPhone 16 Pro Capacitive Camera Control Bezel Sensor */}
+      {onOpenCameraControl && !isLocked && !isStandByOpen && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            sound.playShutterSound();
+            onOpenCameraControl();
+          }}
+          className="ios-camera-control-bezel"
+          title=" Camera Control (Click to open HUD)"
+          aria-label="iPhone 16 Pro Capacitive Camera Control"
+          style={{
+            position: 'absolute',
+            right: 0,
+            top: '475px',
+            width: '6px',
+            height: '56px',
+            borderRadius: '4px 0 0 4px',
+            background: 'rgba(255, 255, 255, 0.35)',
+            backdropFilter: 'blur(10px)',
+            boxShadow: '0 0 8px rgba(0, 0, 0, 0.6), inset 0 0 3px rgba(255, 255, 255, 0.4)',
+            border: 'none',
+            padding: '6px 0',
+            cursor: 'pointer',
+            zIndex: 44,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            transition: 'width 0.15s ease, transform 0.1s ease',
+          }}
+          onPointerEnter={(e) => {
+            (e.currentTarget as HTMLElement).style.width = '10px';
+          }}
+          onPointerLeave={(e) => {
+            (e.currentTarget as HTMLElement).style.width = '6px';
+          }}
+        >
+          <span style={{ width: '3px', height: '1.5px', backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '1px' }} />
+          <span style={{ width: '3px', height: '1.5px', backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '1px' }} />
+          <span style={{ width: '3px', height: '1.5px', backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '1px' }} />
+        </button>
       )}
     </div>
   );

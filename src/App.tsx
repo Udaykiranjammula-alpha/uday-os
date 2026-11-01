@@ -438,6 +438,10 @@ export default function App() {
             setFlashlightOn={handleToggleFlashlight}
             onFlipToBack={() => setIsFlipped(true)}
             onOpenLiveActivities={() => setIsLiveActivitiesOpen(true)}
+            onOpenActionCarousel={() => setIsActionCarouselOpen(true)}
+            onOpenCameraControl={() => setIsCameraControlOpen(true)}
+            onOpenNameDrop={() => setIsNameDropOpen(true)}
+            onOpenSpatialBreakout={() => setIsSpatialOpen(true)}
           />
         </Phone3DCanvas>
 
