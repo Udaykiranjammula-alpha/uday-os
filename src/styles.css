@@ -11378,5 +11378,994 @@ a {
   100% { transform: translateY(680px) rotate(720deg); opacity: 0; }
 }
 
+/* ========================================================
+   8. THE "CRAZY" APPLE TIER: ACTION BUTTON, A18 PRO TEARDOWN, VISIONOS & NAMEDROP
+   ======================================================== */
+
+/* Studio Dock Hardware Pills */
+.studio-flip-pill.action-pill {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #f59e0b;
+}
+.studio-flip-pill.teardown-pill {
+  background: rgba(168, 85, 247, 0.15);
+  border-color: rgba(168, 85, 247, 0.35);
+  color: #c084fc;
+}
+.studio-flip-pill.spatial-pill {
+  background: rgba(6, 182, 212, 0.15);
+  border-color: rgba(6, 182, 212, 0.35);
+  color: #22d3ee;
+}
+.studio-flip-pill.namedrop-pill {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #34d399;
+}
+
+/* --- Action Button Circular Carousel --- */
+.action-button-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(24px);
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.action-button-card {
+  background: #141417;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  width: 100%;
+  max-width: 330px;
+  padding: 22px 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.action-button-top-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.action-hardware-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #a1a1aa;
+}
+.action-close-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.action-dial-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 20px;
+}
+.action-nav-arrow {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.action-nav-arrow:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+.action-center-disc {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 3px solid;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+  box-shadow: 0 0 30px currentColor;
+  transition: all 0.3s ease;
+}
+.action-meta-info {
+  margin-bottom: 18px;
+}
+.action-name {
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0 0 4px;
+  letter-spacing: -0.02em;
+}
+.action-desc {
+  font-size: 11.5px;
+  color: #a1a1aa;
+  margin: 0;
+  line-height: 1.4;
+}
+.action-dots-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+.action-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.action-dot.active {
+  width: 18px;
+  border-radius: 3px;
+}
+.action-trigger-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  transition: transform 0.15s ease;
+}
+.action-trigger-btn:active {
+  transform: scale(0.97);
+}
+
+/* --- Apple Keynote A18 Pro 3D Teardown X-Ray --- */
+.teardown-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(28px);
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.teardown-content-card {
+  background: #0f1015;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  width: 100%;
+  max-width: 440px;
+  padding: 20px 22px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.9);
+}
+.teardown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.teardown-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: #c084fc;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.teardown-title-group h2 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 2px 0 0;
+  color: #ffffff;
+}
+.teardown-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.teardown-viewport-container {
+  position: relative;
+  height: 220px;
+  background: radial-gradient(circle, #1a1a24 0%, #090a0f 100%);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+.teardown-exploded-stage {
+  flex: 1;
+  position: relative;
+  display: grid;
+  place-items: center;
+  transform-style: preserve-3d;
+}
+.teardown-layer {
+  position: absolute;
+  width: 120px;
+  height: 190px;
+  border-radius: 18px;
+  border: 1.5px solid;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 8px;
+  box-sizing: border-box;
+}
+.teardown-layer:hover {
+  filter: brightness(1.3);
+}
+.teardown-layer.layer-glass {
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+}
+.layer-glass-notch {
+  width: 24px;
+  height: 6px;
+  border-radius: 3px;
+  background: #000000;
+  margin: 0 auto;
+}
+.teardown-layer.layer-chassis {
+  border-color: rgba(245, 158, 11, 0.5);
+}
+.teardown-layer.layer-logicboard {
+  border-color: #a855f7;
+  background: rgba(168, 85, 247, 0.12);
+  box-shadow: 0 0 25px rgba(168, 85, 247, 0.4);
+}
+.a18-silicon-chip {
+  margin: auto;
+  width: 58px;
+  height: 58px;
+  border-radius: 10px;
+  background: #1e1b4b;
+  border: 1.5px solid #a855f7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.a18-pulse-glow {
+  position: absolute;
+  inset: -6px;
+  border-radius: 14px;
+  background: rgba(168, 85, 247, 0.35);
+  filter: blur(8px);
+  animation: a18Glow 2s infinite alternate;
+}
+@keyframes a18Glow {
+  0% { transform: scale(0.9); opacity: 0.5; }
+  100% { transform: scale(1.15); opacity: 0.9; }
+}
+.chip-name {
+  font-size: 8px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+.chip-tech {
+  font-size: 6px;
+  color: #c084fc;
+}
+.teardown-layer.layer-thermal {
+  border-color: rgba(16, 185, 129, 0.5);
+}
+.teardown-layer.layer-backglass {
+  border-color: rgba(236, 72, 153, 0.5);
+}
+.magsafe-wire-ring {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px dashed rgba(255, 255, 255, 0.4);
+  margin: auto;
+}
+.layer-tag {
+  font-size: 7.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+.teardown-slider-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 12px;
+  padding: 6px 12px;
+}
+.slider-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #a1a1aa;
+}
+.teardown-range-input {
+  flex: 1;
+  accent-color: #a855f7;
+  cursor: pointer;
+}
+.slider-pct {
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: #ffffff;
+  min-width: 32px;
+  text-align: right;
+}
+.teardown-spec-card {
+  background: #161822;
+  border-radius: 16px;
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-left-width: 4px;
+}
+.spec-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.spec-chip-pill {
+  font-size: 9px;
+  font-weight: 700;
+  border: 1px solid;
+  border-radius: 6px;
+  padding: 1px 6px;
+  letter-spacing: 0.05em;
+}
+.spec-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 3px 0 0;
+  color: #ffffff;
+}
+.spec-metric-val {
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+.spec-description {
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: #a1a1aa;
+  margin: 0 0 12px;
+}
+.component-selector-row {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.comp-chip-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 4px 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.comp-chip-btn.active {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+/* --- VisionOS Spatial Breakout Mode --- */
+.visionos-spatial-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(32px);
+  z-index: 130;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  cursor: none;
+}
+.visionos-gaze-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 200;
+  margin-top: -16px;
+  margin-left: -16px;
+  transition: transform 0.04s ease-out;
+}
+.gaze-outer-ring {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
+  transition: all 0.12s ease;
+}
+.visionos-gaze-cursor.pinching .gaze-outer-ring {
+  transform: scale(0.65);
+  border-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.35);
+}
+.gaze-center-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #ffffff;
+  position: absolute;
+  top: 14px;
+  left: 14px;
+}
+.visionos-top-hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.visionos-pill-badge {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffffff;
+}
+.visionos-exit-btn {
+  background: rgba(255, 255, 255, 0.18);
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.visionos-stage-3d {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  perspective: 1000px;
+}
+.visionos-glass-window {
+  width: 250px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(28px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+  padding: 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+.glass-window-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.spatial-tag {
+  font-size: 8.5px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+.window-dots {
+  display: flex;
+  gap: 4px;
+}
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+.dot.red { background: #ef4444; }
+.dot.yellow { background: #eab308; }
+.dot.green { background: #22c55e; }
+.glass-terminal-body {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+.code-line.prompt { color: #38bdf8; }
+.code-line.status { color: #a1a1aa; }
+.code-line.log { color: #4ade80; }
+.window-footer-action {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 10px;
+  padding: 6px 10px;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+.spatial-music-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.track-text strong { display: block; font-size: 12px; }
+.track-text small { font-size: 9.5px; color: #a1a1aa; }
+.spatial-play-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.spatial-gh-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.stat-item {
+  display: flex;
+  flex-direction: column;
+}
+.stat-label { font-size: 8px; color: #a1a1aa; text-transform: uppercase; }
+.stat-item strong { font-size: 14px; font-weight: 700; color: #38bdf8; }
+
+/* --- Apple NameDrop Ethereal Wave --- */
+.namedrop-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(24px);
+  z-index: 125;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow: hidden;
+}
+.namedrop-liquid-wave {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 280px;
+  pointer-events: none;
+}
+.namedrop-liquid-wave.wave-1 {
+  background: radial-gradient(circle at 50% -20%, rgba(56, 189, 248, 0.85) 0%, rgba(236, 72, 153, 0.45) 45%, transparent 70%);
+  animation: liquidFlow 4s infinite alternate ease-in-out;
+}
+.namedrop-liquid-wave.wave-2 {
+  background: radial-gradient(circle at 45% -10%, rgba(168, 85, 247, 0.7) 0%, rgba(245, 158, 11, 0.35) 50%, transparent 75%);
+  animation: liquidFlow 5s infinite alternate-reverse ease-in-out;
+}
+@keyframes liquidFlow {
+  0% { transform: scaleY(0.85) translateY(-20px); opacity: 0.6; }
+  100% { transform: scaleY(1.15) translateY(10px); opacity: 1; }
+}
+.namedrop-card {
+  position: relative;
+  z-index: 10;
+  background: #181920;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  width: 100%;
+  max-width: 340px;
+  padding: 22px 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+}
+.namedrop-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.namedrop-brand {
+  font-size: 11px;
+  font-weight: 700;
+  color: #38bdf8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.namedrop-close-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.namedrop-profile-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 18px;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+}
+.namedrop-avatar-disc {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0284c7, #38bdf8);
+  color: #ffffff;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+}
+.namedrop-info h3 {
+  font-size: 14.5px;
+  font-weight: 700;
+  margin: 0;
+}
+.namedrop-info p {
+  font-size: 10.5px;
+  color: #a1a1aa;
+  margin: 2px 0 4px;
+}
+.namedrop-status-tag {
+  font-size: 8.5px;
+  color: #34d399;
+  font-weight: 700;
+}
+.devices-subhead {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #71717a;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+.namedrop-devices-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.namedrop-device-cell {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.namedrop-device-cell:hover,
+.namedrop-device-cell.active {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: #38bdf8;
+}
+.device-icon-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  display: grid;
+  place-items: center;
+}
+.device-meta {
+  flex: 1;
+}
+.device-meta strong {
+  display: block;
+  font-size: 12px;
+}
+.device-meta small {
+  font-size: 9.5px;
+  color: #a1a1aa;
+}
+.airdrop-send-btn {
+  background: #007aff;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.namedrop-success-banner {
+  background: rgba(52, 199, 89, 0.15);
+  border: 1px solid rgba(52, 199, 89, 0.4);
+  border-radius: 14px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.namedrop-success-banner strong {
+  display: block;
+  font-size: 11.5px;
+  color: #34d399;
+}
+.namedrop-success-banner p {
+  font-size: 9.5px;
+  color: #cbd5e1;
+  margin: 2px 0 0;
+}
+
+/* --- Apple FaceTime Spatial Call Screen --- */
+.facetime-page-screen {
+  position: absolute;
+  inset: 0;
+  background: #0b0c10;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  user-select: none;
+  overflow: hidden;
+}
+.facetime-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 44px 16px 8px;
+}
+.facetime-back-pill,
+.facetime-mini-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  border-radius: 20px;
+  padding: 6px 12px;
+  color: #ffffff;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+.facetime-call-timer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+}
+.facetime-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #30d158;
+}
+.facetime-main-video-stage {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.facetime-avatar-frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+.facetime-avatar-frame.speaking-pulse {
+  transform: scale(1.05);
+}
+.avatar-ambient-glow {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.4) 0%, transparent 70%);
+  filter: blur(12px);
+}
+.avatar-image-disc {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+  border: 3px solid #ffffff;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  z-index: 2;
+}
+.avatar-initials {
+  font-size: 32px;
+  font-weight: 800;
+  color: #ffffff;
+}
+.avatar-nameplate {
+  margin-top: 10px;
+  text-align: center;
+  z-index: 2;
+}
+.avatar-nameplate strong {
+  display: block;
+  font-size: 15px;
+}
+.avatar-nameplate small {
+  font-size: 10.5px;
+  color: #38bdf8;
+}
+.facetime-speech-bubble {
+  margin-top: 18px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px);
+  border-radius: 16px;
+  padding: 10px 14px;
+  max-width: 270px;
+  text-align: center;
+  border: 0.5px solid rgba(255, 255, 255, 0.2);
+}
+.facetime-speech-bubble p {
+  font-size: 11.5px;
+  line-height: 1.4;
+  margin: 0;
+  color: #ffffff;
+}
+.facetime-pip-window {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  width: 72px;
+  height: 100px;
+  border-radius: 12px;
+  background: #1c1c1e;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 4px;
+}
+.pip-user-badge span {
+  font-size: 8px;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+.pip-avatar-fallback {
+  text-align: center;
+  margin-bottom: 6px;
+}
+.pip-avatar-fallback span {
+  font-size: 9px;
+  color: #a1a1aa;
+}
+.facetime-reaction-burst {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.floating-emoji {
+  position: absolute;
+  font-size: 32px;
+  animation: floatBurst 2s forwards ease-out;
+}
+@keyframes floatBurst {
+  0% { transform: translateY(60px) scale(0.5); opacity: 0; }
+  30% { opacity: 1; transform: translateY(-20px) scale(1.2); }
+  100% { transform: translateY(-160px) scale(1); opacity: 0; }
+}
+.facetime-topics-strip {
+  display: flex;
+  gap: 8px;
+  padding: 0 16px 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.facetime-topic-chip {
+  background: rgba(255, 255, 255, 0.1);
+  border: 0.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 6px 12px;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.facetime-topic-chip:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+.facetime-dock-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  background: rgba(20, 20, 24, 0.85);
+  backdrop-filter: blur(20px);
+  padding: 12px 16px 36px;
+  border-top: 0.5px solid rgba(255, 255, 255, 0.12);
+}
+.facetime-ctrl-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  border: none;
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.facetime-ctrl-btn.active-off {
+  background: #ffffff;
+  color: #000000;
+}
+.facetime-ctrl-btn.end-call {
+  background: #ff3b30;
+  color: #ffffff;
+}
+
+
 
 

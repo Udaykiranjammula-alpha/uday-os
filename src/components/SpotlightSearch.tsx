@@ -17,6 +17,7 @@ interface SpotlightAppItem {
 }
 
 const APPS: SpotlightAppItem[] = [
+  { id: 'facetime', label: 'FaceTime', icon: '📹', route: 'facetime' },
   { id: 'fitness', label: 'Activity Rings', icon: '⭕', route: 'fitness' },
   { id: 'calculator', label: 'Calculator', icon: '🧮', route: 'calculator' },
   { id: 'weather', label: 'Weather', icon: '🌦️', route: 'weather' },

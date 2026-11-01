@@ -72,10 +72,16 @@ export async function fetchUserRepos(username: string = 'Udaykiranjammula-alpha'
 
   try {
     const url = `https://api.github.com/users/${encodeURIComponent(username)}/repos?sort=updated&per_page=10`;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 3500);
+
     const response = await fetch(url, {
+      signal: controller.signal,
       headers: {
         Accept: 'application/vnd.github.v3+json',
       },
+    }).finally(() => {
+      clearTimeout(timer);
     });
 
     if (response.status === 403 || response.status === 429) {

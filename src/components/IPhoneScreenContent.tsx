@@ -31,6 +31,7 @@ import { WeatherApp } from '../apps/WeatherApp';
 import { WalletApp } from '../apps/WalletApp';
 import { FitnessApp } from '../apps/FitnessApp';
 import { StandByApp } from '../apps/StandByApp';
+import { FaceTimeApp } from '../apps/FaceTimeApp';
 import { AppleIntelligenceGlow } from './AppleIntelligenceGlow';
 import { RecruiterCallModal } from './RecruiterCallModal';
 import { AppSwitcher } from './AppSwitcher';
@@ -505,6 +506,19 @@ export function IPhoneScreenContent({
               exit={{ opacity: 0, scale: 0.96 }}
             >
               <FitnessApp
+                onBack={() => onNavigate('home')}
+                onNavigate={onNavigate}
+              />
+            </motion.div>
+          ) : currentRoute === 'facetime' ? (
+            <motion.div
+              key="facetime-view"
+              className="page-screen-anim"
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+            >
+              <FaceTimeApp
                 onBack={() => onNavigate('home')}
                 onNavigate={onNavigate}
               />

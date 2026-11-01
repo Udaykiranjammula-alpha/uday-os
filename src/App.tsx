@@ -1,7 +1,23 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Phone3DCanvas, type PhoneFinish } from './components/Phone3DCanvas';
 import { IPhoneScreenContent } from './components/IPhoneScreenContent';
-import { Rotate3d, Share2, QrCode, Copy, Check, X, Sparkles } from 'lucide-react';
+import { ActionButtonCarousel } from './components/ActionButtonCarousel';
+import { PhoneTeardownModal } from './components/PhoneTeardownModal';
+import { SpatialBreakoutView } from './components/SpatialBreakoutView';
+import { NameDropModal } from './components/NameDropModal';
+import {
+  Rotate3d,
+  Share2,
+  QrCode,
+  Copy,
+  Check,
+  X,
+  Sparkles,
+  Cpu,
+  Eye,
+  Radio,
+  Sliders,
+} from 'lucide-react';
 import type { Project } from './types';
 import { profile } from './data/profile';
 import { sound } from './services/sound';
@@ -12,6 +28,10 @@ export default function App() {
   const [studioLighting, setStudioLighting] = useState<'keynote' | 'cyberpunk' | 'golden'>('keynote');
   const [isFlipped, setIsFlipped] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
+  const [isActionCarouselOpen, setIsActionCarouselOpen] = useState(false);
+  const [isTeardownOpen, setIsTeardownOpen] = useState(false);
+  const [isSpatialOpen, setIsSpatialOpen] = useState(false);
+  const [isNameDropOpen, setIsNameDropOpen] = useState(false);
   const [copiedUrl, setCopiedUrl] = useState(false);
 
   const [currentRoute, setCurrentRoute] = useState<string>(() => {
@@ -52,20 +72,39 @@ export default function App() {
     if (isFlipped) setIsFlipped(false);
   };
 
-  // Keyboard shortcut for Spotlight & Escape
+  // Keyboard shortcut for Spotlight, Action Button, and Escape
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const isInput = target?.matches('input, textarea, select');
+
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         navigateTo(currentRoute === 'search' ? 'home' : 'search');
-      } else if (e.key === 'Escape' && currentRoute === 'search') {
-        navigateTo('home');
+      } else if (!isInput && (e.key === 'a' || e.key === 'A') && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        sound.playActionClickSound();
+        setIsActionCarouselOpen((prev) => !prev);
+      } else if (e.key === 'Escape') {
+        if (isActionCarouselOpen) setIsActionCarouselOpen(false);
+        else if (isTeardownOpen) setIsTeardownOpen(false);
+        else if (isSpatialOpen) setIsSpatialOpen(false);
+        else if (isNameDropOpen) setIsNameDropOpen(false);
+        else if (isShareOpen) setIsShareOpen(false);
+        else if (currentRoute === 'search') navigateTo('home');
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentRoute]);
+  }, [
+    currentRoute,
+    isActionCarouselOpen,
+    isTeardownOpen,
+    isSpatialOpen,
+    isNameDropOpen,
+    isShareOpen,
+  ]);
 
   const finishKey: PhoneFinish =
     color === 'desert'
@@ -227,7 +266,7 @@ export default function App() {
           </li>
         </ul>
 
-        {/* Studio Dock: Flip Phone & Share QR */}
+        {/* Studio Dock: Hardware & Keynote Actions */}
         <div className="studio-flip-dock">
           <button
             type="button"
@@ -241,6 +280,66 @@ export default function App() {
           >
             <Rotate3d size={14} />
             <span>{isFlipped ? 'View Screen' : 'View Back (360°)'}</span>
+          </button>
+
+          {/* Action Button Pill */}
+          <button
+            type="button"
+            className="studio-flip-pill action-pill"
+            onClick={() => {
+              sound.playActionClickSound();
+              setIsActionCarouselOpen(true);
+            }}
+            title="Physical Action Button Carousel (HotKey: A)"
+            aria-label="Action Button"
+          >
+            <Sliders size={13} />
+            <span>Action Button</span>
+          </button>
+
+          {/* 3D A18 Pro Teardown X-Ray Pill */}
+          <button
+            type="button"
+            className="studio-flip-pill teardown-pill"
+            onClick={() => {
+              sound.playActionClickSound();
+              setIsTeardownOpen(true);
+            }}
+            title="Apple Keynote A18 Pro Exploded 3D Teardown"
+            aria-label="A18 Pro Teardown"
+          >
+            <Cpu size={13} />
+            <span>A18 Pro X-Ray</span>
+          </button>
+
+          {/* VisionOS Spatial Mode Pill */}
+          <button
+            type="button"
+            className="studio-flip-pill spatial-pill"
+            onClick={() => {
+              sound.playActionClickSound();
+              setIsSpatialOpen(true);
+            }}
+            title="VisionOS Spatial Computing Breakout"
+            aria-label="VisionOS Spatial Mode"
+          >
+            <Eye size={13} />
+            <span>VisionOS 3D</span>
+          </button>
+
+          {/* NameDrop / AirDrop Pill */}
+          <button
+            type="button"
+            className="studio-flip-pill namedrop-pill"
+            onClick={() => {
+              sound.playActionClickSound();
+              setIsNameDropOpen(true);
+            }}
+            title="Apple AirDrop & NameDrop Ethereal Wave"
+            aria-label="AirDrop"
+          >
+            <Radio size={13} />
+            <span>AirDrop</span>
           </button>
 
           <button
@@ -334,6 +433,37 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* Action Button Circular Carousel Wheel */}
+      <ActionButtonCarousel
+        isOpen={isActionCarouselOpen}
+        onClose={() => setIsActionCarouselOpen(false)}
+        onToggleFlashlight={() => handleToggleFlashlight(!flashlightOn)}
+        flashlightOn={flashlightOn}
+        onNavigate={navigateTo}
+        onOpenTeardown={() => setIsTeardownOpen(true)}
+      />
+
+      {/* Apple Keynote A18 Pro 3D Exploded Teardown Modal */}
+      <PhoneTeardownModal
+        isOpen={isTeardownOpen}
+        onClose={() => setIsTeardownOpen(false)}
+        onNavigate={navigateTo}
+      />
+
+      {/* VisionOS Spatial Breakout 3D Windows */}
+      <SpatialBreakoutView
+        isOpen={isSpatialOpen}
+        onClose={() => setIsSpatialOpen(false)}
+        onNavigate={navigateTo}
+      />
+
+      {/* Apple NameDrop & AirDrop Liquid Ethereal Wave */}
+      <NameDropModal
+        isOpen={isNameDropOpen}
+        onClose={() => setIsNameDropOpen(false)}
+        onNavigate={navigateTo}
+      />
     </main>
   );
 }

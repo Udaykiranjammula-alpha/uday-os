@@ -96,5 +96,5 @@ describe('GitHub Service & Fallback Handling', () => {
     expect(result).toBeDefined();
     expect(Array.isArray(result.repos)).toBe(true);
     expect(result.repos.length).toBeGreaterThan(0);
-  });
+  }, 10000);
 });
