@@ -356,30 +356,32 @@ export function IosHomeScreen({ onNavigate, onOpenSearch, onOpenStandBy }: IosHo
           <span className="ios-icon-title">Geekbench</span>
         </button>
 
-        {/* Education */}
+        {/* VisionOS 3D Spatial Hologram Gallery */}
         <button
           type="button"
           className="ios-home-icon-btn"
-          onClick={() => handleNav('education')}
-          aria-label="Education and Academic Credentials"
+          onClick={() => handleNav('spatial-gallery')}
+          aria-label="VisionOS Spatial Hologram 3D Gallery"
         >
-          <div className="ios-icon-box education-home-box">
-            <span style={{ fontSize: 26 }}>🎓</span>
+          <div className="ios-icon-box spatial-home-box">
+            <span style={{ fontSize: 26 }}>👓</span>
+            <span className="app-red-badge">3D</span>
           </div>
-          <span className="ios-icon-title">Education</span>
+          <span className="ios-icon-title">Spatial 3D</span>
         </button>
 
-        {/* Terminal */}
+        {/* Stage Manager Split View Multitasking */}
         <button
           type="button"
           className="ios-home-icon-btn"
-          onClick={() => handleNav('terminal')}
-          aria-label="Developer Shell and CLI"
+          onClick={() => handleNav('splitview')}
+          aria-label="Stage Manager Split View Multitasking"
         >
-          <div className="ios-icon-box terminal-home-box">
-            <span style={{ fontSize: 24 }}>💻</span>
+          <div className="ios-icon-box splitview-home-box">
+            <span style={{ fontSize: 24 }}>📱</span>
+            <span className="app-red-badge">SPLIT</span>
           </div>
-          <span className="ios-icon-title">Terminal</span>
+          <span className="ios-icon-title">Split View</span>
         </button>
       </section>
 

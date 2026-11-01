@@ -253,6 +253,50 @@ class SoundService {
     } catch {}
   }
 
+  // Satellite S-Band Chirp & Lock-on Telemetry
+  public playSatelliteBeaconSound() {
+    if (!this.enabled) return;
+    try {
+      this.initCtx();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(987.77, now); // B5
+      osc.frequency.exponentialRampToValueAtTime(1975.53, now + 0.12); // B6
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.25);
+    } catch {}
+  }
+
+  // Apple Watch Find My Ping Chime
+  public playWatchPingSound() {
+    if (!this.enabled) return;
+    try {
+      this.initCtx();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+      [0, 0.18, 0.36].forEach((delay) => {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(2093, now + delay); // C7
+        gain.gain.setValueAtTime(0.25, now + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.14);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now + delay);
+        osc.stop(now + delay + 0.15);
+      });
+    } catch {}
+  }
+
   // Incoming Recruiter Phone Call Ringtone (Classic iOS Marimba motif)
   public playCallChime() {
     if (!this.enabled) return;

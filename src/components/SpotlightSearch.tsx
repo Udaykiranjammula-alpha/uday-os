@@ -17,6 +17,8 @@ interface SpotlightAppItem {
 }
 
 const APPS: SpotlightAppItem[] = [
+  { id: 'spatial-gallery', label: 'Spatial 3D Hologram Gallery', icon: '👓', route: 'spatial-gallery' },
+  { id: 'splitview', label: 'Stage Manager Split View', icon: '📱', route: 'splitview' },
   { id: 'genmoji', label: 'Genmoji (Apple Intelligence)', icon: '🎨', route: 'genmoji' },
   { id: 'benchmark', label: 'Geekbench A18 Pro', icon: '⚡', route: 'benchmark' },
   { id: 'facetime', label: 'FaceTime', icon: '📹', route: 'facetime' },

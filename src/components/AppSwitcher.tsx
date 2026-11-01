@@ -12,6 +12,8 @@ export interface AppCard {
 }
 
 export const DEFAULT_APP_DECK: AppCard[] = [
+  { id: 'spatial-gallery', title: 'Spatial 3D', icon: '👓', color: '#0ea5e9', subtitle: 'VisionOS Hologram Gallery' },
+  { id: 'splitview', title: 'Split View', icon: '📱', color: '#6366f1', subtitle: 'Stage Manager Multitasking' },
   { id: 'genmoji', title: 'Genmoji', icon: '🎨', color: '#a855f7', subtitle: 'Apple Intelligence Studio' },
   { id: 'benchmark', title: 'Geekbench', icon: '⚡', color: '#f59e0b', subtitle: 'A18 Pro Silicon Diagnostics' },
   { id: 'facetime', title: 'FaceTime', icon: '📹', color: '#30d158', subtitle: 'Spatial Video Interview' },

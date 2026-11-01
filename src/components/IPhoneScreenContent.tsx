@@ -34,6 +34,8 @@ import { StandByApp } from '../apps/StandByApp';
 import { FaceTimeApp } from '../apps/FaceTimeApp';
 import { GenmojiApp } from '../apps/GenmojiApp';
 import { BenchmarkApp } from '../apps/BenchmarkApp';
+import { SpatialGalleryApp } from '../apps/SpatialGalleryApp';
+import { SplitViewScreen } from './SplitViewScreen';
 import { AppleIntelligenceGlow } from './AppleIntelligenceGlow';
 import { RecruiterCallModal } from './RecruiterCallModal';
 import { AppSwitcher } from './AppSwitcher';
@@ -549,6 +551,35 @@ export function IPhoneScreenContent({
               <BenchmarkApp
                 onBack={() => onNavigate('home')}
                 onNavigate={onNavigate}
+              />
+            </motion.div>
+          ) : currentRoute === 'spatial-gallery' ? (
+            <motion.div
+              key="spatial-gallery-view"
+              className="page-screen-anim"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+            >
+              <SpatialGalleryApp
+                onBack={() => onNavigate('home')}
+                onNavigate={onNavigate}
+                onSelectProject={(p) => setActiveProject(p)}
+              />
+            </motion.div>
+          ) : currentRoute === 'splitview' ? (
+            <motion.div
+              key="splitview-view"
+              className="page-screen-anim"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 15 }}
+            >
+              <SplitViewScreen
+                onClose={() => onNavigate('home')}
+                onNavigate={onNavigate}
+                activeProject={activeProject}
+                setActiveProject={setActiveProject}
               />
             </motion.div>
           ) : currentRoute === 'leetcode' ? (

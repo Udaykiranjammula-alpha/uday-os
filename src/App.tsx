@@ -6,6 +6,9 @@ import { PhoneTeardownModal } from './components/PhoneTeardownModal';
 import { SpatialBreakoutView } from './components/SpatialBreakoutView';
 import { NameDropModal } from './components/NameDropModal';
 import { AirPodsSpatialModal } from './components/AirPodsSpatialModal';
+import { SatelliteRadarModal } from './components/SatelliteRadarModal';
+import { AppleWatchCompanion } from './components/AppleWatchCompanion';
+import { WritingToolsHUD } from './components/WritingToolsHUD';
 import {
   Rotate3d,
   Share2,
@@ -19,6 +22,10 @@ import {
   Radio,
   Sliders,
   Headphones,
+  Satellite,
+  Columns,
+  Watch,
+  Wand2,
 } from 'lucide-react';
 import type { Project } from './types';
 import { profile } from './data/profile';
@@ -35,6 +42,9 @@ export default function App() {
   const [isSpatialOpen, setIsSpatialOpen] = useState(false);
   const [isNameDropOpen, setIsNameDropOpen] = useState(false);
   const [isAirPodsOpen, setIsAirPodsOpen] = useState(false);
+  const [isSatelliteOpen, setIsSatelliteOpen] = useState(false);
+  const [isWatchOpen, setIsWatchOpen] = useState(true);
+  const [isWritingToolsOpen, setIsWritingToolsOpen] = useState(false);
   const [copiedUrl, setCopiedUrl] = useState(false);
 
   const [currentRoute, setCurrentRoute] = useState<string>(() => {
@@ -48,6 +58,16 @@ export default function App() {
   const handleToggleFlashlight = useCallback((on: boolean) => {
     setFlashlightOn(on);
     void toggleHardwareTorch(on);
+  }, []);
+
+  const handlePingPhoneFromWatch = useCallback(() => {
+    sound.playWatchPingSound();
+    setFlashlightOn(true);
+    setTimeout(() => {
+      setFlashlightOn(false);
+      void toggleHardwareTorch(false);
+    }, 1500);
+    void toggleHardwareTorch(true);
   }, []);
 
   const handleFlipChange = useCallback((flipped: boolean) => {
@@ -94,6 +114,8 @@ export default function App() {
         else if (isSpatialOpen) setIsSpatialOpen(false);
         else if (isNameDropOpen) setIsNameDropOpen(false);
         else if (isAirPodsOpen) setIsAirPodsOpen(false);
+        else if (isSatelliteOpen) setIsSatelliteOpen(false);
+        else if (isWritingToolsOpen) setIsWritingToolsOpen(false);
         else if (isShareOpen) setIsShareOpen(false);
         else if (currentRoute === 'search') navigateTo('home');
       }
@@ -108,6 +130,8 @@ export default function App() {
     isSpatialOpen,
     isNameDropOpen,
     isAirPodsOpen,
+    isSatelliteOpen,
+    isWritingToolsOpen,
     isShareOpen,
   ]);
 
@@ -362,6 +386,66 @@ export default function App() {
             <span>AirPods Spatial</span>
           </button>
 
+          {/* Emergency SOS via Satellite Pill */}
+          <button
+            type="button"
+            className="studio-flip-pill satellite-pill"
+            onClick={() => {
+              sound.playActionClickSound();
+              setIsSatelliteOpen(true);
+            }}
+            title="Apple Emergency SOS via Satellite Orbital Radar"
+            aria-label="Satellite SOS"
+          >
+            <Satellite size={13} />
+            <span>Satellite SOS</span>
+          </button>
+
+          {/* Split View Multitasking Pill */}
+          <button
+            type="button"
+            className="studio-flip-pill splitview-pill"
+            onClick={() => {
+              sound.playActionClickSound();
+              navigateTo(currentRoute === 'splitview' ? 'home' : 'splitview');
+            }}
+            title="iOS Stage Manager Dual Split View"
+            aria-label="Split View"
+          >
+            <Columns size={13} />
+            <span>Split View</span>
+          </button>
+
+          {/* Apple Watch Companion Pill */}
+          <button
+            type="button"
+            className="studio-flip-pill watch-pill"
+            onClick={() => {
+              sound.playActionClickSound();
+              setIsWatchOpen((prev) => !prev);
+            }}
+            title="Apple Watch Ultra 2 Titanium Companion"
+            aria-label="Watch Ultra"
+          >
+            <Watch size={13} />
+            <span>Watch Ultra</span>
+          </button>
+
+          {/* Apple Intelligence Writing Tools Pill */}
+          <button
+            type="button"
+            className="studio-flip-pill writingtools-pill"
+            onClick={() => {
+              sound.playActionClickSound();
+              setIsWritingToolsOpen(true);
+            }}
+            title="Apple Intelligence Writing Tools & Code Refactor"
+            aria-label="Writing Tools"
+          >
+            <Wand2 size={13} />
+            <span>Writing Tools</span>
+          </button>
+
           <button
             type="button"
             className="studio-flip-pill share-btn"
@@ -378,7 +462,7 @@ export default function App() {
         </div>
       </nav>
 
-      {/* Center: The Interactive Virtual iPhone */}
+      {/* Center: The Interactive Virtual iPhone & Apple Watch Ultra Companion */}
       <div
         className="phone-world"
         aria-label={`Interactive ${color === 'desert' ? 'Cosmic Orange' : 'Dark Cherry'} iPhone 17 Pro Max portfolio`}
@@ -404,6 +488,13 @@ export default function App() {
             onFlipToBack={() => setIsFlipped(true)}
           />
         </Phone3DCanvas>
+
+        {/* Apple Watch Ultra 2 Titanium Studio Companion */}
+        <AppleWatchCompanion
+          isOpen={isWatchOpen}
+          onClose={() => setIsWatchOpen(false)}
+          onPingPhone={handlePingPhoneFromWatch}
+        />
       </div>
 
       {/* Share & Mobile QR Code Modal */}
@@ -489,6 +580,19 @@ export default function App() {
       <AirPodsSpatialModal
         isOpen={isAirPodsOpen}
         onClose={() => setIsAirPodsOpen(false)}
+      />
+
+      {/* Apple Emergency SOS via Satellite Orbital Radar */}
+      <SatelliteRadarModal
+        isOpen={isSatelliteOpen}
+        onClose={() => setIsSatelliteOpen(false)}
+        onNavigate={navigateTo}
+      />
+
+      {/* Apple Intelligence Writing Tools & Code Refactor HUD */}
+      <WritingToolsHUD
+        isOpen={isWritingToolsOpen}
+        onClose={() => setIsWritingToolsOpen(false)}
       />
     </main>
   );

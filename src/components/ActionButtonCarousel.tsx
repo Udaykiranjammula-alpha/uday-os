@@ -14,6 +14,9 @@ import {
   ChevronRight,
   Check,
   Sparkles,
+  Satellite,
+  Columns,
+  Eye,
 } from 'lucide-react';
 import { sound } from '../services/sound';
 
@@ -142,6 +145,28 @@ export function ActionButtonCarousel({
       color: '#ffd60a',
       action: () => {
         onNavigate('benchmark');
+        onClose();
+      },
+    },
+    {
+      id: 'spatial-gallery',
+      name: 'VisionOS Spatial 3D',
+      subtitle: 'Stereoscopic Parallax Project Holograms',
+      icon: <Eye size={28} />,
+      color: '#0ea5e9',
+      action: () => {
+        onNavigate('spatial-gallery');
+        onClose();
+      },
+    },
+    {
+      id: 'splitview',
+      name: 'Stage Manager Split',
+      subtitle: 'Run Dual Multitasking Apps Side-by-Side',
+      icon: <Columns size={28} />,
+      color: '#6366f1',
+      action: () => {
+        onNavigate('splitview');
         onClose();
       },
     },
