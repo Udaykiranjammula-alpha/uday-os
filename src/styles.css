@@ -13650,6 +13650,13 @@ a {
   flex: 1;
   position: relative;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.pane-content-frame > * {
+  flex: 1;
+  min-height: 0;
 }
 .split-draggable-divider {
   height: 16px;
@@ -13691,12 +13698,13 @@ a {
    ========================================================================= */
 .apple-watch-companion-frame {
   position: absolute;
-  right: -240px;
+  left: calc(50% + 235px);
   top: 50%;
   transform: translateY(-50%);
   z-index: 40;
+  pointer-events: auto;
 }
-@media (max-width: 1200px) {
+@media (max-width: 1100px) {
   .apple-watch-companion-frame {
     display: none;
   }
