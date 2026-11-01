@@ -10139,6 +10139,33 @@ a {
   background: #ff9f0a;
   color: #ffffff;
 }
+.calc-mode-segmented {
+  display: flex;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  padding: 2px;
+  gap: 2px;
+}
+.calc-seg-pill {
+  border: none;
+  border-radius: 16px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.calc-seg-pill.active {
+  background: #ff9f0a !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(255, 159, 10, 0.4);
+}
+.calc-scientific-container button:active,
+.calc-grid button:active {
+  transform: scale(0.92);
+  filter: brightness(1.2);
+}
 .calc-page-title {
   font-size: 15px;
   font-weight: 600;
