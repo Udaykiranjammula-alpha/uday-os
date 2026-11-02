@@ -1,0 +1,101 @@
+diff --git a/src/services/liveActivity.ts b/src/services/liveActivity.ts
+index e234567..f345678 100644
+--- a/src/services/liveActivity.ts
++++ b/src/services/liveActivity.ts
+@@ -437,17 +437,18 @@ export class LiveActivityCoordinator {
+   public startTimer(durationSeconds: number) {
+-    const totalMs = durationSeconds * 1000;
++    const safeDuration = Math.max(0, durationSeconds);
++    const totalMs = safeDuration * 1000;
+     this.state.clock = {
+       isActive: true,
+       type: 'timer',
+       isPaused: false,
+       isRunning: true,
+       totalDurationMs: totalMs,
+       remainingMs: totalMs,
+-      totalDurationSeconds: durationSeconds,
+-      remainingSeconds: durationSeconds,
++      totalDurationSeconds: safeDuration,
++      remainingSeconds: safeDuration,
+       stopwatchMs: 0,
+       formattedTime: this.formatMinutesSeconds(totalMs),
+       laps: [],
+     };
+     this.startClockTicker();
+@@ -472,7 +473,7 @@ export class LiveActivityCoordinator {
+   public toggleTimerRunning() {
+-    if (!this.state.clock.isActive) {
++    if (!this.state.clock.isActive || this.state.clock.type !== 'timer') {
+       this.startTimer(300); // 5 min default
+       return;
+     }
+     if (this.state.clock.isPaused) {
+       this.resumeTimer();
+@@ -509,17 +510,20 @@ export class LiveActivityCoordinator {
+   public startStopwatch() {
++    const isStopwatch = this.state.clock.type === 'stopwatch';
++    const initialMs = isStopwatch ? this.state.clock.remainingMs : 0;
++    const initialLaps = isStopwatch ? (this.state.clock.laps || []) : [];
+     this.state.clock = {
+       isActive: true,
+       type: 'stopwatch',
+       isPaused: false,
+       isRunning: true,
+-      remainingMs: this.state.clock.type === 'stopwatch' ? this.state.clock.remainingMs : 0,
++      remainingMs: initialMs,
+       totalDurationMs: 0,
+       remainingSeconds: 0,
+       totalDurationSeconds: 0,
+-      stopwatchMs: this.state.clock.type === 'stopwatch' ? this.state.clock.remainingMs : 0,
+-      formattedTime: this.formatStopwatchTime(this.state.clock.remainingMs),
+-      laps: this.state.clock.laps || [],
++      stopwatchMs: initialMs,
++      formattedTime: this.formatStopwatchTime(initialMs),
++      laps: initialLaps,
+     };
+     this.startClockTicker();
+     this.notify();
+@@ -534,8 +538,20 @@ export class LiveActivityCoordinator {
++  public resumeStopwatch() {
++    if (!this.state.clock.isActive || this.state.clock.type !== 'stopwatch') return;
++    this.state.clock.isPaused = false;
++    this.state.clock.isRunning = true;
++    this.startClockTicker();
++    this.notify();
++  }
++
+   public toggleStopwatchRunning() {
+-    if (this.state.clock.isActive && !this.state.clock.isPaused) {
+-      this.pauseStopwatch();
++    if (!this.state.clock.isActive || this.state.clock.type !== 'stopwatch') {
++      this.startStopwatch();
++      return;
++    }
++    if (this.state.clock.isPaused) {
++      this.resumeStopwatch();
+     } else {
+-      this.startStopwatch();
++      this.pauseStopwatch();
+     }
+   }
+@@ -599,14 +615,16 @@ export class LiveActivityCoordinator {
+   public formatMinutesSeconds(ms: number): string {
+-    const totalSecs = Math.ceil(ms / 1000);
++    const safeMs = Math.max(0, ms);
++    const totalSecs = Math.ceil(safeMs / 1000);
+     const m = Math.floor(totalSecs / 60).toString().padStart(2, '0');
+     const s = Math.floor(totalSecs % 60).toString().padStart(2, '0');
+     return `${m}:${s}`;
+   }
+ 
+   public formatStopwatchTime(ms: number): string {
+-    const m = Math.floor(ms / 60000).toString().padStart(2, '0');
+-    const s = Math.floor((ms % 60000) / 1000).toString().padStart(2, '0');
+-    const cs = Math.floor((ms % 1000) / 10).toString().padStart(2, '0');
++    const safeMs = Math.max(0, ms);
++    const m = Math.floor(safeMs / 60000).toString().padStart(2, '0');
++    const s = Math.floor((safeMs % 60000) / 1000).toString().padStart(2, '0');
++    const cs = Math.floor((safeMs % 1000) / 10).toString().padStart(2, '0');
+     return `${m}:${s}.${cs}`;
+   }

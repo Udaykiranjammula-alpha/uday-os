@@ -12,6 +12,7 @@ import {
   EyeOff,
 } from 'lucide-react';
 import { sound } from '../services/sound';
+import { haptics } from '../services/haptics';
 
 export interface AssistiveTouchProps {
   onNavigate: (route: string) => void;
@@ -172,10 +173,12 @@ export function AssistiveTouch({
       } catch {}
 
       sound.playTapSound();
+      haptics.wheelTick();
     } else {
       // Tap detected: open AssistiveTouch menu
       setIsOpen(true);
       sound.playTapSound();
+      haptics.tap();
     }
   };
 
@@ -197,6 +200,7 @@ export function AssistiveTouch({
   const handleAction = useCallback(
     (actionId: string) => {
       sound.playActionClickSound();
+      haptics.actionButton();
       setIsOpen(false);
 
       if (actionId === 'switcher') {
@@ -211,12 +215,14 @@ export function AssistiveTouch({
   // Collapse / Close menu
   const handleClose = useCallback(() => {
     sound.playTapSound();
+    haptics.tap();
     setIsOpen(false);
   }, []);
 
   // Hide AssistiveTouch toggle
   const handleHide = useCallback(() => {
     sound.playTapSound();
+    haptics.tap();
     setIsOpen(false);
     onToggleEnabled?.(false);
   }, [onToggleEnabled]);

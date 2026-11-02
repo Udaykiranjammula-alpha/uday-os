@@ -69,12 +69,12 @@ Every feature identified during the Survey phase is mapped to an authoritative m
 | # | Name | Scope | Dependencies | Status |
 |---|------|-------|-------------|--------|
 | M1 | Dynamic Island Live Activities & PiP Multitasking | `liveActivity.ts`, `DynamicIsland.tsx`, `PiPOverlay.tsx`, `styles.css`, integration with Music & Clock | None | **DONE** |
-| M2 | Xcode Cloud In-Phone Compiler & LeetCode Playground | `CodeEditor.tsx`, `codeRunner.ts`, `XcodeApp.tsx`, `LeetCodeApp.tsx`, routes & icon integration | None | PLANNED |
-| M3 | Apple HealthKit 3D Activity Rings, Gyroscope & Hardware Haptics | `haptics.ts`, `FitnessApp.tsx` (3D rings, gyro/mouse kinetic gauge, 360° medals), `SpatialParallax.tsx` | None | PLANNED |
-| M4 | Spotlight Search 2.0 with Math, Conversions & Shortcuts | `spotlightIndex.ts`, `mathEvaluator.ts`, `SpotlightSearch.tsx`, action shortcuts | M1, M2 | PLANNED |
-| M5 | ESP32 Dual-Core FreeRTOS & Oscilloscope Engineering Lab | `EmbeddedLabApp.tsx` (dual-core telemetry, 60fps canvas oscilloscope, noise injection & CRC retransmit) | None | PLANNED |
-| M6 | macOS Sequoia Mirroring & iOS 18 Genmoji / Image Playground | `MacMirrorView.tsx` (mirroring, clipboard, drag-drop), `GenmojiApp.tsx` (mixing, diffusion, export, iMessage) | M1, M5 | PLANNED |
-| M7 | Final Milestone: 100% E2E Test Suite & Adversarial Hardening | Tier 1-4 test execution from E2E Testing Track; Tier 5 white-box adversarial coverage hardening; deployment push | M1-M6, TEST_READY | PLANNED |
+| M2 | Xcode Cloud In-Phone Compiler & LeetCode Playground | `CodeEditor.tsx`, `codeRunner.ts`, `XcodeApp.tsx`, `LeetCodeApp.tsx`, routes & icon integration | None | **DONE** |
+| M3 | Apple HealthKit 3D Activity Rings, Gyroscope & Hardware Haptics | `haptics.ts`, `FitnessApp.tsx` (3D rings, gyro/mouse kinetic gauge, 360° medals), `SpatialParallax.tsx` | None | **DONE** |
+| M4 | Spotlight Search 2.0 with Math, Conversions & Shortcuts | `spotlightIndex.ts`, `mathEvaluator.ts`, `SpotlightSearch.tsx`, action shortcuts | M1, M2 | **DONE** |
+| M5 | ESP32 Dual-Core FreeRTOS & Oscilloscope Engineering Lab | `EmbeddedLabApp.tsx` (dual-core telemetry, 60fps canvas oscilloscope, noise injection & CRC retransmit) | None | **DONE** |
+| M6 | macOS Sequoia Mirroring & iOS 18 Genmoji / Image Playground | `MacMirrorView.tsx` (mirroring, clipboard, drag-drop), `GenmojiApp.tsx` (mixing, diffusion, export, iMessage) | M1, M5 | **DONE** |
+| M7 | Final Milestone: 100% E2E Test Suite & Adversarial Hardening | Tier 1-4 test execution from E2E Testing Track; Tier 5 white-box adversarial coverage hardening; deployment push | M1-M6, TEST_READY | **DONE** |
 
 *Parallel Track: E2E Testing Track Orchestrator runs in parallel to design and implement the comprehensive test harness and test suite (`TEST_INFRA.md` -> `TEST_READY.md`).*
 

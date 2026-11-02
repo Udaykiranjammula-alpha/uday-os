@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Laptop } from 'lucide-react';
 import { DynamicIsland } from './DynamicIsland';
 import { PiPOverlay } from './PiPOverlay';
 import { StatusBar } from './StatusBar';
@@ -24,6 +25,7 @@ import { CameraApp } from '../apps/CameraApp';
 import { AiAssistantApp } from '../apps/AiAssistantApp';
 import { LeetCodeApp } from '../apps/LeetCodeApp';
 import { XcodeApp } from '../apps/XcodeApp';
+import { EmbeddedLabApp } from '../apps/EmbeddedLabApp';
 import { MessagesApp } from '../apps/MessagesApp';
 import { ArcadeApp } from '../apps/ArcadeApp';
 import { ClockApp } from '../apps/ClockApp';
@@ -71,6 +73,7 @@ export interface IPhoneScreenContentProps {
   onOpenCameraControl?: () => void;
   onOpenNameDrop?: () => void;
   onOpenSpatialBreakout?: () => void;
+  universalPasteNotification?: string | null;
 }
 
 export function IPhoneScreenContent({
@@ -92,6 +95,7 @@ export function IPhoneScreenContent({
   onOpenCameraControl,
   onOpenNameDrop,
   onOpenSpatialBreakout,
+  universalPasteNotification,
 }: IPhoneScreenContentProps) {
   const previousRouteRef = useRef<string>('home');
   useEffect(() => {
@@ -295,6 +299,14 @@ export function IPhoneScreenContent({
         onNavigate={onNavigate}
         onOpenLiveActivities={onOpenLiveActivities}
       />
+
+      {/* Universal Clipboard Toast from macOS Sequoia Mirroring (Feature 26) */}
+      {universalPasteNotification && (
+        <div className="phone-mac-paste-toast">
+          <Laptop size={12} className="text-zinc-200" />
+          <span>{universalPasteNotification}</span>
+        </div>
+      )}
 
       {/* Status Bar (Right side taps trigger iOS 18 Control Center, battery triggers MagSafe) */}
       <StatusBar
@@ -701,6 +713,16 @@ export function IPhoneScreenContent({
             >
               <XcodeApp onBack={() => onNavigate('home')} onNavigate={onNavigate} />
             </motion.div>
+          ) : currentRoute === 'embedded-lab' ? (
+            <motion.div
+              key="embedded-lab-view"
+              className="page-screen-anim"
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+            >
+              <EmbeddedLabApp onBack={() => onNavigate('home')} onNavigate={onNavigate} />
+            </motion.div>
           ) : currentRoute === 'messages' ? (
             <motion.div
               key="messages-view"
@@ -775,6 +797,11 @@ export function IPhoneScreenContent({
                 onNavigateProject={(p) => {
                   onNavigate('projects');
                   setActiveProject(p);
+                }}
+                onAction={(_actionId, payload) => {
+                  if (payload === 'titanium-black') setColor('black');
+                  if (payload === 'titanium-desert') setColor('desert');
+                  if (payload === 'toggle-torch') setFlashlightOn(!flashlightOn);
                 }}
               />
             </motion.div>

@@ -19,6 +19,7 @@ import {
   Lock,
 } from 'lucide-react';
 import { sound } from '../services/sound';
+import { haptics } from '../services/haptics';
 
 interface ControlCenterProps {
   isOpen: boolean;
@@ -49,6 +50,7 @@ export function ControlCenter({
   const [isPlaying, setIsPlaying] = useState(sound.getIsPlaying());
 
   const handleToggleMusic = () => {
+    haptics.tap();
     sound.toggleAmbientMusic((playing) => {
       setIsPlaying(playing);
     });
@@ -56,6 +58,7 @@ export function ControlCenter({
 
   const handleToggleFlashlight = () => {
     sound.playTapSound();
+    haptics.actionButton();
     setFlashlightOn(!flashlightOn);
   };
 
@@ -64,6 +67,7 @@ export function ControlCenter({
     const offsetY = rect.bottom - e.clientY;
     const ratio = Math.max(0.15, Math.min(1.0, offsetY / rect.height));
     setBrightness(ratio);
+    haptics.wheelTick();
   };
 
   const handleVolumePointer = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -73,6 +77,7 @@ export function ControlCenter({
     const newVol = Math.round(ratio * 100);
     setVolume(newVol);
     sound.setVolume(ratio);
+    haptics.wheelTick();
   };
 
   return (

@@ -1,4 +1,4 @@
-# BRIEFING — 2026-11-01T15:56:00Z
+# BRIEFING — 2026-11-01T16:30:00Z
 
 ## Mission
 Implement Milestone 1 in full: Dynamic Island Live Activities & PiP Multitasking with complete real-time coordinators, canvas waveforms, circular countdown rings, A18 Pro indicators, expanded capsule controls, persistent PiP overlay, Music/Clock integration, and Robocopy synchronization.
@@ -18,7 +18,7 @@ Implement Milestone 1 in full: Dynamic Island Live Activities & PiP Multitasking
 
 ## Current Parent
 - Conversation ID: 1ae9bb65-98e9-49e2-889d-e047ba75afaf
-- Updated: 2026-11-01T15:56:00Z
+- Updated: 2026-11-01T16:30:00Z
 
 ## Task Summary
 - **What to build**:
@@ -36,9 +36,10 @@ Implement Milestone 1 in full: Dynamic Island Live Activities & PiP Multitasking
 - **Code layout**: PROJECT.md § Code Layout.
 
 ## Key Decisions Made
-- Standardize `LiveActivityState` to comprehensively support Audio, Clock, Algorithm/Compiler, and PiP with clean helper methods.
-- Provide `useLiveActivity()` via `useSyncExternalStore` for seamless reactive components without stale closures.
+- Standardized `LiveActivityState` to comprehensively support Audio, Clock, Algorithm/Compiler, and PiP with clean helper methods.
+- Provided `useLiveActivity()` via `useSyncExternalStore` for seamless reactive components without stale closures.
 - Canvas renderers use direct context drawing via `requestAnimationFrame` and `useRef` to avoid React re-render thrashing.
+- Used `Date.now()` and global timers in `liveActivity.ts` for environment compatibility across browser runtime and Vitest runner.
 
 ## Artifact Index
 - `src/services/liveActivity.ts` — Central coordinator service & subscription hook
@@ -51,11 +52,19 @@ Implement Milestone 1 in full: Dynamic Island Live Activities & PiP Multitasking
 - `src/__tests__/liveActivity.test.ts` — Unit tests for live activity coordinator
 
 ## Change Tracker
-- **Files modified**: [TBD]
-- **Build status**: pending
+- **Files modified**:
+  - `src/services/liveActivity.ts`: Singleton coordinator with 50ms timer engine, audio, algorithm, and PiP multitasking.
+  - `src/components/DynamicIsland.tsx`: Compact & expanded capsule with 4-bar and 20-bar canvas audio visualizers, circular countdown ring, cyan A18 Pro indicator, tabs.
+  - `src/components/PiPOverlay.tsx`: Persistent draggable floating video window clamped to bezel coordinates with 60fps canvas screencast.
+  - `src/components/IPhoneScreenContent.tsx`: Mounted persistent `PiPOverlay` outside route AnimatePresence.
+  - `src/apps/MusicApp.tsx`: Synchronized playback, track selection, scrubber, and volume with `liveActivity`.
+  - `src/apps/ClockApp.tsx`: Synchronized stopwatch and timer with `liveActivity` across navigation.
+  - `src/styles.css`: Added glassmorphic styling, animations, and keyframes for capsule and PiP window.
+  - `src/__tests__/liveActivity.test.ts`: Added 10 comprehensive unit tests covering all coordinator subsystems.
+- **Build status**: PASS (`tsc --noEmit` clean, 206/206 tests passing, Vite production build clean in 5.98s)
 - **Pending issues**: none
 
 ## Quality Status
-- **Build/test result**: pending
-- **Lint status**: 0
-- **Tests added/modified**: pending
+- **Build/test result**: PASS (tsc: 0 errors; tests: 206/206 passed; build: 0 errors)
+- **Lint status**: 0 violations
+- **Tests added/modified**: `src/__tests__/liveActivity.test.ts` (10 tests added, all passing)

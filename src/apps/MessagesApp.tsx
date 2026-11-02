@@ -64,6 +64,27 @@ export function MessagesApp({ onBack, onNavigate }: MessagesAppProps) {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
+  // Load newly transferred Genmoji sticker from Image Playground
+  useEffect(() => {
+    try {
+      const rawSticker = localStorage.getItem('uday_latest_genmoji_sticker');
+      if (rawSticker) {
+        const sticker = JSON.parse(rawSticker);
+        localStorage.removeItem('uday_latest_genmoji_sticker');
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `genmoji-${Date.now()}`,
+            sender: 'recruiter',
+            text: `🎨 [Genmoji Sticker] ${sticker.emoji} ${sticker.badge} (${sticker.name})`,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            status: 'Delivered',
+          },
+        ]);
+      }
+    } catch {}
+  }, []);
+
   const triggerConfetti = useCallback(() => {
     setShowConfetti(true);
     sound.playApplePayChime();

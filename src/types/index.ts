@@ -12,7 +12,8 @@ export type AppId =
   | 'terminal'
   | 'settings'
   | 'notes'
-  | 'xcode';
+  | 'xcode'
+  | 'embedded-lab';
 
 export type ProjectCategory =
   | 'All'

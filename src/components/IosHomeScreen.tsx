@@ -524,6 +524,23 @@ export function IosHomeScreen({ onNavigate, onOpenSearch, onOpenStandBy }: IosHo
                 <span className="ios-icon-title">App Store</span>
               </button>
             </section>
+
+            {/* Row 4: Systems & Hardware Lab */}
+            <section className="apps-single-row" style={{ marginTop: '4px' }}>
+              {/* Embedded Systems Lab */}
+              <button
+                type="button"
+                className="ios-home-icon-btn"
+                onClick={() => handleNav('embedded-lab')}
+                aria-label="ESP32 Dual-Core FreeRTOS & Oscilloscope Lab"
+              >
+                <div className="ios-icon-box embedded-home-box">
+                  <span style={{ fontSize: 26 }}>⚡</span>
+                  <span className="app-red-badge">RTOS</span>
+                </div>
+                <span className="ios-icon-title">Systems Lab</span>
+              </button>
+            </section>
           </div>
         </motion.div>
 

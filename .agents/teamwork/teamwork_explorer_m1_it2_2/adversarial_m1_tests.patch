@@ -1,0 +1,73 @@
+diff --git a/src/__tests__/adversarial_m1.test.ts b/src/__tests__/adversarial_m1.test.ts
+index d7a67b9..98b3f12 100644
+--- a/src/__tests__/adversarial_m1.test.ts
++++ b/src/__tests__/adversarial_m1.test.ts
+@@ -207,45 +207,38 @@ describe('Milestone 1 Adversarial Challenge & Stress Suite', () => {
+-    it('DEFECT 2 REPRODUCTION: Clock type cross-toggle deadlock (toggleStopwatchRunning no-ops when timer active, toggleTimerRunning no-ops when stopwatch active)', () => {
++    it('FIX VERIFIED 2: Clock type cross-toggle transitions mode cleanly without deadlock', () => {
+       // Scenario A: Timer is active, user invokes toggleStopwatchRunning
+       liveActivity.startTimer(120);
+       expect(liveActivity.getClock().isActive).toBe(true);
+       expect(liveActivity.getClock().type).toBe('timer');
++      expect(liveActivity.getClock().isRunning).toBe(true);
+       expect(liveActivity.getClock().isPaused).toBe(false);
+ 
+-      // Calling toggleStopwatchRunning:
+-      // Inside liveActivity.ts:
+-      // if (this.state.clock.isActive && !this.state.clock.isPaused) { this.pauseStopwatch(); }
+-      // Inside pauseStopwatch():
+-      // if (!this.state.clock.isActive || this.state.clock.type !== 'stopwatch') return;
+-      // Because type is 'timer', pauseStopwatch returns immediately without doing anything!
++      // Calling toggleStopwatchRunning switches cleanly to stopwatch
+       liveActivity.toggleStopwatchRunning();
+       const afterToggleStopwatch = liveActivity.getClock();
+-      // It neither paused the timer nor started the stopwatch!
+-      expect(afterToggleStopwatch.type).toBe('timer');
+-      expect(afterToggleStopwatch.isPaused).toBe(false); // BUG CONFIRMED: DEADLOCK / NO-OP!
++      expect(afterToggleStopwatch.isActive).toBe(true);
++      expect(afterToggleStopwatch.type).toBe('stopwatch');
++      expect(afterToggleStopwatch.isRunning).toBe(true);
++      expect(afterToggleStopwatch.isPaused).toBe(false);
++      expect(afterToggleStopwatch.remainingMs).toBe(0);
++      expect(afterToggleStopwatch.formattedTime).toBe('00:00.00');
+ 
+       // Scenario B: Stopwatch is active, user invokes toggleTimerRunning
+-      liveActivity.startStopwatch();
+-      expect(liveActivity.getClock().isActive).toBe(true);
+       expect(liveActivity.getClock().type).toBe('stopwatch');
+       expect(liveActivity.getClock().isPaused).toBe(false);
+ 
+-      // Calling toggleTimerRunning:
+-      // Inside liveActivity.ts:
+-      // if (!this.state.clock.isActive) { this.startTimer(300); return; }
+-      // if (this.state.clock.isPaused) { this.resumeTimer(); } else { this.pauseTimer(); }
+-      // Inside pauseTimer():
+-      // if (!this.state.clock.isActive || this.state.clock.type !== 'timer') return;
+-      // Because type is 'stopwatch', pauseTimer returns immediately without doing anything!
++      // Calling toggleTimerRunning switches cleanly to timer (default 300s)
+       liveActivity.toggleTimerRunning();
+       const afterToggleTimer = liveActivity.getClock();
+-      expect(afterToggleTimer.type).toBe('stopwatch');
+-      expect(afterToggleTimer.isPaused).toBe(false); // BUG CONFIRMED: DEADLOCK / NO-OP!
++      expect(afterToggleTimer.isActive).toBe(true);
++      expect(afterToggleTimer.type).toBe('timer');
++      expect(afterToggleTimer.isRunning).toBe(true);
++      expect(afterToggleTimer.isPaused).toBe(false);
++      expect(afterToggleTimer.remainingMs).toBe(300000);
++      expect(afterToggleTimer.formattedTime).toBe('05:00');
+     });
+ 
+-    it('DEFECT 3 REPRODUCTION: Negative duration timer produces invalid negative formattedTime "-1:-10"', () => {
++    it('FIX VERIFIED 3: Negative duration timer is sanitized to 0s and formatted safely as "00:00"', () => {
+       // Calling startTimer with negative duration
+       liveActivity.startTimer(-10);
+       const clock = liveActivity.getClock();
+-      // formatMinutesSeconds(-10000) does Math.floor(-10 / 60) = -1 and -10 % 60 = -10
+-      // yielding "-1:-10" on Dynamic Island for up to 50ms before tick 1 clamps remainingMs
+-      expect(clock.formattedTime).toBe('-1:-10'); // BUG CONFIRMED: Invalid negative time display!
++      expect(clock.totalDurationMs).toBe(0);
++      expect(clock.remainingMs).toBe(0);
++      expect(clock.totalDurationSeconds).toBe(0);
++      expect(clock.remainingSeconds).toBe(0);
++      expect(clock.formattedTime).toBe('00:00');
+     });

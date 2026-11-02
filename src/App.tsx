@@ -13,6 +13,7 @@ import { LiveActivitiesModal } from './components/LiveActivitiesModal';
 import { CameraControlHUD } from './components/CameraControlHUD';
 import { ApplePayRecruiterSheet } from './components/ApplePayRecruiterSheet';
 import { KeynoteStudioHub } from './components/KeynoteStudioHub';
+import { MacMirrorView } from './components/MacMirrorView';
 import {
   Rotate3d,
   Share2,
@@ -34,6 +35,7 @@ import {
   MapPin,
   Camera,
   CreditCard,
+  Laptop,
 } from 'lucide-react';
 import type { Project } from './types';
 import { profile } from './data/profile';
@@ -64,8 +66,23 @@ export default function App() {
   const [isCameraControlOpen, setIsCameraControlOpen] = useState(false);
   const [isApplePayOpen, setIsApplePayOpen] = useState(false);
   const [isKeynoteHubOpen, setIsKeynoteHubOpen] = useState(false);
+  const [isMacMirrorOpen, setIsMacMirrorOpen] = useState(false);
+  const [universalPasteNotification, setUniversalPasteNotification] = useState<string | null>(null);
   const [visionOSEnv, setVisionOSEnv] = useState<VisionOSEnvironment>('steve-jobs');
   const [copiedUrl, setCopiedUrl] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth >= 1200) {
+      setIsMacMirrorOpen(true);
+    }
+  }, []);
+
+  const handleUniversalPaste = (_snippet: string) => {
+    setUniversalPasteNotification('Pasted from MacBook Pro');
+    setTimeout(() => {
+      setUniversalPasteNotification(null);
+    }, 3000);
+  };
 
   const [currentRoute, setCurrentRoute] = useState<string>(() => {
     return normalizeRoute(window.location.hash);
@@ -417,6 +434,21 @@ export default function App() {
             <Share2 size={13} />
             <span>Share & QR</span>
           </button>
+
+          {/* macOS Sequoia iPhone Mirroring Pill (Feature 25) */}
+          <button
+            type="button"
+            className={`studio-flip-pill ${isMacMirrorOpen ? 'active' : ''}`}
+            onClick={() => {
+              sound.playTapSound();
+              setIsMacMirrorOpen((prev) => !prev);
+            }}
+            title="Toggle macOS Sequoia iPhone Mirroring"
+            aria-label="Toggle Mac Mirroring"
+          >
+            <Laptop size={13} />
+            <span>Mac Mirroring</span>
+          </button>
         </div>
       </nav>
 
@@ -449,6 +481,7 @@ export default function App() {
             onOpenCameraControl={() => setIsCameraControlOpen(true)}
             onOpenNameDrop={() => setIsNameDropOpen(true)}
             onOpenSpatialBreakout={() => setIsSpatialOpen(true)}
+            universalPasteNotification={universalPasteNotification}
           />
         </Phone3DCanvas>
 
@@ -602,6 +635,14 @@ export default function App() {
         onOpenActionCarousel={() => setIsActionCarouselOpen(true)}
         onToggleFlip={() => setIsFlipped(!isFlipped)}
         isFlipped={isFlipped}
+      />
+
+      {/* macOS Sequoia iPhone Mirroring & Universal Clipboard Window (Features 25 - 27) */}
+      <MacMirrorView
+        isOpen={isMacMirrorOpen}
+        onClose={() => setIsMacMirrorOpen(false)}
+        onNavigatePhone={navigateTo}
+        onUniversalPaste={handleUniversalPaste}
       />
     </main>
   );

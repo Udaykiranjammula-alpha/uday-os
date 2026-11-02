@@ -14,6 +14,7 @@ import {
   Image as ImageIcon,
   StickyNote,
   Code2,
+  Cpu,
   type LucideIcon,
 } from 'lucide-react';
 import type { AppId } from '../types';
@@ -34,6 +35,7 @@ const iconComponentMap: Record<AppId, LucideIcon> = {
   terminal: TerminalIcon,
   settings: Settings,
   xcode: Code2,
+  'embedded-lab': Cpu,
 };
 
 interface AppIconProps {

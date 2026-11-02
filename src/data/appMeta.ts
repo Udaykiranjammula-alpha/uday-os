@@ -15,4 +15,5 @@ export const appMeta: Record<AppId, AppMeta> = {
   terminal: { label: 'Terminal', short: '>_', color: '#111827' },
   settings: { label: 'Settings', short: '⚙', color: '#64748b' },
   xcode: { label: 'Xcode Cloud', short: 'XC', color: '#0a84ff', badge: 'PRO' },
+  'embedded-lab': { label: 'Embedded Lab', short: 'ESP', color: '#00e5ff', badge: 'RTOS' },
 };

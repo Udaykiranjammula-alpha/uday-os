@@ -17,8 +17,13 @@ import {
   Dumbbell,
   Timer,
   Check,
+  Compass,
+  Activity,
+  Shield,
+  RotateCw,
 } from 'lucide-react';
 import { sound } from '../services/sound';
+import { haptics } from '../services/haptics';
 
 interface FitnessAppProps {
   onBack: () => void;
@@ -35,11 +40,177 @@ interface AwardBadge {
   theme: 'gold' | 'cyan' | 'rose' | 'emerald' | 'purple' | 'amber';
 }
 
+interface InteractiveMedal {
+  id: string;
+  title: string;
+  tier: 'gold' | 'cyan';
+  criteria: string;
+  criteriaSolved?: number;
+  criteriaDegree?: string;
+  criteriaTech?: string;
+  unlocked: boolean;
+  icon: string;
+  description: string;
+}
+
 export function FitnessApp({ onBack, onNavigate }: FitnessAppProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedDay, setSelectedDay] = useState(4); // Friday
   const [showConfetti, setShowConfetti] = useState(false);
   const [selectedBadge, setSelectedBadge] = useState<AwardBadge | null>(null);
+
+  // 360° Interactive Draggable 3D Medals
+  const interactiveMedals: InteractiveMedal[] = [
+    {
+      id: 'leetcode',
+      title: '184 LeetCode Master Medal',
+      tier: 'gold',
+      criteria: '184 Solved · Top 5% Optimal O(N)',
+      criteriaSolved: 184,
+      unlocked: true,
+      icon: '🥇',
+      description: 'Gold-tier distinction for solving 184+ LeetCode problems with sub-millisecond execution complexity.',
+    },
+    {
+      id: 'kl-university',
+      title: 'KL University Distinction Shield',
+      tier: 'gold',
+      criteria: 'B.Tech CSE · First Class Distinction',
+      criteriaDegree: 'B.Tech CSE',
+      unlocked: true,
+      icon: '🛡️',
+      description: 'Academic distinction awarded by KL University for excellence in Computer Science & Systems Engineering.',
+    },
+    {
+      id: 'esp32',
+      title: 'ESP32 Dual-Core Telemetry Trophy',
+      tier: 'cyan',
+      criteria: 'FreeRTOS · Dual-Core Pipeline',
+      criteriaTech: 'FreeRTOS',
+      unlocked: true,
+      icon: '🏆',
+      description: 'Hardware excellence award for engineering dual-core FreeRTOS Wi-Fi CSI sensing & edge inference engines.',
+    },
+  ];
+
+  const [activeMedalId, setActiveMedalId] = useState<string>('leetcode');
+  const [medalRotationY, setMedalRotationY] = useState<number>(0);
+  const [isDraggingMedal, setIsDraggingMedal] = useState<boolean>(false);
+  const medalDragStartX = useRef<number>(0);
+  const medalDragStartAngle = useRef<number>(0);
+
+  // Kinetic Energy & Gyroscope Telemetry
+  const [kineticCharge, setKineticCharge] = useState<number>(45);
+  const [isShakeActive, setIsShakeActive] = useState<boolean>(false);
+  const [telemetry, setTelemetry] = useState<{
+    magnitude: number;
+    mode: 'native-gyro' | 'desktop-inertial-mouse';
+  }>({
+    magnitude: 9.81,
+    mode: 'desktop-inertial-mouse',
+  });
+
+  // Mouse velocity tracking for desktop inertial fallback
+  const lastMousePos = useRef<{ x: number; y: number; t: number }>({ x: 0, y: 0, t: Date.now() });
+
+  useEffect(() => {
+    // 1. DeviceMotionEvent / DeviceOrientation for Native Mobile
+    let hasNativeGyro = false;
+
+    const handleDeviceMotion = (e: DeviceMotionEvent) => {
+      hasNativeGyro = true;
+      const acc = e.accelerationIncludingGravity;
+      if (acc && acc.x !== null && acc.y !== null && acc.z !== null) {
+        const mag = Math.sqrt(acc.x * acc.x + acc.y * acc.y + acc.z * acc.z);
+        setTelemetry({ magnitude: parseFloat(mag.toFixed(2)), mode: 'native-gyro' });
+        if (mag > 18.0) {
+          setIsShakeActive(true);
+          haptics.actionButton();
+          setTimeout(() => setIsShakeActive(false), 800);
+        }
+        setKineticCharge((prev) => Math.min(100, Math.max(0, prev + (mag - 9.8) * 0.8)));
+      }
+    };
+
+    // 2. Mouse Inertial Velocity Fallback for Desktop
+    const handleMouseMove = (e: MouseEvent) => {
+      if (hasNativeGyro) return;
+      const now = Date.now();
+      const dt = Math.max(1, now - lastMousePos.current.t);
+      const dx = e.clientX - lastMousePos.current.x;
+      const dy = e.clientY - lastMousePos.current.y;
+      const speed = Math.sqrt(dx * dx + dy * dy) / dt; // px/ms
+      lastMousePos.current = { x: e.clientX, y: e.clientY, t: now };
+
+      const simulatedMag = 9.81 + speed * 12.0;
+      setTelemetry({
+        magnitude: parseFloat(simulatedMag.toFixed(2)),
+        mode: 'desktop-inertial-mouse',
+      });
+
+      if (simulatedMag > 18.0) {
+        setIsShakeActive(true);
+        setTimeout(() => setIsShakeActive(false), 500);
+      }
+
+      setKineticCharge((prev) => Math.min(100, prev + speed * 6.5));
+    };
+
+    // 3. Leaky-bucket exponential decay
+    const decayInterval = setInterval(() => {
+      setKineticCharge((prev) => {
+        if (prev <= 15) return 15;
+        return parseFloat((prev * 0.94).toFixed(1));
+      });
+    }, 250);
+
+    window.addEventListener('devicemotion', handleDeviceMotion, { passive: true });
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+
+    return () => {
+      window.removeEventListener('devicemotion', handleDeviceMotion);
+      window.removeEventListener('mousemove', handleMouseMove);
+      clearInterval(decayInterval);
+    };
+  }, []);
+
+  const computeSpecularGlow = (rotationDeg: number) => {
+    const rad = (rotationDeg * Math.PI) / 180;
+    const lightAngle = (45 * Math.PI) / 180;
+    return Math.max(0, Math.cos(rad - lightAngle));
+  };
+
+  const handleMedalPointerDown = (e: React.PointerEvent) => {
+    setIsDraggingMedal(true);
+    medalDragStartX.current = e.clientX;
+    medalDragStartAngle.current = medalRotationY;
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    } catch {}
+  };
+
+  const handleMedalPointerMove = (e: React.PointerEvent) => {
+    if (!isDraggingMedal) return;
+    const deltaX = e.clientX - medalDragStartX.current;
+    const newAngle = ((medalDragStartAngle.current + deltaX * 0.5) % 360 + 360) % 360;
+    setMedalRotationY(newAngle);
+    if (Math.abs(deltaX) % 24 < 2) {
+      haptics.wheelTick();
+    }
+  };
+
+  const handleMedalPointerUp = (e: React.PointerEvent) => {
+    if (!isDraggingMedal) return;
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {}
+    setIsDraggingMedal(false);
+    // Cupertino spring snap to front
+    const normalized = ((medalRotationY % 360) + 360) % 360;
+    const snapTo = normalized > 180 ? 360 : 0;
+    setMedalRotationY(snapTo === 360 ? 0 : 0);
+    haptics.tap();
+  };
 
   // Exact Apple Fitness 3 activity rings metrics requested:
   // Move 620/600 kcal, Exercise 45/30 min, Stand 12/12 hr
@@ -251,12 +422,14 @@ export function FitnessApp({ onBack, onNavigate }: FitnessAppProps) {
 
   const handleCelebrate = () => {
     sound.playWatchPingSound();
+    haptics.success();
     setShowConfetti(true);
     setTimeout(() => setShowConfetti(false), 3200);
   };
 
   const handleOpenBadge = (badge: AwardBadge) => {
     sound.playTapSound();
+    haptics.tap();
     setSelectedBadge(badge);
   };
 
@@ -407,6 +580,134 @@ export function FitnessApp({ onBack, onNavigate }: FitnessAppProps) {
             <span className="trend-sub text-zinc-400">Flow state sustained</span>
           </div>
         </div>
+
+        {/* Kinetic Energy & Gyroscope Telemetry (Features 13 & 14) */}
+        <div className="fitness-section-header">
+          <div className="flex items-center gap-1.5">
+            <Activity size={15} className="text-emerald-400" />
+            <h2>Kinetic Motion Telemetry</h2>
+          </div>
+          <span className="text-[11px] text-zinc-400 font-mono">
+            {telemetry.mode === 'native-gyro' ? '📱 iOS Gyroscope' : '🖱️ Inertial Mouse'}
+          </span>
+        </div>
+
+        <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-3.5 mb-4 backdrop-blur-md">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Compass size={14} className={isShakeActive ? 'text-amber-400 animate-spin' : 'text-emerald-400'} />
+              <span className="text-xs font-semibold text-zinc-200">Kinetic Energy Charge</span>
+            </div>
+            <div className="flex items-center gap-2">
+              {isShakeActive && (
+                <span className="text-[10px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded-full font-bold">
+                  SHAKE DETECTED
+                </span>
+              )}
+              <span className="text-xs font-mono text-emerald-400 font-bold">{Math.round(kineticCharge)}%</span>
+            </div>
+          </div>
+
+          {/* Kinetic Energy Bar with Leaky-Bucket Decay */}
+          <div className="w-full bg-zinc-800 h-2.5 rounded-full overflow-hidden mb-2.5">
+            <div
+              className="h-full bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400 rounded-full transition-all duration-150"
+              style={{
+                width: `${Math.min(100, Math.max(0, kineticCharge))}%`,
+                boxShadow: kineticCharge > 50 ? '0 0 10px rgba(52, 211, 153, 0.6)' : 'none',
+              }}
+            />
+          </div>
+
+          <div className="flex items-center justify-between text-[11px] text-zinc-400 font-mono">
+            <span>Accel Magnitude: {telemetry.magnitude.toFixed(2)} m/s²</span>
+            <span>Leaky-Bucket: -6%/tick</span>
+          </div>
+        </div>
+
+        {/* 360° Interactive Metallic Medals (Feature 15) */}
+        <div className="fitness-section-header">
+          <div className="flex items-center gap-1.5">
+            <Shield size={15} className="text-amber-400" />
+            <h2>360° Interactive Medals</h2>
+          </div>
+          <span className="text-[11px] text-zinc-400 font-medium">Drag to spin</span>
+        </div>
+
+        {/* Medal Switcher Tabs */}
+        <div className="flex gap-1.5 mb-3">
+          {interactiveMedals.map((m) => (
+            <button
+              key={m.id}
+              type="button"
+              className={`flex-1 py-1 px-1.5 rounded-lg text-[11px] font-medium transition-all ${
+                activeMedalId === m.id
+                  ? 'bg-zinc-800 text-white border border-zinc-700 shadow-sm'
+                  : 'bg-zinc-900/60 text-zinc-400 border border-zinc-800/60 hover:text-zinc-200'
+              }`}
+              onClick={() => {
+                haptics.tap();
+                setActiveMedalId(m.id);
+                setMedalRotationY(0);
+              }}
+            >
+              {m.title.split(' ')[1] || m.title}
+            </button>
+          ))}
+        </div>
+
+        {/* 3D Interactive Medal Viewport */}
+        {(() => {
+          const activeMedal = interactiveMedals.find((m) => m.id === activeMedalId) || interactiveMedals[0];
+          const specularGlow = computeSpecularGlow(medalRotationY);
+
+          return (
+            <div
+              className="relative bg-zinc-900/90 border border-zinc-800 rounded-2xl p-4 mb-4 select-none touch-none cursor-grab active:cursor-grabbing overflow-hidden text-center"
+              onPointerDown={handleMedalPointerDown}
+              onPointerMove={handleMedalPointerMove}
+              onPointerUp={handleMedalPointerUp}
+              onPointerCancel={handleMedalPointerUp}
+            >
+              {/* 3D Rotating Medal Disc */}
+              <div
+                className="w-24 h-24 mx-auto rounded-full relative flex items-center justify-center text-4xl mb-3 shadow-2xl transition-transform"
+                style={{
+                  transform: `perspective(600px) rotateY(${medalRotationY}deg)`,
+                  background:
+                    activeMedal.tier === 'gold'
+                      ? 'radial-gradient(circle at 35% 35%, #ffe066, #d97706, #78350f)'
+                      : 'radial-gradient(circle at 35% 35%, #7dd3fc, #0284c7, #082f49)',
+                  border: activeMedal.tier === 'gold' ? '2px solid #fef08a' : '2px solid #bae6fd',
+                  boxShadow: `0 8px 24px rgba(0,0,0,0.6), inset 0 2px 4px rgba(255,255,255,0.4)`,
+                }}
+              >
+                {/* Dynamic Specular Glare Reflection Highlight */}
+                <div
+                  className="absolute inset-0 rounded-full pointer-events-none"
+                  style={{
+                    background:
+                      'linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 60%)',
+                    opacity: specularGlow,
+                    transition: 'opacity 0.05s linear',
+                  }}
+                />
+                <span className="relative z-10 drop-shadow-md">{activeMedal.icon}</span>
+              </div>
+
+              <h3 className="text-sm font-bold text-white mb-0.5">{activeMedal.title}</h3>
+              <p className="text-xs text-amber-400 font-semibold mb-1">{activeMedal.criteria}</p>
+              <p className="text-[11px] text-zinc-400 max-w-xs mx-auto leading-relaxed mb-2">
+                {activeMedal.description}
+              </p>
+
+              <div className="flex items-center justify-center gap-1 text-[10px] text-zinc-500 font-mono">
+                <RotateCw size={10} />
+                <span>Drag horizontally to rotate 360° · Spring snap-back</span>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Apple Fitness Award Badges Grid */}
         <div className="fitness-section-header">
