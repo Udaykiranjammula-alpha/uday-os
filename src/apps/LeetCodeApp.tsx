@@ -31,7 +31,7 @@ interface SolutionProblem {
   cppCode: string;
 }
 
-export function LeetCodeApp({ onBack }: { onBack: () => void }) {
+export function LeetCodeApp({ onBack, onNavigate }: { onBack: () => void; onNavigate?: (route: string) => void }) {
   const [activeTab, setActiveTab] = useState<'overview' | 'solutions' | 'topics'>('overview');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDifficulty, setSelectedDifficulty] = useState<'All' | 'Easy' | 'Medium' | 'Hard'>('All');
@@ -538,6 +538,30 @@ public:
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Xcode Cloud Interactive Playground Callout */}
+            <div className="lc-section-box lc-xcode-callout">
+              <div className="lc-xcode-callout-header">
+                <Code2 size={16} className="text-cyan" />
+                <h3 className="lc-section-title" style={{ margin: 0 }}>Xcode Cloud Playground</h3>
+              </div>
+              <p className="lc-section-desc">
+                Recruiters can test live algorithm execution in Apple SF Mono with real microsecond latency, memory tracking, and Dynamic Island A18 Pro CPU gauges!
+              </p>
+              {onNavigate && (
+                <button
+                  type="button"
+                  className="lc-open-xcode-btn"
+                  onClick={() => {
+                    sound.playTapSound();
+                    onNavigate('xcode');
+                  }}
+                >
+                  <ExternalLink size={12} className="mr-1" />
+                  <span>Launch Xcode Cloud Compiler</span>
+                </button>
+              )}
             </div>
 
             {/* Quick Skills Callout */}

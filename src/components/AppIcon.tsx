@@ -13,6 +13,7 @@ import {
   Settings,
   Image as ImageIcon,
   StickyNote,
+  Code2,
   type LucideIcon,
 } from 'lucide-react';
 import type { AppId } from '../types';
@@ -32,6 +33,7 @@ const iconComponentMap: Record<AppId, LucideIcon> = {
   notes: StickyNote,
   terminal: TerminalIcon,
   settings: Settings,
+  xcode: Code2,
 };
 
 interface AppIconProps {

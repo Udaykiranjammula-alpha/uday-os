@@ -353,17 +353,18 @@ export function IosHomeScreen({ onNavigate, onOpenSearch, onOpenStandBy }: IosHo
 
             {/* Row 1: Media & Creative */}
             <section className="apps-single-row" style={{ marginTop: '6px' }}>
-              {/* Photos Gallery */}
+              {/* Xcode Cloud In-Phone IDE */}
               <button
                 type="button"
                 className="ios-home-icon-btn"
-                onClick={() => handleNav('photos')}
-                aria-label="Photos application"
+                onClick={() => handleNav('xcode')}
+                aria-label="Xcode Cloud In-Phone Compiler"
               >
-                <div className="ios-icon-box">
-                  <img src="/ios/photos.png" alt="Photos" width={52} height={52} />
+                <div className="ios-icon-box xcode-home-box">
+                  <span style={{ fontSize: 26 }}>🛠️</span>
+                  <span className="app-red-badge">A18</span>
                 </div>
-                <span className="ios-icon-title">Photos</span>
+                <span className="ios-icon-title">Xcode</span>
               </button>
 
               {/* Apple Maps 3D Flyover */}

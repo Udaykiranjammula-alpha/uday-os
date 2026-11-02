@@ -14,4 +14,5 @@ export const appMeta: Record<AppId, AppMeta> = {
   notes: { label: 'Notes', short: 'NT', color: '#ec4899', badge: '3' },
   terminal: { label: 'Terminal', short: '>_', color: '#111827' },
   settings: { label: 'Settings', short: '⚙', color: '#64748b' },
+  xcode: { label: 'Xcode Cloud', short: 'XC', color: '#0a84ff', badge: 'PRO' },
 };

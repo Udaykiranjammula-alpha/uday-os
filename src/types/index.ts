@@ -11,7 +11,8 @@ export type AppId =
   | 'achievements'
   | 'terminal'
   | 'settings'
-  | 'notes';
+  | 'notes'
+  | 'xcode';
 
 export type ProjectCategory =
   | 'All'

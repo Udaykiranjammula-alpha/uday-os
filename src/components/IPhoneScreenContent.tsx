@@ -23,6 +23,7 @@ import { TerminalApp } from '../apps/TerminalApp';
 import { CameraApp } from '../apps/CameraApp';
 import { AiAssistantApp } from '../apps/AiAssistantApp';
 import { LeetCodeApp } from '../apps/LeetCodeApp';
+import { XcodeApp } from '../apps/XcodeApp';
 import { MessagesApp } from '../apps/MessagesApp';
 import { ArcadeApp } from '../apps/ArcadeApp';
 import { ClockApp } from '../apps/ClockApp';
@@ -688,7 +689,17 @@ export function IPhoneScreenContent({
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <LeetCodeApp onBack={() => onNavigate('home')} />
+              <LeetCodeApp onBack={() => onNavigate('home')} onNavigate={onNavigate} />
+            </motion.div>
+          ) : currentRoute === 'xcode' ? (
+            <motion.div
+              key="xcode-view"
+              className="page-screen-anim"
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+            >
+              <XcodeApp onBack={() => onNavigate('home')} onNavigate={onNavigate} />
             </motion.div>
           ) : currentRoute === 'messages' ? (
             <motion.div
