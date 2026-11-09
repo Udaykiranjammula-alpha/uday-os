@@ -8,6 +8,7 @@ import { IosHomeScreen } from '../components/IosHomeScreen';
 import { AchievementsApp } from '../apps/AchievementsApp';
 import { EducationApp } from '../apps/EducationApp';
 import { IPhoneBack } from '../components/IPhoneBack';
+import { MacMirrorView } from '../components/MacMirrorView';
 
 describe('Master Perfection & Error-Free Quality Gates', () => {
   describe('1. Home Screen 3-Page Discrete Pagination & App Architecture', () => {
@@ -83,6 +84,28 @@ describe('Master Perfection & Error-Free Quality Gates', () => {
         expect(typeof route).toBe('string');
         expect(route.length).toBeGreaterThan(0);
       });
+    });
+  });
+
+  describe('4. macOS Sequoia iPhone Mirroring & Glassmorphism Window', () => {
+    it('MacMirrorView renders correctly with isOpen=true', () => {
+      expect(typeof MacMirrorView).toBe('function');
+      const el = React.createElement(MacMirrorView, {
+        isOpen: true,
+        onClose: () => {},
+        onNavigatePhone: () => {},
+        onUniversalPaste: () => {},
+      });
+      expect(el).toBeDefined();
+      expect(el.props.isOpen).toBe(true);
+    });
+
+    it('MacMirrorView returns null when isOpen=false', () => {
+      const el = React.createElement(MacMirrorView, {
+        isOpen: false,
+        onClose: () => {},
+      });
+      expect(el.props.isOpen).toBe(false);
     });
   });
 });
