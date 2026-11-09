@@ -19,6 +19,8 @@ import { InstagramApp } from '../apps/InstagramApp';
 import { PhotosApp } from '../apps/PhotosApp';
 import { SkillsApp } from '../apps/SkillsApp';
 import { ResumeApp } from '../apps/ResumeApp';
+import { AchievementsApp } from '../apps/AchievementsApp';
+import { EducationApp } from '../apps/EducationApp';
 import { NotesApp } from '../apps/NotesApp';
 import { TerminalApp } from '../apps/TerminalApp';
 import { CameraApp } from '../apps/CameraApp';
@@ -167,11 +169,14 @@ export function IPhoneScreenContent({
     // Only handle mouse drag-scrolling; touch devices already have native touch scroll
     if (e.pointerType !== 'mouse' || e.button !== 0) return;
 
+    // Home screen has strictly horizontal pagination with 0 vertical scrolling
+    if (currentRoute === 'home') return;
+
     const target = e.target as HTMLElement | null;
     // Exclude buttons, links, form controls, and interactive elements from screen drag-scroll
     if (
       target?.closest(
-        'button, a, input, textarea, select, [role="button"], .ios-home-icon-btn, .widget-clickable, .camera-screen, .cc-slider-capsule, .brightness-slider-container, .volume-slider-container, .arcade-canvas-wrap, .arcade-app-page, .calc-grid, .camera-control-sensor-strip, .assistive-touch-float, .assistive-touch-menu, .assistive-touch-backdrop'
+        'button, a, input, textarea, select, [role="button"], .ios-homescreen-view, .ios-homescreen-viewport, .ios-homescreen-page, .ios-home-icon-btn, .widget-clickable, .camera-screen, .cc-slider-capsule, .brightness-slider-container, .volume-slider-container, .arcade-canvas-wrap, .arcade-app-page, .calc-grid, .camera-control-sensor-strip, .assistive-touch-float, .assistive-touch-menu, .assistive-touch-backdrop'
       )
     ) {
       return;
@@ -237,6 +242,7 @@ export function IPhoneScreenContent({
 
   // Mouse wheel listener ensuring scrolling works smoothly across all desktop browsers in 3D CSS
   const onScreenWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    if (currentRoute === 'home') return;
     let node = e.target as HTMLElement | null;
     while (node && !node.classList.contains('iphone-screen')) {
       const style = window.getComputedStyle(node);
@@ -762,6 +768,26 @@ export function IPhoneScreenContent({
               exit={{ opacity: 0, x: -20 }}
             >
               <ResumeApp onBack={() => onNavigate('home')} />
+            </motion.div>
+          ) : currentRoute === 'achievements' ? (
+            <motion.div
+              key="achievements-view"
+              className="page-screen-anim"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+            >
+              <AchievementsApp onBack={() => onNavigate('home')} />
+            </motion.div>
+          ) : currentRoute === 'education' ? (
+            <motion.div
+              key="education-view"
+              className="page-screen-anim"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+            >
+              <EducationApp onBack={() => onNavigate('home')} />
             </motion.div>
           ) : currentRoute === 'notes' ? (
             <motion.div

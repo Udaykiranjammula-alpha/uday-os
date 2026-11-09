@@ -1,10 +1,29 @@
 import React from 'react';
-import { GraduationCap, BookOpen, Layers, CheckCircle2 } from 'lucide-react';
+import { GraduationCap, BookOpen, Layers, CheckCircle2, ChevronLeft } from 'lucide-react';
 import { educationList } from '../data/education';
 
-export function EducationApp() {
+interface EducationAppProps {
+  onBack?: () => void;
+}
+
+export function EducationApp({ onBack }: EducationAppProps) {
   return (
     <div className="phone-screen-content">
+      {onBack && (
+        <header className="files-top-header" style={{ marginBottom: 8 }}>
+          <button
+            type="button"
+            className="files-back-btn"
+            onClick={onBack}
+            aria-label="Back to Home Screen"
+          >
+            <ChevronLeft size={22} />
+            <span>Home</span>
+          </button>
+          <span className="files-doc-name">Education</span>
+          <div style={{ width: 44 }} />
+        </header>
+      )}
       {/* Intro Header */}
       <div className="section-intro-block">
         <span className="eyebrow-accent">ACADEMIC FOUNDATION</span>

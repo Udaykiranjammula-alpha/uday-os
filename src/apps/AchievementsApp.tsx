@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trophy, ShieldCheck, Cpu, Code2, Award } from 'lucide-react';
+import { Trophy, ShieldCheck, Cpu, Code2, Award, ChevronLeft } from 'lucide-react';
 import { achievementsList } from '../data/achievements';
 
 const categoryIcon = {
@@ -9,9 +9,28 @@ const categoryIcon = {
   Academic: Award,
 };
 
-export function AchievementsApp() {
+interface AchievementsAppProps {
+  onBack?: () => void;
+}
+
+export function AchievementsApp({ onBack }: AchievementsAppProps) {
   return (
     <div className="phone-screen-content">
+      {onBack && (
+        <header className="files-top-header" style={{ marginBottom: 8 }}>
+          <button
+            type="button"
+            className="files-back-btn"
+            onClick={onBack}
+            aria-label="Back to Home Screen"
+          >
+            <ChevronLeft size={22} />
+            <span>Home</span>
+          </button>
+          <span className="files-doc-name">Honors & Awards</span>
+          <div style={{ width: 44 }} />
+        </header>
+      )}
       {/* Intro Header */}
       <div className="section-intro-block">
         <span className="eyebrow-accent">VERIFIED RECORD</span>

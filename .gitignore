@@ -27,3 +27,6 @@ Thumbs.db
 
 # Scratch & utility automation scripts
 *.ps1
+
+# Local Firmware & IDE projects
+Embedded_Systems_Mini_Projects/

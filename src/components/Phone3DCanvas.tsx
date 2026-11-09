@@ -311,8 +311,7 @@ export function Phone3DCanvas({
 
     let flareTexture: THREE.CanvasTexture | null = null;
     let flareMat: THREE.SpriteMaterial | null = null;
-    let beamGeo: THREE.ConeGeometry | null = null;
-    let beamMat: THREE.MeshBasicMaterial | null = null;
+    let haloMat: THREE.SpriteMaterial | null = null;
 
     const initAndLoad = async () => {
       try {
@@ -329,10 +328,10 @@ export function Phone3DCanvas({
         torchGroup.position.copy(FLASH_POS);
         modelGroup.add(torchGroup);
 
-        const torchPointLight = new THREE.PointLight(0xfff6d0, 0, 24, 1.6);
+        const torchPointLight = new THREE.PointLight(0xfff6d0, 0, 24, 1.8);
         torchPointLight.position.set(0, 0, -0.05);
 
-        const torchSpotLight = new THREE.SpotLight(0xfffae6, 0, 45, Math.PI / 4.2, 0.75, 1.5);
+        const torchSpotLight = new THREE.SpotLight(0xfffae6, 0, 50, Math.PI / 4, 0.85, 1.5);
         torchSpotLight.position.set(0, 0, -0.04);
         const torchTarget = new THREE.Object3D();
         torchTarget.position.set(0, 0, -25); // Points outward into space behind phone!
@@ -349,29 +348,26 @@ export function Phone3DCanvas({
         });
         const torchFlare = new THREE.Sprite(flareMat);
         torchFlare.position.set(0, 0, -0.02);
-        torchFlare.scale.set(1.65, 1.65, 1.65);
+        torchFlare.scale.set(1.5, 1.5, 1.5);
         torchFlare.visible = false;
 
-        const beamHeight = 16;
-        const beamRadius = 3.2;
-        beamGeo = new THREE.ConeGeometry(beamRadius, beamHeight, 32, 1, true);
-        beamGeo.translate(0, -beamHeight / 2, 0); // Apex at (0, 0, 0)
-        beamGeo.rotateX(Math.PI / 2); // Points straight out along -Z into space away from back glass!
-        beamMat = new THREE.MeshBasicMaterial({
-          color: 0xfff5cc,
+        haloMat = new THREE.SpriteMaterial({
+          map: flareTexture,
+          color: 0xffe899,
           transparent: true,
-          opacity: 0,
+          opacity: 0.45,
           blending: THREE.AdditiveBlending,
-          side: THREE.DoubleSide,
           depthWrite: false,
         });
-        const torchBeam = new THREE.Mesh(beamGeo, beamMat);
-        torchBeam.position.set(0, 0, -0.03);
+        const torchHalo = new THREE.Sprite(haloMat);
+        torchHalo.position.set(0, 0, -0.015);
+        torchHalo.scale.set(3.4, 3.4, 3.4);
+        torchHalo.visible = false;
 
         torchGroup.add(torchPointLight);
         torchGroup.add(torchSpotLight);
+        torchGroup.add(torchHalo);
         torchGroup.add(torchFlare);
-        torchGroup.add(torchBeam);
 
         const tryLoad = (primaryUrl: string, secondaryUrl: string) => {
           loader.load(
@@ -422,10 +418,10 @@ export function Phone3DCanvas({
                   });
                 }
 
-                torchPointLight.intensity = on ? 7.5 : 0;
-                torchSpotLight.intensity = on ? 12.0 : 0;
+                torchPointLight.intensity = on ? 8.5 : 0;
+                torchSpotLight.intensity = on ? 14.0 : 0;
                 torchFlare.visible = on;
-                if (beamMat) beamMat.opacity = on ? 0.16 : 0;
+                torchHalo.visible = on;
                 needsCssRenderRef.current = true;
               };
               updateFlashlightRef.current = applyFlashlight;
@@ -677,8 +673,7 @@ export function Phone3DCanvas({
       container.removeEventListener('click', onClickCapture, true);
       flareTexture?.dispose();
       flareMat?.dispose();
-      beamGeo?.dispose();
-      beamMat?.dispose();
+      haloMat?.dispose();
       webglRenderer.dispose();
       envTexture.dispose();
       webglRenderer.domElement.remove();

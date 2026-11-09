@@ -200,12 +200,12 @@ a {
 
 /* Studio Flip Dock */
 .studio-flip-dock {
-  margin-top: 24px;
+  margin-top: 16px;
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 8px;
-  max-width: 280px;
+  max-width: 360px;
   margin-left: auto;
 }
 .studio-flip-pill {
@@ -1672,12 +1672,12 @@ a {
 
 .ios-homescreen-slider {
   display: flex;
-  width: 200%;
+  width: 300%;
   height: 100%;
 }
 
 .ios-homescreen-page {
-  width: 50%;
+  width: 33.333333%;
   height: 100%;
   padding: 0 16px;
   display: flex;
@@ -1686,6 +1686,82 @@ a {
   box-sizing: border-box;
   overflow: hidden;
 }
+
+/* Spatial & Pro Suite Header Card */
+.ios-pro-suite-card {
+  width: 100%;
+  height: 88px;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 22px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: transform 0.18s ease, border-color 0.18s ease;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
+}
+.iphone-screen.appearance-light .ios-pro-suite-card {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+}
+.ios-pro-suite-card:hover {
+  transform: scale(1.02);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+.pro-suite-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(168, 85, 247, 0.2);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #d8b4fe;
+  width: fit-content;
+}
+.iphone-screen.appearance-light .pro-suite-badge {
+  background: rgba(147, 51, 234, 0.12);
+  color: #7e22ce;
+  border-color: rgba(147, 51, 234, 0.25);
+}
+.pro-suite-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #a855f7;
+  box-shadow: 0 0 6px #a855f7;
+}
+.pro-suite-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+.iphone-screen.appearance-light .pro-suite-title {
+  color: #0f172a;
+}
+.pro-suite-desc {
+  font-size: 9.5px;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.iphone-screen.appearance-light .pro-suite-desc {
+  color: #64748b;
+}
+
+
 
 .ios-home-page-arrow:hover {
   background: rgba(255, 255, 255, 0.28) !important;
@@ -3347,6 +3423,20 @@ a {
   height: 806px;
   border-radius: 46px;
   overflow: hidden;
+}
+.fallback-torch-beam {
+  position: absolute;
+  top: 48px;
+  right: 56px;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(255, 238, 170, 0.65) 30%, rgba(255, 205, 110, 0.2) 60%, transparent 80%);
+  pointer-events: none;
+  filter: blur(2px);
+  z-index: 100;
+  box-shadow: 0 0 55px 22px rgba(255, 240, 180, 0.75);
+  animation: torchPulseGlow 1.5s infinite alternate ease-in-out;
 }
 .phone-stage.phone-dragging {
   cursor: grabbing;
@@ -17002,7 +17092,7 @@ a {
   .studio-flip-dock {
     margin-top: 6px !important;
     gap: 6px !important;
-    max-width: 320px !important;
+    max-width: 360px !important;
     justify-content: flex-end !important;
   }
   .studio-flip-pill {
