@@ -13,6 +13,22 @@ Every application—from **Projects** and **GitHub** to **Terminal** and **Setti
 
 ---
 
+## 📸 Live Interface Gallery
+
+<div align="center">
+  <img src="docs/screenshots/uday-os-hero.png" alt="UDAY OS 3D Interactive Titanium Phone" width="100%" />
+  <p><em>UDAY OS 3D Interactive Phone: Real-time Three.js titanium chassis, studio lighting controls, and interactive iOS 18 screen</em></p>
+</div>
+
+<br/>
+
+| In-Phone Projects & Architecture Hub | Sandboxed Developer Terminal CLI |
+|:---:|:---:|
+| <img src="docs/screenshots/uday-os-projects.png" alt="In-Phone Projects Showcase" width="100%" /> | <img src="docs/screenshots/uday-os-terminal.png" alt="Developer Terminal CLI" width="100%" /> |
+| *Featured Embedded & Cloud Systems with In-Phone Launchers* | *Interactive UNIX-like Command Shell with Live Telemetry* |
+
+---
+
 ## 📱 Hardware & OS Features
 
 - **Titanium Device Frame**: Realistic metallic gradients, subtle bezel highlights, hardware buttons, and ambient lighting.
