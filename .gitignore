@@ -30,3 +30,7 @@ Thumbs.db
 
 # Local Firmware & IDE projects
 Embedded_Systems_Mini_Projects/
+*.zip
+
+# Standalone nested project repositories
+zor-ai-v2/
